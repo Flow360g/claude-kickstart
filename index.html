@@ -1,0 +1,1786 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Summit Half Dome</title>
+<meta name="description" content="A Claude kickstart for Half Dome's Client Solutions team, played as the Half Dome hike.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#D2C663; --red:#8E1C02; --purple:#B0A3D0;
+  --ink:#1A1917; --muted:#55524E; --card:#F7F6F5; --line:#DEDBD6;
+  --gold-soft:#EEE8B8; --purple-soft:#E6E0F2; --red-soft:#F1DAD3;
+  --sans:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-family:var(--sans);overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+code,.mono{font-family:var(--mono)}
+
+/* ---------- stage (designed at 1280 x 720, letterboxed) ---------- */
+#viewport{position:fixed;inset:0;overflow:hidden;background:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center;overflow:hidden;background:#cfe0ea;border-radius:2px}
+#game{position:absolute;inset:0;width:1280px;height:720px;display:block}
+
+/* ---------- HUD ---------- */
+.hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;padding:18px 22px;pointer-events:none;z-index:5}
+.hud-left{display:flex;flex-direction:column;gap:6px}
+.wordmark{font-weight:900;font-size:26px;letter-spacing:-0.04em;color:var(--ink);line-height:1;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.wordmark i{font-style:normal;color:var(--red)}
+.worldtag{font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:rgba(247,246,245,.92);border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--ink);display:inline-flex;gap:8px;align-items:center;width:max-content}
+.worldtag b{color:var(--red)}
+.hud-right{display:flex;gap:8px;pointer-events:auto}
+.hbtn{display:flex;align-items:center;gap:8px;background:rgba(247,246,245,.94);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;font-weight:700;color:var(--ink);box-shadow:0 2px 0 rgba(26,25,23,.08)}
+.hbtn:hover{background:#fff;border-color:var(--gold)}
+.hbtn kbd{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--ink);color:var(--card);border-radius:5px;padding:2px 6px}
+.hbtn .count{font-family:var(--mono);font-size:12px;background:var(--gold);border-radius:999px;padding:1px 8px}
+.progress{position:absolute;left:22px;bottom:18px;z-index:5;display:flex;gap:8px;pointer-events:none}
+.chip{font-family:var(--mono);font-size:12px;font-weight:600;background:rgba(247,246,245,.92);border:1px solid var(--line);border-radius:999px;padding:6px 12px;display:flex;gap:8px;align-items:center}
+.chip .dot{width:10px;height:10px;border-radius:3px;background:var(--gold);border:1px solid #9c9140}
+.chip .dot.p{background:var(--purple);border-color:#7d6fa6;border-radius:50%}
+.help{position:absolute;right:22px;bottom:18px;z-index:5;font-family:var(--mono);font-size:11.5px;color:var(--ink);background:rgba(247,246,245,.85);border:1px solid var(--line);border-radius:10px;padding:7px 11px;pointer-events:none;transition:opacity .6s}
+.help kbd{font-family:var(--mono);background:var(--ink);color:var(--card);border-radius:4px;padding:1px 5px;font-size:10.5px}
+
+.toast{position:absolute;left:50%;top:76px;transform:translate(-50%,-12px);background:var(--ink);color:var(--card);font-weight:700;font-size:15px;padding:10px 16px;border-radius:12px;opacity:0;transition:all .25s;z-index:30;pointer-events:none;display:flex;gap:10px;align-items:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast i{width:10px;height:10px;border-radius:50%;background:var(--gold);display:inline-block}
+
+/* ---------- touch controls ---------- */
+.touch{position:absolute;inset:auto 0 0 0;height:150px;z-index:6;display:none;pointer-events:none}
+.touch.on{display:block}
+.tbtn{position:absolute;bottom:26px;width:96px;height:96px;border-radius:50%;background:rgba(247,246,245,.55);border:2px solid rgba(26,25,23,.25);font:800 30px var(--sans);color:var(--ink);pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.tbtn:active,.tbtn.down{background:var(--gold)}
+
+/* ---------- overlays ---------- */
+.overlay{position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(26,25,23,.42);opacity:0;transition:opacity .18s}
+.overlay.show{opacity:1}
+.panel{position:relative;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px rgba(26,25,23,.35),0 2px 0 rgba(26,25,23,.06);transform:translateY(14px) scale(.98);transition:transform .22s cubic-bezier(.2,1.4,.4,1)}
+.overlay.show .panel{transform:none}
+.panel:before{content:"";position:absolute;left:0;right:0;top:0;height:8px;border-radius:20px 20px 0 0;background:var(--gold)}
+.panel.red:before{background:var(--red)}
+.panel.purple:before{background:var(--purple)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;gap:10px;align-items:center}
+.eyebrow .tag{background:var(--ink);color:var(--card);border-radius:6px;padding:3px 8px;letter-spacing:.04em}
+.eyebrow .tag.gold{background:var(--gold);color:var(--ink)}
+.eyebrow .tag.purple{background:var(--purple);color:var(--ink)}
+.eyebrow .tag.red{background:var(--red);color:#fff}
+.closehint{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.closehint kbd{font-family:var(--mono);background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;color:var(--ink)}
+
+/* card */
+.card{width:820px;max-height:640px;padding:34px 40px 26px;display:flex;flex-direction:column;gap:14px;cursor:pointer}
+.card h2{margin:0;font-size:36px;line-height:1.08;font-weight:800;letter-spacing:-0.02em}
+.card .lines{display:flex;flex-direction:column;gap:6px}
+.card .lines p{margin:0;font-size:20px;line-height:1.42;color:#33312e}
+.card .lines code,.list code{font-family:var(--mono);font-size:.88em;background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.card .tagline{align-self:flex-start;font-family:var(--mono);font-size:13px;font-weight:600;background:var(--gold-soft);border:1px solid var(--gold);border-radius:999px;padding:4px 12px}
+.card .foot{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.talk{font-size:15px;border:1.5px dashed var(--purple);background:var(--purple-soft);border-radius:10px;padding:8px 12px;color:var(--ink)}
+.talk b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
+.visual{position:relative;height:236px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.replay{position:absolute;right:10px;bottom:10px;z-index:3;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+.replay:hover{border-color:var(--gold);color:var(--ink)}
+
+/* item card */
+.item{width:820px;padding:34px 40px 26px;display:flex;flex-direction:column;gap:14px}
+.item h2{margin:0;font-size:34px;font-weight:800;letter-spacing:-0.02em}
+.item .sub{margin:0;font-size:17px;color:var(--muted)}
+.prompt{position:relative;margin:0;font-family:var(--mono);font-size:15px;line-height:1.55;white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);border-left:5px solid var(--purple);border-radius:12px;padding:16px 18px;max-height:300px;overflow:auto;cursor:text;user-select:text;-webkit-user-select:text}
+.prompt .ph{background:var(--purple-soft);border-radius:4px;padding:0 3px;color:#4a3d78}
+.btnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;background:var(--ink);color:var(--card);display:inline-flex;gap:8px;align-items:center}
+.btn:hover{background:#000}
+.btn.gold{background:var(--gold);color:var(--ink)}
+.btn.gold:hover{background:#c4b84f}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.small{padding:8px 12px;font-size:13.5px;border-radius:10px}
+.copied{font-family:var(--mono);font-size:13px;color:#4f6f2f;font-weight:600}
+.note{font-family:var(--mono);font-size:13px;background:var(--gold-soft);border-radius:8px;padding:4px 10px}
+
+/* quiz */
+.quiz{width:820px;padding:34px 40px 28px;display:flex;flex-direction:column;gap:16px}
+.quiz h2{margin:0;font-size:30px;line-height:1.15;font-weight:800;letter-spacing:-0.01em}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;font-size:17px;font-weight:600;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--ink);min-height:68px;transition:transform .12s,border-color .12s}
+.opt:hover{border-color:var(--ink);transform:translateY(-1px)}
+.opt kbd{flex:none;font-family:var(--mono);font-size:12px;width:26px;height:26px;display:grid;place-items:center;border-radius:7px;background:var(--card);border:1px solid var(--line)}
+.opt.wrong{border-color:var(--red);background:var(--red-soft);animation:shake .35s}
+.opt.right{border-color:#9c9140;background:var(--gold);}
+.opt[disabled]{cursor:default}
+.why{font-size:17px;line-height:1.45;border-radius:12px;padding:12px 16px;display:none}
+.why.show{display:block}
+.why.bad{background:var(--red-soft);border:1px solid #d9a99a}
+.why.good{background:var(--gold-soft);border:1px solid var(--gold)}
+.why b{font-weight:800}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* basecamp */
+.camp{width:760px;padding:36px 40px 30px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;background:#1f1d1a;color:var(--card);border-color:#36332e}
+.camp:before{background:var(--red)}
+.camp .eyebrow{color:#b9b3a8}
+.camp h2{margin:0;font-size:40px;line-height:1.08;font-weight:900;letter-spacing:-0.02em}
+.camp h2 em{font-style:normal;color:var(--gold)}
+.camp p{margin:0;font-size:22px;color:#e9e5dc}
+.fire{position:relative;width:140px;height:120px;margin:4px 0}
+.fire .glow{position:absolute;left:50%;bottom:4px;width:200px;height:120px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(210,198,99,.45),transparent);animation:glow 1.4s ease-in-out infinite alternate}
+.fire .log{position:absolute;bottom:8px;left:50%;width:110px;height:16px;background:#6b4a2c;border-radius:8px}
+.fire .log.a{transform:translateX(-50%) rotate(14deg)}
+.fire .log.b{transform:translateX(-50%) rotate(-14deg)}
+.fire .fl{position:absolute;bottom:18px;left:50%;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;transform-origin:bottom center}
+.fire .f1{width:60px;height:86px;margin-left:-30px;background:var(--red);animation:flick 0.9s ease-in-out infinite alternate}
+.fire .f2{width:42px;height:66px;margin-left:-21px;background:#d9762a;animation:flick 0.7s ease-in-out infinite alternate-reverse}
+.fire .f3{width:24px;height:42px;margin-left:-12px;background:var(--gold);animation:flick 0.55s ease-in-out infinite alternate}
+@keyframes flick{0%{transform:scale(1,1) skewX(-3deg)}100%{transform:scale(.9,1.12) skewX(4deg)}}
+@keyframes glow{to{opacity:.6;transform:translateX(-50%) scale(1.08)}}
+.camp .btn{margin-top:8px}
+
+/* complete */
+.done{width:700px;padding:36px 40px 30px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.done h2{margin:0;font-size:42px;font-weight:900;letter-spacing:-0.02em}
+.done p{margin:0;font-size:19px;color:var(--muted)}
+.stats{display:flex;gap:10px}
+
+/* backpack */
+.pack{width:900px;max-height:640px;padding:30px 36px 24px;display:flex;flex-direction:column;gap:14px}
+.pack:before{background:var(--purple)}
+.pack h2{margin:0;font-size:32px;font-weight:800}
+.packlist{overflow:auto;display:flex;flex-direction:column;gap:12px;padding-right:6px}
+.pitem{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.pitem.locked{background:transparent;border-style:dashed;color:var(--muted);flex-direction:row;align-items:center;gap:12px}
+.pitem .ph-lock{width:30px;height:30px;border-radius:8px;background:var(--line);display:grid;place-items:center;font-family:var(--mono);font-weight:700}
+.pitem h3{margin:0;font-size:18px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pitem h3 small{font-family:var(--mono);font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.pitem .prompt{font-size:13.5px;max-height:150px;padding:12px 14px}
+
+/* title */
+.title{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:center;padding:0 90px;background:linear-gradient(90deg,rgba(247,246,245,.96) 0,rgba(247,246,245,.88) 46%,rgba(247,246,245,0) 72%);opacity:0;transition:opacity .25s}
+.title.show{opacity:1}
+.title .kick{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.title h1{margin:10px 0 8px;font-size:92px;line-height:.92;font-weight:900;letter-spacing:-0.045em;max-width:640px}
+.title h1 span{display:block;color:var(--red)}
+.title p{font-size:21px;color:var(--muted);margin:6px 0 26px;max-width:520px;line-height:1.4}
+.title .btnrow .btn{font-size:18px;padding:14px 22px}
+.keys{margin-top:28px;font-family:var(--mono);font-size:13px;color:var(--muted);display:grid;grid-template-columns:auto auto;gap:6px 18px;width:max-content}
+.keys kbd{font-family:var(--mono);background:#fff;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11.5px;color:var(--ink);margin-right:3px}
+
+/* map */
+.map{position:absolute;inset:0;z-index:20;opacity:0;transition:opacity .2s;background:var(--card)}
+.map.show{opacity:1}
+.map svg{position:absolute;inset:0;width:1280px;height:720px}
+.map .mhead{position:absolute;left:40px;top:30px;display:flex;flex-direction:column;gap:6px}
+.map .mhead h2{margin:0;font-size:40px;font-weight:900;letter-spacing:-0.02em}
+.map .mhead p{margin:0;font-size:17px;color:var(--muted);max-width:520px}
+.map .mclose{position:absolute;right:30px;top:28px;display:flex;gap:10px;align-items:center}
+.node{cursor:pointer}
+.node:hover .nring{stroke:var(--ink)}
+.node:focus{outline:none}
+.node:focus .nring{stroke:var(--ink);stroke-width:4}
+.nlabel{font-family:var(--sans);font-size:15px;font-weight:800;fill:var(--ink);paint-order:stroke;stroke:#F7F6F5;stroke-width:5px;stroke-linejoin:round}
+.nsub{font-family:var(--mono);font-size:11.5px;font-weight:600;fill:var(--muted);letter-spacing:.04em;paint-order:stroke;stroke:#F7F6F5;stroke-width:4px;stroke-linejoin:round}
+.pulse{animation:pulse 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.1)}}
+
+/* ---------- list view (outside the stage, normal page) ---------- */
+#list{position:fixed;inset:0;z-index:100;background:#fff;overflow:auto;display:none;color:var(--ink)}
+#list.on{display:block}
+.list{max-width:860px;margin:0 auto;padding:28px 22px 80px}
+.lhead{position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);z-index:2}
+.lhead .wordmark{font-size:24px;text-shadow:none}
+.list h1{font-size:44px;font-weight:900;letter-spacing:-0.03em;margin:30px 0 4px;line-height:1}
+.list .lede{color:var(--muted);font-size:18px;margin:0 0 10px}
+.lnav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 10px}
+.lnav a{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 11px}
+.lnav a:hover{border-color:var(--gold);background:var(--gold-soft)}
+.list section{border-top:6px solid var(--gold);margin-top:38px;padding-top:16px}
+.list section:nth-of-type(3n+2){border-top-color:var(--purple)}
+.list section:nth-of-type(3n+3){border-top-color:var(--red)}
+.list h2{font-size:30px;margin:4px 0 2px;letter-spacing:-0.02em}
+.list .wsub{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.list h3{font-size:20px;margin:22px 0 6px}
+.list h4{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin:26px 0 4px;color:var(--red)}
+.list p,.list li{font-size:17px;line-height:1.5}
+.list p{margin:4px 0}
+.list .lcard{border-left:3px solid var(--line);padding-left:14px;margin:14px 0}
+.list .lcard h3{margin:0 0 4px}
+.list .ltag{display:inline-block;font-family:var(--mono);font-size:12.5px;background:var(--gold-soft);border-radius:999px;padding:2px 10px;margin-top:4px}
+.list .litem{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.list .litem h3{margin:0 0 8px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.list .prompt{font-size:14px;max-height:none}
+.list details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:8px}
+.list summary{cursor:pointer;font-weight:700}
+.list .camp-l{background:#1f1d1a;color:var(--card);border-radius:12px;padding:12px 16px;margin:14px 0;font-size:17px}
+.list .camp-l b{color:var(--gold)}
+.list ol,.list ul{padding-left:22px}
+
+/* ---------- card visuals ---------- */
+.vx{position:absolute;inset:0;font-family:var(--sans)}
+.vx .lbl{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+/* prefs */
+.v-prefs .win{position:absolute;left:24px;top:22px;width:430px;height:190px;border:1px solid var(--line);border-radius:12px;background:var(--card);overflow:hidden}
+.v-prefs .bar{height:30px;display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid var(--line);background:#fff}
+.v-prefs .bar i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.v-prefs .bar span{margin-left:8px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.v-prefs .ta{margin:12px;height:120px;background:#fff;border:1.5px solid var(--gold);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:12.5px;line-height:1.5;color:var(--ink)}
+.v-prefs .caret{display:inline-block;width:7px;height:15px;background:var(--ink);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.v-prefs .sw{position:absolute;left:38px;bottom:30px;display:flex;gap:8px}
+.v-prefs .sw b{width:26px;height:26px;border-radius:7px;transform:scale(0);transition:transform .35s cubic-bezier(.2,1.6,.4,1);border:1px solid rgba(0,0,0,.12)}
+.v-prefs .sw b.on{transform:scale(1)}
+.v-prefs .reach{position:absolute;right:24px;top:22px;width:240px;height:190px;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.v-prefs .pill{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;font-weight:800;font-size:18px;color:#a9a49c;background:#fff;display:flex;justify-content:space-between;align-items:center;transition:all .35s}
+.v-prefs .pill:after{content:"";width:12px;height:12px;border-radius:50%;background:var(--line);transition:all .35s}
+.v-prefs .pill.on{border-color:#9c9140;background:var(--gold);color:var(--ink);transform:translateX(-6px)}
+.v-prefs .pill.on:after{background:var(--red)}
+/* about */
+.v-about .pg{position:absolute;left:40px;top:22px;width:170px;height:192px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:12px;display:flex;flex-direction:column;gap:6px;transform-origin:top left;animation:pgShrink 1.4s .5s ease-in-out forwards}
+.v-about .pg i{display:block;height:6px;border-radius:3px;background:#d5d1ca}
+.v-about .pg i:nth-child(3n){width:70%}
+@keyframes pgShrink{to{opacity:.25;transform:scale(.82)}}
+.v-about .x{position:absolute;left:60px;top:96px;font-family:var(--mono);font-weight:700;color:var(--red);font-size:13px;opacity:0;animation:fadeIn .4s 1.6s forwards;background:#fff;border:1.5px solid var(--red);border-radius:6px;padding:2px 8px;transform:rotate(-6deg)}
+.v-about .arrow{position:absolute;left:236px;top:104px;font-size:34px;color:var(--muted)}
+.v-about .tight{position:absolute;left:290px;top:38px;width:410px;border:2px solid var(--gold);border-radius:12px;background:#fff;padding:16px 18px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;min-height:150px}
+.v-about .tight .lbl{width:100%}
+.v-about .tight span{font-weight:700;font-size:15px;border-radius:999px;padding:6px 12px;background:var(--gold-soft);border:1px solid var(--gold);opacity:0;transform:translateY(8px);animation:popIn .4s forwards}
+.v-about .ok{position:absolute;left:290px;top:200px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink);opacity:0;animation:fadeIn .4s 3.2s forwards}
+@keyframes popIn{to{opacity:1;transform:none}}
+@keyframes fadeIn{to{opacity:1}}
+/* memory */
+.v-mem .toggles{position:absolute;left:30px;top:30px;width:270px;display:flex;flex-direction:column;gap:14px}
+.v-mem .tg{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.v-mem .sw{width:44px;height:24px;border-radius:999px;background:var(--line);position:relative;transition:background .3s}
+.v-mem .sw:after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .3s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.v-mem .sw.on{background:var(--red)}
+.v-mem .sw.on:after{left:23px}
+.v-mem .mem{position:absolute;left:330px;top:22px;width:420px;height:192px;border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;display:flex;flex-direction:column;gap:8px}
+.v-mem .m{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:600;background:var(--purple-soft);border-radius:8px;padding:7px 10px;opacity:0;transform:translateX(12px);transition:all .4s}
+.v-mem .m.on{opacity:1;transform:none}
+.v-mem .m .pen{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid #c9c0e3;border-radius:6px;padding:1px 6px;background:#fff}
+.v-mem .m.edit{outline:2px solid var(--gold);background:#fff}
+/* import */
+.v-imp .box{position:absolute;top:28px;width:220px;height:180px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);padding:14px}
+.v-imp .box h4{margin:0;font-size:18px}
+.v-imp .a{left:40px}
+.v-imp .b{right:40px;border-color:var(--gold);background:#fff}
+.v-imp .rail{position:absolute;left:270px;right:270px;top:118px;height:2px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px)}
+.v-imp .tok{position:absolute;left:60px;font-weight:700;font-size:14px;background:var(--purple);border-radius:999px;padding:6px 12px;opacity:0;animation:fly 1.5s ease-in-out forwards;white-space:nowrap}
+@keyframes fly{0%{opacity:0;transform:translateX(0)}12%{opacity:1}85%{opacity:1}100%{opacity:1;transform:translateX(430px)}}
+.v-imp .landed{position:absolute;right:58px;top:84px;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+/* folders */
+.v-fold .grid{position:absolute;left:40px;right:40px;top:58px;display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.v-fold .f{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:700;font-size:14px;transition:opacity .4s}
+.v-fold .f .ic{position:relative;width:84px;height:64px}
+.v-fold .f .ic:before{content:"";position:absolute;left:0;top:0;width:36px;height:14px;border-radius:5px 5px 0 0;background:#cfc9be}
+.v-fold .f .ic:after{content:"";position:absolute;left:0;top:9px;right:0;bottom:0;border-radius:6px;background:#e4dfd6;border:1px solid #cfc9be}
+.v-fold .f.t .ic:before{background:#b8ad4f}
+.v-fold .f.t .ic:after{background:var(--gold);border-color:#9c9140}
+.v-fold .f .mk{position:absolute;right:-8px;bottom:-8px;z-index:2;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:900;transform:scale(0);transition:transform .35s cubic-bezier(.2,1.6,.4,1)}
+.v-fold .f.t .mk{background:var(--ink);color:var(--gold)}
+.v-fold .f.n .mk{background:#fff;border:1.5px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:11px}
+.v-fold .f.show .mk{transform:scale(1)}
+.v-fold .f.n.show{opacity:.45}
+.v-fold .cap{position:absolute;left:0;right:0;bottom:20px;text-align:center}
+/* origin */
+.v-origin svg{position:absolute;inset:0;width:100%;height:100%}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage" aria-label="Summit Half Dome game">
+    <canvas id="game" width="1280" height="720"></canvas>
+    <div class="hud">
+      <div class="hud-left">
+        <div class="wordmark">halfdome</div>
+        <div class="worldtag" id="worldtag"></div>
+      </div>
+      <div class="hud-right">
+        <button class="hbtn" id="btnMap" title="World map (M)">Map <kbd>M</kbd></button>
+        <button class="hbtn" id="btnPack" title="Backpack (B)">Backpack <span class="count" id="packCount">0</span> <kbd>B</kbd></button>
+        <button class="hbtn" id="btnList" title="List view (L)">List view <kbd>L</kbd></button>
+        <button class="hbtn" id="btnSound" title="Sound" aria-pressed="false">Sound off</button>
+      </div>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div class="help" id="help"><kbd>&larr;</kbd><kbd>&rarr;</kbd> move &nbsp; <kbd>Space</kbd> jump &nbsp; <kbd>E</kbd> read a marker &nbsp; <kbd>Esc</kbd> close</div>
+    <div class="toast" id="toast"></div>
+    <div class="touch" id="touch">
+      <button class="tbtn" data-k="left" style="left:24px">&#9664;</button>
+      <button class="tbtn" data-k="right" style="left:134px">&#9654;</button>
+      <button class="tbtn" data-k="act" style="right:134px;font-size:24px">E</button>
+      <button class="tbtn" data-k="jump" style="right:24px">&#9650;</button>
+    </div>
+    <div id="layer"></div>
+  </div>
+</div>
+<div id="list" aria-label="List view"></div>
+
+<script>
+/* =====================================================================
+   CONTENT
+   Edit text here without touching the game code below.
+   - Inline `code` and **bold** are supported in card lines.
+   - In prompts, [square brackets] are highlighted as placeholders.
+   - Level legend (one character = one 40px tile, 18 rows tall):
+       #  granite (solid)        =  log or plank (stand on top)
+       ~  water                  ?  trail marker (next card, left to right)
+       !  hidden trail marker    b  backpack item (next item, left to right)
+       P  player start           S  trailhead sign
+       T  pine tree              R  ranger station (quiz)
+       C  basecamp (next basecamp, left to right)
+       X  end of the trail
+   - A world with `level: null` shows on the map and in the list view
+     but is not playable yet.
+   ===================================================================== */
+const CONTENT = {
+  title: 'Summit Half Dome',
+  kicker: 'Claude kickstart · Client Solutions',
+  intro: 'Six stages of the Half Dome hike, from the valley floor to the Visor. Read the trail markers, fill your backpack, and summit with a kit you can use on Monday.',
+  basecampHeadline: 'Eyes up: Harry is running this live in Claude',
+
+  easterEgg: {
+    title: 'Trail secret',
+    lines: ['Half Dome, the agency, was named after the founders climbed Half Dome in Yosemite.'],
+    visual: 'origin'
+  },
+
+  worlds: [
+    {
+      id: 1,
+      place: 'Happy Isles',
+      stage: 'Happy Isles trailhead',
+      topic: 'Set Claude up once',
+      cards: [
+        { title: 'Add the brand colours',
+          lines: ['Paste the palette into your personal preferences, and every artifact comes out on brand.'],
+          visual: 'prefs' },
+        { title: 'Tell it about your job',
+          lines: ['Role, clients, platforms, and how you like answers.', 'A tight paragraph beats a page.'],
+          visual: 'about' },
+        { title: 'Turn on memory and chat search',
+          lines: ['It remembers across chats, and you can see and edit every memory.'],
+          visual: 'memory' },
+        { title: 'Import from ChatGPT',
+          lines: ['Bring across what it already knows about you.'],
+          visual: 'import' },
+        { title: 'Trusted folders (desktop app)',
+          lines: ['Only the folders Claude should work in.'],
+          visual: 'folders' }
+      ],
+      items: [
+        { id: 'brand-block', title: 'Brand block',
+          text: "When creating documents or artifacts for Half Dome, use our brand colours as accents: Gold #D2C663, Red #8E1C02, Purple #B0A3D0. Use #F7F6F5 as the background for slides, and white for everything else. Don't use these colours for unrelated requests." },
+        { id: 'about-you-block', title: 'About-you block',
+          text: "I'm a [role] in the [team] at Half Dome, an independent performance marketing agency. I work on [clients or projects], and most of my day is [main tasks]. What good looks like in my role: [outcomes you own]. My goals in this role are XYZ. Write in Australian English, be concise and direct, lead with the answer, and show your working on any numbers." }
+      ],
+      quiz: {
+        question: 'Where do the brand colours go so every artifact uses them?',
+        options: [
+          { text: 'Your personal preferences', correct: true,
+            why: 'Preferences carry into every chat, every artifact and every project.' },
+          { text: 'A single chat',
+            why: 'That only helps the chat you pasted it into. Preferences carry into every chat.' },
+          { text: 'Each project separately',
+            why: "You'd be repeating yourself in every project. Your personal preferences cover all of them at once." },
+          { text: 'A Monday board',
+            why: 'A board is where work lives, not where Claude picks up how you like things. Paste the palette into your personal preferences.' }
+        ]
+      },
+      basecamps: [
+        { text: 'Do the setup now, together.' }
+      ],
+      level: [
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '                                                                      b     ?',
+        '                                                                                 =====',
+        '         !     ?             ?                                ?                                   ?',
+        '                    b                                               T                  T',
+        '                   ###                                            #######################                       ##',
+        ' T P  S    T       ###   T          T                      T      #######################      T               ###   T      R        C     T   X  T',
+        '#########################################======   =======###############################################   ###########################################',
+        '#########################################~~~~~~~~~~~~~~~~###############################################~~~###########################################',
+        '#########################################~~~~~~~~~~~~~~~~###############################################~~~###########################################'
+      ]
+    },
+
+    {
+      id: 2,
+      place: 'Mist Trail',
+      stage: 'Mist Trail and Vernal Fall',
+      topic: 'Pick the model for the job',
+      cards: [
+        { title: 'Opus 5.5: leave it here',
+          lines: ['Multi-step work, and anything going to a client.', 'The default.'] },
+        { title: 'Sonnet 5',
+          lines: ['Quick drafts, summaries, one-report reads.'] },
+        { title: 'Haiku 4.5',
+          lines: ['Bulk reformatting and simple repeat jobs.'] },
+        { title: 'Fable 5.1',
+          lines: ['The rare, very hard, long-running job.'] },
+        { title: 'Rule of thumb',
+          lines: ["A senior strategist's job, use Opus.", 'A fast pair of hands, use Sonnet.'] },
+        { title: 'Opus 5.5 landed 22 September 2026 and is the new default',
+          lines: ['Around 40% cheaper to run and over 30% faster than Opus 5.', 'Five-hour usage limits are up on Team plans.', 'Tip: a fresh chat per task uses less than one endless thread.'] }
+      ],
+      items: [],
+      quiz: {
+        question: "You're drafting a client recap from a messy WIP. Which model?",
+        options: [
+          { text: 'Opus 5.5', correct: true,
+            why: "It's multi-step work and it's going to a client. That's Opus, and it's the default." },
+          { text: 'Sonnet 5',
+            why: "Sonnet suits quick drafts and summaries. This one is multi-step and it's going to a client." },
+          { text: 'Haiku 4.5',
+            why: 'Haiku is for bulk reformatting and simple repeat jobs. A client recap needs more than that.' },
+          { text: 'Fable 5.1',
+            why: "Fable is for the rare, very hard, long-running job. A recap doesn't need it." }
+        ]
+      },
+      basecamps: [],
+      level: null
+    },
+
+    {
+      id: 3,
+      place: 'Nevada Fall',
+      stage: 'Nevada Fall and Little Yosemite Valley',
+      topic: 'Connectors',
+      cards: [
+        { title: 'MCPs are APIs for a language model',
+          lines: ['Claude reaches into the system instead of being told about it second hand.'] },
+        { title: 'The ones that matter to us',
+          lines: ['Microsoft 365 (SharePoint, Outlook, Teams), Monday.com (briefs and boards), Slack (channels and threads), Granola (call notes and transcripts), plus many more under Settings, Connectors.'] },
+        { title: 'Check every one',
+          lines: ['Most can write as well as read.', 'Know which before you ask for changes.'] },
+        { title: "Read first. Write when you're sure",
+          lines: ['Draft-first flows and approval steps keep a person in charge of changes.'] },
+        { title: 'Set up once',
+          lines: ['Your admin switches a connector on for the organisation; each person then signs in with their own account.'] },
+        { title: 'Design system: raw notes in, on-brand out',
+          lines: ['Feed it our best examples and decks and docs come out in Half Dome style.'] }
+      ],
+      items: [],
+      quiz: {
+        question: 'A connector can usually...',
+        options: [
+          { text: 'Read, and often write, so check before asking for changes', correct: true,
+            why: 'Most can write as well as read. Know which before you ask for changes.' },
+          { text: "Only read, so it can't change anything",
+            why: 'Most can write as well as read. Check every one before you ask for changes.' },
+          { text: 'Work for everyone once one person signs in',
+            why: 'Your admin switches it on for the organisation, then each person signs in with their own account.' },
+          { text: 'Make changes with no need for a person to check',
+            why: "Read first, write when you're sure. Draft-first flows and approval steps keep a person in charge." }
+        ]
+      },
+      basecamps: [],
+      level: null
+    },
+
+    {
+      id: 4,
+      place: 'Sub Dome',
+      stage: 'Sub Dome granite stairs',
+      topic: 'The four building blocks',
+      cards: [
+        { title: 'Artifacts',
+          lines: ['Docs, dashboards and tools built in the thread and iterated in place.'],
+          tag: 'One thread' },
+        { title: 'Projects',
+          lines: ['Files, context and memory shared across every chat.', 'One per client.'],
+          tag: 'One client' },
+        { title: 'Skills',
+          lines: ['Write the method once; every task after follows the same standard.', 'Type `/` to run one by name.', 'Three ways to make one: let Claude build it with `/skill-creator`, record yourself doing the task, or say "turn this conversation into a skill".'],
+          tag: 'Every future task. The highest leverage step.' },
+        { title: 'Scheduled tasks',
+          lines: ['Runs on a schedule in the cloud, even with your laptop shut.', 'A **manual** task is a saved prompt with a run button.'],
+          tag: 'Every Monday' },
+        { title: 'Anatomy of a skill',
+          lines: ['A folder with `SKILL.md` (when to use it, the method), and optional `scripts/` and `templates/`.', 'It loads only when a task needs it.'] }
+      ],
+      items: [],
+      quiz: {
+        question: 'Which step do most people skip, even though it gives the most leverage?',
+        options: [
+          { text: 'Skills', correct: true,
+            why: 'Write the method once and every future task follows the same standard. Most people stop on the first step.' },
+          { text: 'Artifacts',
+            why: "Artifacts are the first step, and that's where most people stop. The highest leverage step is further up." },
+          { text: 'Projects',
+            why: 'Projects pay off for one client. Skills pay off on every future task.' },
+          { text: 'Scheduled tasks',
+            why: 'Scheduled tasks pay off every Monday, but the highest leverage step is Skills.' }
+        ]
+      },
+      basecamps: [],
+      level: null
+    },
+
+    {
+      id: 5,
+      place: 'The Cables',
+      stage: 'The Cables',
+      topic: 'Client Solutions workflows',
+      intro: 'The cables are the skills that pull you up the hardest part.',
+      cards: [
+        { section: '5a. A home for every client (the TMC project)', title: 'Who sees what',
+          lines: ['Instructions: everyone. Context: everyone. Memory: only you.', 'Scheduled tasks: whoever sets them up. Connectors: each person signs in.'] },
+        { section: '5a. A home for every client (the TMC project)', title: 'Instructions = the client playbook',
+          lines: ['Contacts, tone, rules for Claude, and where the Monday board, Slack channel and SharePoint folder live.'] },
+        { section: '5a. A home for every client (the TMC project)', title: 'Context = the client context doc',
+          lines: ['One template for every client.', 'The Client Solutions Director fills it in and re-uploads it each month.'] },
+        { section: '5a. A home for every client (the TMC project)', title: 'Memory is personal',
+          lines: ['Anything the whole team needs goes in Instructions or Context.'] },
+
+        { section: '5b. /mi-to-monday: MI sheet to Monday in one prompt', title: 'The problem',
+          lines: ['Agencies and client creative teams fill in an Excel MI sheet.', 'Retyping it into Monday is slow and error-prone.'] },
+        { section: '5b. /mi-to-monday: MI sheet to Monday in one prompt', title: 'What Claude does',
+          lines: ['Reads the messy sheet (month banners, repeated headers, formulas), shows a plan, waits for a yes, then builds the board.'] },
+        { section: '5b. /mi-to-monday: MI sheet to Monday in one prompt', title: 'The TMC test',
+          lines: ['31 rows read, 30 items created, 22 rows flagged for a human.'] },
+        { section: '5b. /mi-to-monday: MI sheet to Monday in one prompt', title: 'What it catches',
+          lines: ['Portrait on landscape panels, wrong file names, duplicate rows, passed deadlines, copy over character limits.'] },
+        { section: '5b. /mi-to-monday: MI sheet to Monday in one prompt', title: "It doesn't fix data silently",
+          lines: ['The QA flags tell a person what to chase.'] },
+
+        { section: '5c. /wip-wrapup: one WIP, four outputs', title: 'One command after every WIP',
+          lines: ['Claude reads the Granola note, treating your edited notes as the source of truth.'] },
+        { section: '5c. /wip-wrapup: one WIP, four outputs', title: 'Four outputs',
+          lines: ["Notes saved to the client's WIP Notes folder in SharePoint (kept after Granola deletes them); new tasks added to the Monday WIP board; a client email drafted in Outlook; an internal recap drafted in Slack."] },
+        { section: '5c. /wip-wrapup: one WIP, four outputs', title: 'Guardrails',
+          lines: ['It asks before changing existing Monday items.', 'Drafts only, nothing is sent.', 'Internal stays internal.'] },
+        { section: '5c. /wip-wrapup: one WIP, four outputs', title: 'The traps it handles',
+          lines: ['A task with no owner stays unassigned.', '"Yes in principle" is recorded as conditional.', 'Internal comments never reach the client email.'] }
+      ],
+      items: [
+        { id: 'week-ahead', title: 'Week-ahead scheduled task',
+          text: 'Every Monday: read the TMC WIP board on Monday.com, #tmc-internal Slack messages from the last 7 days, and Granola meetings in the TMC folder from the last 7 days. Post one message to #tmc-internal with: (1) overdue items with owner, (2) items due this week, (3) client requests with no reply yet, (4) MI material deadlines in the next 14 days. Bullets, no fluff. If nothing is overdue or at risk, say so in one line.' },
+        { id: 'mi-to-monday', title: '/mi-to-monday',
+          text: '/mi-to-monday TMC OOH Dispatch Sep-Nov', note: 'Attach the MI sheet.' },
+        { id: 'wip-wrapup', title: '/wip-wrapup',
+          text: '/wip-wrapup TMC' }
+      ],
+      quiz: {
+        question: '/wip-wrapup wants to change the due date on an existing Monday item. What happens?',
+        options: [
+          { text: 'It asks you first', correct: true,
+            why: 'It asks before changing existing Monday items. Drafts only, nothing is sent.' },
+          { text: 'It changes it',
+            why: 'Not without you. It asks before changing existing Monday items.' },
+          { text: 'It deletes and recreates it',
+            why: 'It never does that. It asks before changing existing Monday items.' },
+          { text: 'It emails the client',
+            why: 'Drafts only, nothing is sent. And it asks before changing existing Monday items.' }
+        ]
+      },
+      basecamps: [
+        { text: 'A home for every client: the TMC project.' },
+        { text: '/mi-to-monday: MI sheet to Monday in one prompt.' },
+        { text: '/wip-wrapup: one WIP, four outputs.' }
+      ],
+      level: null
+    },
+
+    {
+      id: 6,
+      place: 'The Summit',
+      stage: 'The Summit and the Visor',
+      topic: 'Beyond the chat, and next steps',
+      cards: [
+        { title: 'Claude in Chrome',
+          lines: ['Works with your logins, on the platforms and dashboards that have no connector.'] },
+        { title: 'Claude in Excel',
+          lines: ['Reads the whole model, builds formulas, explains a sheet someone else built.'] },
+        { title: 'Claude in Word',
+          lines: ['Drafts and edits in the doc, as tracked changes you accept or reject.'] }
+      ],
+      items: [],
+      quiz: null,
+      basecamps: [],
+      summit: {
+        heading: 'You summited Half Dome',
+        nextSteps: ['Finish the setup steps.', 'Run one skill on one of your own clients.', 'Post the output, and what surprised you, in the AI Updates channel.'],
+        always: ['Read drafts before anything is sent.', 'Check numbers before a client sees them.', 'Client work stays in the Half Dome workspace.'],
+        closing: "The features change weekly. The foundations don't."
+      },
+      level: null
+    }
+  ]
+};
+</script>
+
+<script>
+/* =====================================================================
+   GAME CODE (no need to edit below to change text)
+   ===================================================================== */
+(() => {
+'use strict';
+
+const TILE = 40, VW = 1280, VH = 720, STEP = 1 / 120;
+const GRAV = 2500, JUMP_V = 900, RUN = 320, MAXFALL = 1100;
+const C = { gold: '#D2C663', red: '#8E1C02', purple: '#B0A3D0', ink: '#1A1917', card: '#F7F6F5', line: '#DEDBD6' };
+const $ = (s, el = document) => el.querySelector(s);
+const PRESENTER = new URLSearchParams(location.search).has('presenter');
+
+/* ---------------- storage ---------------- */
+const SAVE_KEY = 'summit-half-dome-v1';
+const save = (() => {
+  const d = { items: [], read: [], quiz: [], done: [], camps: [], sound: false, egg: false };
+  try { const raw = localStorage.getItem(SAVE_KEY); if (raw) Object.assign(d, JSON.parse(raw)); } catch (e) {}
+  return d;
+})();
+function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) {} }
+function mark(list, v) { if (!save[list].includes(v)) { save[list].push(v); persist(); } }
+
+/* ---------------- helpers ---------------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+const promptHTML = s => esc(s).replace(/\[([^\]]+)\]/g, '<span class="ph">[$1]</span>');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const approach = (v, t, d) => v < t ? Math.min(v + d, t) : Math.max(v - d, t);
+const hash = (x, y) => { let h = x * 374761393 + y * 668265263; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const allItems = () => CONTENT.worlds.flatMap(w => w.items.map(it => ({ ...it, world: w.id })));
+function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; }
+function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
+
+/* ---------------- sound (off by default) ---------------- */
+let actx = null;
+function blip(f = 660, d = 0.08, type = 'square', vol = 0.05, slide = 0) {
+  if (!save.sound) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(f * slide, t + d);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + d + 0.02);
+  } catch (e) {}
+}
+const sfx = {
+  jump: () => blip(420, 0.12, 'square', 0.04, 1.8),
+  land: () => blip(140, 0.06, 'triangle', 0.05),
+  bump: () => blip(220, 0.08, 'square', 0.05, 0.7),
+  open: () => { blip(660, 0.07, 'triangle', 0.05); setTimeout(() => blip(990, 0.09, 'triangle', 0.05), 70); },
+  item: () => [660, 880, 1320].forEach((f, i) => setTimeout(() => blip(f, 0.09, 'triangle', 0.05), i * 70)),
+  wrong: () => blip(180, 0.18, 'sawtooth', 0.04, 0.8),
+  right: () => [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => blip(f, 0.12, 'triangle', 0.05), i * 90)),
+  splash: () => blip(300, 0.2, 'sine', 0.05, 0.4)
+};
+
+/* ---------------- canvas + scaling ---------------- */
+const stage = $('#stage'), cv = $('#game'), ctx = cv.getContext('2d');
+let scale = 1, res = 1;
+function fit() {
+  scale = Math.min(innerWidth / VW, innerHeight / VH);
+  stage.style.transform = `translate(-50%,-50%) scale(${scale})`;
+  res = clamp(scale * (window.devicePixelRatio || 1), 1, 2);
+  cv.width = Math.round(VW * res); cv.height = Math.round(VH * res);
+}
+addEventListener('resize', fit); fit();
+
+/* ---------------- world themes (art only) ---------------- */
+const THEMES = {
+  1: { sky: ['#a9d2ea', '#f4e7d2'], sun: [0.16, 0.2, 'rgba(255,244,205,'], ridge: '#9aa9bd', dome: '#8e98ab', cliff: '#a7a49b', cliffDark: '#8f8b82', pine: '#3d5a40', pineFar: '#6c8a74', grass: '#6f9150', grassTop: '#86a861', rock: '#8d8980', rockDark: '#6d6961', water: '#5f9fbe', domeScale: 0.7, falls: true },
+  2: { sky: ['#9ccbe3', '#f3ead8'], sun: [0.2, 0.18, 'rgba(255,244,205,'], ridge: '#98a6b9', dome: '#8a94a8', cliff: '#a19e95', cliffDark: '#88847b', pine: '#3a573e', pineFar: '#6c8a74', grass: '#6a8d50', grassTop: '#7fa35f', rock: '#8a867e', rockDark: '#6a665f', water: '#6aa8c6', domeScale: 0.82, falls: true },
+  3: { sky: ['#8fc2e0', '#f6e6c8'], sun: [0.32, 0.14, 'rgba(255,240,195,'], ridge: '#93a1b4', dome: '#8791a4', cliff: '#9f9b91', cliffDark: '#857f76', pine: '#38553c', pineFar: '#6b8770', grass: '#6c8b4c', grassTop: '#85a35c', rock: '#89857d', rockDark: '#68645d', water: '#6aa8c6', domeScale: 0.96, falls: true },
+  4: { sky: ['#86b9da', '#f5dfb7'], sun: [0.55, 0.12, 'rgba(255,236,180,'], ridge: '#8f9bb0', dome: '#858ea0', cliff: '#a3a097', cliffDark: '#8a867c', pine: '#3d573f', pineFar: '#71896f', grass: '#8a9a62', grassTop: '#a1ad74', rock: '#9a968d', rockDark: '#7a766e', water: '#6aa8c6', domeScale: 1.12, falls: false },
+  5: { sky: ['#7fa9cf', '#f2cf95'], sun: [0.75, 0.16, 'rgba(255,226,160,'], ridge: '#8a92a6', dome: '#7f8698', cliff: '#a29d92', cliffDark: '#8a8479', pine: '#3e5440', pineFar: '#748670', grass: '#9c9a6a', grassTop: '#b1ac7b', rock: '#a29d93', rockDark: '#827d74', water: '#6aa8c6', domeScale: 1.3, falls: false },
+  6: { sky: ['#e9a865', '#f7dc8f'], sun: [0.86, 0.3, 'rgba(255,220,140,'], ridge: '#a2879a', dome: '#8e7f8c', cliff: '#b59c84', cliffDark: '#987f6b', pine: '#4a4a3a', pineFar: '#8a7d6c', grass: '#b8a46a', grassTop: '#d2c07f', rock: '#b4a28d', rockDark: '#917f6c', water: '#6aa8c6', domeScale: 1.5, falls: false }
+};
+
+/* ---------------- level parsing ---------------- */
+const T_EMPTY = 0, T_SOLID = 1, T_PLANK = 2, T_WATER = 3, T_MARK = 4, T_HIDDEN = 5;
+let L = null; // current level
+function parseLevel(world) {
+  const rows = world.level, H = rows.length, W = Math.max(...rows.map(r => r.length));
+  const grid = new Uint8Array(W * H);
+  const lv = { world, W, H, grid, markers: [], hidden: [], items: [], signs: [], pines: [], camps: [], ranger: null, exit: null, start: { x: 2, y: H - 4 }, cellMark: new Map() };
+  let mi = 0, ii = 0, ci = 0;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const ch = rows[y][x] || ' ';
+    const set = t => grid[y * W + x] = t;
+    switch (ch) {
+      case '#': set(T_SOLID); break;
+      case '=': set(T_PLANK); break;
+      case '~': set(T_WATER); break;
+      case '?': { set(T_MARK); const m = { x, y, idx: mi++, bump: 0, kind: 'card' }; lv.markers.push(m); lv.cellMark.set(y * W + x, m); break; }
+      case '!': { set(T_HIDDEN); const m = { x, y, bump: 0, kind: 'egg', revealed: false }; lv.hidden.push(m); lv.cellMark.set(y * W + x, m); break; }
+      case 'b': lv.items.push({ x, y, idx: ii++, t: Math.random() * 6 }); break;
+      case 'P': lv.start = { x, y }; break;
+      case 'S': lv.signs.push({ x, y, kind: 'start' }); break;
+      case 'T': lv.pines.push({ x, y, h: 120 + hash(x, y) * 70 }); break;
+      case 'R': lv.ranger = { x, y, flag: 0, raised: false }; break;
+      case 'C': lv.camps.push({ x, y, idx: ci++ }); break;
+      case 'X': lv.exit = { x, y }; break;
+    }
+  }
+  // markers, items and basecamps are numbered left to right, whatever row they sit on
+  const byX = (a, b) => a.x - b.x || a.y - b.y;
+  lv.markers.sort(byX).forEach((m, i) => m.idx = i);
+  lv.items.sort(byX).forEach((m, i) => m.idx = i);
+  lv.camps.sort(byX).forEach((m, i) => m.idx = i);
+  return lv;
+}
+const tileAt = (x, y) => {
+  if (x < 0 || x >= L.W) return T_SOLID;
+  if (y < 0 || y >= L.H) return T_EMPTY;
+  return L.grid[y * L.W + x];
+};
+const isSolidTile = (x, y) => {
+  const t = tileAt(x, y);
+  if (t === T_SOLID || t === T_MARK) return true;
+  if (t === T_HIDDEN) { const m = L.cellMark.get(y * L.W + x); return m && m.revealed; }
+  return false;
+};
+
+/* ---------------- player ---------------- */
+const P = { x: 0, y: 0, w: 24, h: 50, vx: 0, vy: 0, ground: false, coyote: 0, buffer: 0, face: 1, sx: 1, sy: 1, walk: 0, safe: { x: 0, y: 0 }, inv: 0 };
+function placePlayer(tx, ty) {
+  P.x = tx * TILE + (TILE - P.w) / 2; P.y = (ty + 1) * TILE - P.h;
+  P.vx = P.vy = 0; P.ground = false; P.safe = { x: P.x, y: P.y };
+}
+
+/* ---------------- input ---------------- */
+const keys = { left: false, right: false, jump: false };
+let jumpQueued = false, actQueued = false;
+
+/* ---------------- game state ---------------- */
+let worldIdx = 0, cam = { x: 0, y: 0 }, shake = 0, time = 0, overlayOpen = false, started = false;
+const parts = [];
+let rangerZone = false, campZone = -1, exitZone = false, nearTarget = null;
+
+function loadWorld(id, opts = {}) {
+  const w = CONTENT.worlds.find(w => w.id === id);
+  if (!w) return;
+  if (!w.level) { toast(`World ${id} opens in the next build`); return false; }
+  worldIdx = CONTENT.worlds.indexOf(w);
+  L = parseLevel(w);
+  L.hidden.forEach(h => { h.revealed = save.egg; });
+  if (save.quiz.includes(w.id) && L.ranger) { L.ranger.raised = true; L.ranger.flag = 1; }
+  placePlayer(L.start.x, L.start.y);
+  cam.x = clamp(P.x - VW * 0.35, 0, L.W * TILE - VW);
+  cam.y = clamp(L.H * TILE - VH, 0, 1e9);
+  parts.length = 0; rangerZone = false; campZone = -1; exitZone = false;
+  if (location.hash !== '#world-' + id) { try { history.replaceState(null, '', location.pathname + location.search + '#world-' + id); } catch (e) {} }
+  updateHud();
+  started = true;
+  return true;
+}
+
+/* ---------------- physics ---------------- */
+function update(dt) {
+  time += dt;
+  for (const m of L.markers) m.bump = Math.max(0, m.bump - dt * 6);
+  for (const m of L.hidden) m.bump = Math.max(0, m.bump - dt * 6);
+  if (L.ranger) { const r = L.ranger; r.flag = approach(r.flag, r.raised ? 1 : 0, dt * 0.9); }
+  updateParticles(dt);
+  shake = Math.max(0, shake - dt * 30);
+
+  if (overlayOpen || !started) { P.sx = lerp(P.sx, 1, 0.2); P.sy = lerp(P.sy, 1, 0.2); return; }
+
+  const dir = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+  if (dir) P.face = dir;
+  const accel = P.ground ? 2600 : 1800;
+  if (dir) P.vx = approach(P.vx, dir * RUN, accel * dt);
+  else P.vx = approach(P.vx, 0, (P.ground ? 3200 : 900) * dt);
+
+  if (jumpQueued) { P.buffer = 0.14; jumpQueued = false; }
+  P.coyote = P.ground ? 0.1 : P.coyote - dt;
+  if (P.buffer > 0 && P.coyote > 0) {
+    P.vy = -JUMP_V; P.buffer = 0; P.coyote = 0; P.ground = false;
+    P.sx = 0.72; P.sy = 1.32; dust(P.x + P.w / 2, P.y + P.h, 6); sfx.jump();
+  }
+  P.buffer -= dt;
+
+  let g = GRAV;
+  if (P.vy < 0 && !keys.jump) g *= 2.3;           // short hop when released
+  if (Math.abs(P.vy) < 90 && !P.ground) g *= 0.7;  // floaty apex
+  P.vy = Math.min(P.vy + g * dt, MAXFALL);
+
+  // horizontal
+  P.x += P.vx * dt;
+  collideX();
+  // vertical
+  const prevBottom = P.y + P.h, prevTop = P.y;
+  P.y += P.vy * dt;
+  const wasGround = P.ground;
+  P.ground = false;
+  collideY(prevBottom, prevTop);
+  if (P.ground && !wasGround) {
+    const impact = clamp(lastFall / 900, 0, 1);
+    P.sx = 1 + 0.35 * impact; P.sy = 1 - 0.3 * impact;
+    if (impact > 0.35) { dust(P.x + P.w / 2, P.y + P.h, 4 + Math.round(impact * 6)); sfx.land(); }
+  }
+  lastFall = P.vy > 0 ? P.vy : lastFall;
+  if (P.ground) {
+    const cx = Math.floor((P.x + P.w / 2) / TILE), by = Math.floor((P.y + P.h + 2) / TILE);
+    const l = tileAt(Math.floor((P.x + 2) / TILE), by), r = tileAt(Math.floor((P.x + P.w - 2) / TILE), by);
+    if ((l === T_SOLID || l === T_PLANK) && (r === T_SOLID || r === T_PLANK) && tileAt(cx, by) !== T_WATER) P.safe = { x: P.x, y: P.y };
+  }
+
+  // water and falling out
+  const fx = Math.floor((P.x + P.w / 2) / TILE), fy = Math.floor((P.y + P.h - 8) / TILE);
+  if (tileAt(fx, fy) === T_WATER || P.y > L.H * TILE + 80) respawn();
+
+  // walk anim + squash recovery
+  P.walk += Math.abs(P.vx) * dt * 0.05;
+  P.sx = lerp(P.sx, 1, 0.16); P.sy = lerp(P.sy, 1, 0.16);
+  if (P.ground && Math.abs(P.vx) > 200 && Math.random() < 0.06) dust(P.x + P.w / 2 - P.face * 10, P.y + P.h, 1);
+
+  interact();
+  // camera
+  const look = P.face * 90 + P.vx * 0.15;
+  const tx = clamp(P.x + P.w / 2 - VW * 0.42 + look, 0, Math.max(0, L.W * TILE - VW));
+  cam.x = lerp(cam.x, tx, 1 - Math.pow(0.0006, dt));
+  const ty = clamp(P.y - VH * 0.55, 0, Math.max(0, L.H * TILE - VH));
+  cam.y = lerp(cam.y, ty, 1 - Math.pow(0.002, dt));
+}
+let lastFall = 0;
+
+function collideX() {
+  const top = Math.floor(P.y / TILE), bot = Math.floor((P.y + P.h - 1) / TILE);
+  if (P.vx > 0) {
+    const tx = Math.floor((P.x + P.w) / TILE);
+    for (let y = top; y <= bot; y++) if (isSolidTile(tx, y)) { P.x = tx * TILE - P.w; P.vx = 0; break; }
+  } else if (P.vx < 0) {
+    const tx = Math.floor(P.x / TILE);
+    for (let y = top; y <= bot; y++) if (isSolidTile(tx, y)) { P.x = (tx + 1) * TILE; P.vx = 0; break; }
+  }
+  P.x = clamp(P.x, 0, L.W * TILE - P.w);
+}
+function collideY(prevBottom, prevTop) {
+  const l = Math.floor((P.x + 1) / TILE), r = Math.floor((P.x + P.w - 1) / TILE);
+  if (P.vy >= 0) {
+    const ty = Math.floor((P.y + P.h) / TILE);
+    for (let x = l; x <= r; x++) {
+      const t = tileAt(x, ty);
+      const solid = isSolidTile(x, ty) || (t === T_PLANK && prevBottom <= ty * TILE + 1);
+      if (solid) { P.y = ty * TILE - P.h; P.vy = 0; P.ground = true; return; }
+    }
+  } else {
+    const ty = Math.floor(P.y / TILE);
+    // prefer the tile under the player's centre when bumping
+    const cx = Math.floor((P.x + P.w / 2) / TILE);
+    const order = [cx, l, r].filter((v, i, a) => a.indexOf(v) === i);
+    for (const x of order) {
+      const t = tileAt(x, ty);
+      const hiddenHit = t === T_HIDDEN && prevTop >= (ty + 1) * TILE - 1;
+      if (isSolidTile(x, ty) || hiddenHit) {
+        P.y = (ty + 1) * TILE; P.vy = 40;
+        const m = L.cellMark.get(ty * L.W + x);
+        if (m) hitMarker(m); else { sfx.bump(); }
+        return;
+      }
+    }
+  }
+}
+function respawn() {
+  splash(P.x + P.w / 2, P.y + P.h);
+  sfx.splash();
+  P.x = P.safe.x; P.y = P.safe.y - 2; P.vx = 0; P.vy = 0; P.sx = 1.3; P.sy = 0.7;
+  for (let i = 0; i < 10; i++) parts.push({ x: P.x + P.w / 2, y: P.y + P.h / 2, vx: (Math.random() - 0.5) * 240, vy: (Math.random() - 0.7) * 240, life: 0.6, max: 0.6, size: 4, color: C.purple, g: 300 });
+}
+
+/* ---------------- interactions ---------------- */
+function hitMarker(m) {
+  m.bump = 1; shake = Math.max(shake, 3);
+  sparkleBurst(m.x * TILE + 20, m.y * TILE, m.kind === 'egg' ? C.purple : C.gold, 10);
+  if (m.kind === 'egg') {
+    if (!m.revealed) { m.revealed = true; save.egg = true; persist(); }
+    sfx.open();
+    setTimeout(() => openCard(CONTENT.easterEgg, { eyebrow: 'Hidden marker', secret: true }), 160);
+  } else {
+    sfx.open();
+    setTimeout(() => openMarkerCard(m.idx), 160);
+  }
+}
+function openMarkerCard(idx) {
+  const w = L.world, card = w.cards[idx];
+  if (!card) return;
+  mark('read', `${w.id}-${idx}`);
+  updateHud();
+  openCard(card, { eyebrow: `World ${w.id} · Card ${idx + 1} of ${w.cards.length}` });
+}
+function interact() {
+  const pcx = P.x + P.w / 2, pcy = P.y + P.h / 2;
+  nearTarget = null;
+  // markers within reach
+  let best = null, bd = 1e9;
+  for (const m of [...L.markers, ...L.hidden.filter(h => h.revealed)]) {
+    const mx = m.x * TILE + 20, my = m.y * TILE + 20;
+    const dx = Math.abs(mx - pcx), dy = pcy - my;
+    if (dx < 64 && dy > -40 && dy < 190 && dx < bd) { bd = dx; best = m; }
+  }
+  if (best) nearTarget = { type: 'marker', m: best, x: best.x * TILE + 20, y: best.y * TILE - 10, label: best.kind === 'egg' ? 'Read' : 'Read' };
+
+  // items
+  for (const it of L.items) {
+    const id = L.world.items[it.idx] && L.world.items[it.idx].id;
+    if (!id || it.taken) continue;
+    const ix = it.x * TILE + 6, iy = it.y * TILE + 4 + Math.sin(time * 3 + it.t) * 5;
+    if (pcx > ix - 16 && pcx < ix + 44 && P.y < iy + 34 && P.y + P.h > iy) collectItem(it);
+  }
+
+  // ranger station
+  if (L.ranger && L.world.quiz) {
+    const rx = L.ranger.x * TILE + 40;
+    const d = Math.abs(pcx - rx);
+    if (d > 130) rangerZone = false;             // re-arm once they walk away
+    if (d < 70 && P.ground && !rangerZone) { rangerZone = true; if (!save.quiz.includes(L.world.id)) openQuiz(); }
+    if (Math.abs(pcx - rx) < 110 && !nearTarget) nearTarget = { type: 'quiz', x: rx, y: (L.ranger.y + 1) * TILE - 120, label: 'Quiz' };
+  }
+  // basecamps
+  let inCamp = -1;
+  for (const c of L.camps) {
+    const cx = c.x * TILE + 20;
+    if (Math.abs(pcx - cx) < 60 && P.ground) inCamp = c.idx;
+    if (Math.abs(pcx - cx) < 90 && !nearTarget) nearTarget = { type: 'camp', c, x: cx, y: (c.y + 1) * TILE - 96, label: 'Basecamp' };
+  }
+  if (inCamp >= 0 && campZone !== inCamp) openBasecamp(inCamp);
+  campZone = inCamp;
+  // exit
+  if (L.exit) {
+    const ex = L.exit.x * TILE + 20;
+    const inExit = pcx > ex - 10;
+    if (inExit && !exitZone) completeWorld();
+    exitZone = inExit;
+  }
+  if (actQueued) {
+    actQueued = false;
+    if (nearTarget) {
+      if (nearTarget.type === 'marker') { const m = nearTarget.m; m.bump = 1; sfx.open(); m.kind === 'egg' ? openCard(CONTENT.easterEgg, { eyebrow: 'Hidden marker', secret: true }) : openMarkerCard(m.idx); }
+      else if (nearTarget.type === 'quiz') openQuiz();
+      else if (nearTarget.type === 'camp') openBasecamp(nearTarget.c.idx);
+    }
+  }
+}
+function collectItem(it) {
+  it.taken = true;
+  const item = L.world.items[it.idx];
+  const fresh = !save.items.includes(item.id);
+  mark('items', item.id);
+  sparkleBurst(it.x * TILE + 20, it.y * TILE + 20, C.purple, 18);
+  sparkleBurst(it.x * TILE + 20, it.y * TILE + 20, C.gold, 10);
+  sfx.item(); updateHud();
+  setTimeout(() => openItem(item, fresh), 220);
+}
+
+/* ---------------- particles ---------------- */
+function dust(x, y, n) { for (let i = 0; i < n; i++) parts.push({ x: x + (Math.random() - 0.5) * 16, y: y - 2, vx: (Math.random() - 0.5) * 140, vy: -Math.random() * 70, life: 0.45, max: 0.45, size: 5 + Math.random() * 5, color: 'rgba(235,228,214,', type: 'dust', g: -40 }); }
+function sparkleBurst(x, y, color, n) { for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 80 + Math.random() * 220; parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.7, max: 0.7, size: 3 + Math.random() * 3, color, type: 'spark', g: 380 }); } }
+function splash(x, y) { for (let i = 0; i < 18; i++) parts.push({ x: x + (Math.random() - 0.5) * 20, y, vx: (Math.random() - 0.5) * 220, vy: -150 - Math.random() * 300, life: 0.8, max: 0.8, size: 3 + Math.random() * 3, color: '#cfe6f2', type: 'spark', g: 900 }); }
+function confetti(x, y, n = 70) { const cols = [C.gold, C.red, C.purple, '#fff']; for (let i = 0; i < n; i++) { const a = -Math.PI / 2 + (Math.random() - 0.5) * 1.6, s = 250 + Math.random() * 450; parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: 1.8 + Math.random(), max: 2.6, size: 5 + Math.random() * 4, color: cols[i % 4], type: 'conf', g: 520, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 14 }); } }
+function updateParticles(dt) {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const p = parts[i]; p.life -= dt;
+    if (p.life <= 0) { parts.splice(i, 1); continue; }
+    p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+    if (p.type === 'conf') { p.vx *= 0.99; p.vy = Math.min(p.vy, 160); p.rot += p.vr * dt; }
+    if (p.type === 'dust') { p.vx *= 0.9; p.size += dt * 10; }
+  }
+}
+
+/* ---------------- drawing: background ---------------- */
+function halfDomePath(c, x, base, s) {
+  // rounded dome on the left, sheer flat face on the right
+  c.beginPath();
+  c.moveTo(x - 420 * s, base);
+  c.bezierCurveTo(x - 330 * s, base - 30 * s, x - 260 * s, base - 70 * s, x - 210 * s, base - 120 * s);
+  c.bezierCurveTo(x - 150 * s, base - 250 * s, x - 40 * s, base - 300 * s, x + 60 * s, base - 296 * s);
+  c.bezierCurveTo(x + 110 * s, base - 292 * s, x + 140 * s, base - 280 * s, x + 152 * s, base - 266 * s);
+  c.lineTo(x + 150 * s, base - 200 * s);
+  c.lineTo(x + 158 * s, base - 120 * s);
+  c.lineTo(x + 168 * s, base - 40 * s);
+  c.lineTo(x + 250 * s, base);
+  c.closePath();
+}
+function ridgeLine(c, par, base, amp, color, seed) {
+  c.fillStyle = color; c.beginPath(); c.moveTo(0, VH);
+  for (let x = 0; x <= VW + 20; x += 20) {
+    const wx = x + cam.x * par;
+    const h = Math.sin(wx * 0.004 + seed) * 0.5 + Math.sin(wx * 0.011 + seed * 2) * 0.3 + Math.sin(wx * 0.023 + seed * 3) * 0.2;
+    c.lineTo(x, base - amp * (0.6 + h * 0.5));
+  }
+  c.lineTo(VW, VH); c.closePath(); c.fill();
+}
+function drawPine(c, x, base, h, color) {
+  const w = h * 0.42;
+  c.fillStyle = '#4b3a2a'; c.fillRect(x - 3, base - h * 0.16, 6, h * 0.16);
+  c.fillStyle = color;
+  for (let i = 0; i < 4; i++) {
+    const ty = base - h * 0.14 - i * h * 0.21, ww = w * (1 - i * 0.2);
+    c.beginPath(); c.moveTo(x - ww / 2, ty); c.lineTo(x, ty - h * 0.34); c.lineTo(x + ww / 2, ty); c.closePath(); c.fill();
+  }
+}
+function drawBackground(th, wid) {
+  const c = ctx;
+  const g = c.createLinearGradient(0, 0, 0, VH);
+  g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]);
+  c.fillStyle = g; c.fillRect(0, 0, VW, VH);
+  // sun glow
+  const [sx, sy, sc] = th.sun;
+  const sg = c.createRadialGradient(VW * sx, VH * sy, 10, VW * sx, VH * sy, 260);
+  sg.addColorStop(0, sc + '0.95)'); sg.addColorStop(0.15, sc + '0.6)'); sg.addColorStop(1, sc + '0)');
+  c.fillStyle = sg; c.fillRect(0, 0, VW, VH);
+  // clouds
+  c.fillStyle = 'rgba(255,255,255,0.55)';
+  for (let i = 0; i < 5; i++) {
+    const cx = ((i * 330 + time * (6 + i * 2) - cam.x * 0.03) % (VW + 300) + VW + 300) % (VW + 300) - 150;
+    const cy = 70 + (i % 3) * 45;
+    c.beginPath(); c.ellipse(cx, cy, 70, 16, 0, 0, 7); c.ellipse(cx + 40, cy - 10, 46, 16, 0, 0, 7); c.ellipse(cx - 36, cy - 4, 40, 12, 0, 0, 7); c.fill();
+  }
+  // far ridges
+  ridgeLine(c, 0.05, 500, 110, th.ridge, 1.3);
+  // Half Dome: rounded back on the left, sheer face on the right. Grows each world.
+  const ds = th.domeScale;
+  const dx = 860 - cam.x * 0.025, base = 540;
+  halfDomePath(c, dx, base, ds);
+  const dg = c.createLinearGradient(dx - 300 * ds, base - 300 * ds, dx + 150 * ds, base);
+  dg.addColorStop(0, shade(th.dome, 28)); dg.addColorStop(0.7, th.dome); dg.addColorStop(1, shade(th.dome, -10));
+  c.fillStyle = dg; c.fill();
+  c.save(); halfDomePath(c, dx, base, ds); c.clip();
+  // sunlit rim along the curve
+  c.strokeStyle = 'rgba(255,255,255,0.22)'; c.lineWidth = 6 * ds;
+  c.beginPath(); c.moveTo(dx - 210 * ds, base - 116 * ds);
+  c.bezierCurveTo(dx - 150 * ds, base - 246 * ds, dx - 40 * ds, base - 296 * ds, dx + 60 * ds, base - 292 * ds); c.stroke();
+  // shadowed face and its vertical streaks
+  const fg = c.createLinearGradient(dx + 90 * ds, 0, dx + 260 * ds, 0);
+  fg.addColorStop(0, 'rgba(30,30,50,0)'); fg.addColorStop(0.25, 'rgba(30,30,50,0.28)'); fg.addColorStop(1, 'rgba(30,30,50,0.34)');
+  c.fillStyle = fg; c.fillRect(dx + 90 * ds, base - 310 * ds, 180 * ds, 310 * ds);
+  c.strokeStyle = 'rgba(30,30,50,0.16)'; c.lineWidth = Math.max(1, 2 * ds);
+  for (let i = 0; i < 6; i++) { c.beginPath(); c.moveTo(dx + (118 + i * 6) * ds, base - 262 * ds); c.lineTo(dx + (126 + i * 8) * ds, base); c.stroke(); }
+  c.restore();
+  // valley walls (kept low so Half Dome stays the hero)
+  const cliffPar = 0.2;
+  const cliffTop = sx => { const wx = sx + cam.x * cliffPar; const n = Math.sin(wx * 0.0024) * 0.65 + Math.sin(wx * 0.0067 + 2) * 0.35; return 575 - Math.max(0, n) * 135; };
+  const cg = c.createLinearGradient(0, 430, 0, 600);
+  cg.addColorStop(0, shade(th.cliff, 10)); cg.addColorStop(1, th.cliffDark);
+  c.fillStyle = cg;
+  c.beginPath(); c.moveTo(0, VH);
+  for (let x = 0; x <= VW + 20; x += 20) c.lineTo(x, cliffTop(x));
+  c.lineTo(VW, VH); c.closePath(); c.fill();
+  // waterfall off the valley wall
+  if (th.falls) {
+    // a fall wherever the wall is tall enough, every 600px of wall
+    const off = (cam.x * cliffPar) % 600;
+    for (let fx = -off - 60; fx < VW + 80; fx += 600) {
+      const top = cliffTop(fx);
+      if (top > 470) continue;
+      c.fillStyle = 'rgba(255,255,255,0.8)'; c.fillRect(fx, top, 16, 590 - top);
+      c.fillStyle = 'rgba(205,230,243,0.95)';
+      for (let i = 0; i < 6; i++) { const yy = top + ((time * 150 + i * 30) % (590 - top)); c.fillRect(fx + 2 + (i % 2) * 8, yy, 4, 18); }
+      c.fillStyle = 'rgba(255,255,255,0.45)'; c.beginPath(); c.ellipse(fx + 8, 590, 46, 12, 0, 0, 7); c.fill();
+    }
+  }
+  // far pines
+  for (let i = 0; i < 26; i++) {
+    const wx = ((i * 97 - cam.x * 0.4) % (VW + 120) + VW + 120) % (VW + 120) - 60;
+    drawPine(c, wx, 590 + (i % 3) * 6, 70 + (i * 37 % 40), th.pineFar);
+  }
+  c.fillStyle = th.pineFar; c.fillRect(0, 596, VW, VH);
+}
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16);
+  const r = clamp((n >> 16) + amt, 0, 255), g = clamp(((n >> 8) & 255) + amt, 0, 255), b = clamp((n & 255) + amt, 0, 255);
+  return `rgb(${r},${g},${b})`;
+}
+
+/* ---------------- drawing: level ---------------- */
+function drawTiles(th) {
+  const c = ctx;
+  const x0 = Math.max(0, Math.floor(cam.x / TILE) - 1), x1 = Math.min(L.W - 1, Math.ceil((cam.x + VW) / TILE) + 1);
+  const y0 = Math.max(0, Math.floor(cam.y / TILE)), y1 = Math.min(L.H - 1, Math.ceil((cam.y + VH) / TILE));
+  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const t = L.grid[y * L.W + x], px = x * TILE, py = y * TILE;
+    if (t === T_SOLID) {
+      const topOpen = !isSolidTile(x, y - 1) && tileAt(x, y - 1) !== T_PLANK;
+      c.fillStyle = y >= L.H - 2 ? th.rockDark : th.rock; c.fillRect(px, py, TILE + 0.5, TILE + 0.5);
+      const h1 = hash(x, y), h2 = hash(y, x);
+      c.fillStyle = 'rgba(0,0,0,0.08)'; c.fillRect(px + h1 * 30, py + h2 * 30, 6, 4);
+      c.fillStyle = 'rgba(255,255,255,0.08)'; c.fillRect(px + h2 * 28, py + h1 * 28 + 6, 8, 3);
+      if (!isSolidTile(x - 1, y) && tileAt(x - 1, y) !== T_PLANK) { c.fillStyle = 'rgba(0,0,0,0.12)'; c.fillRect(px, py, 4, TILE); }
+      if (!isSolidTile(x + 1, y) && tileAt(x + 1, y) !== T_PLANK) { c.fillStyle = 'rgba(0,0,0,0.16)'; c.fillRect(px + TILE - 4, py, 4, TILE); }
+      if (topOpen) {
+        c.fillStyle = th.grass; c.fillRect(px, py, TILE + 0.5, 10);
+        c.fillStyle = th.grassTop; c.fillRect(px, py, TILE + 0.5, 4);
+        for (let k = 0; k < 3; k++) { const gx = px + 6 + k * 12 + h1 * 6; c.fillRect(gx, py - 4, 3, 5); }
+      }
+    } else if (t === T_PLANK) {
+      c.fillStyle = '#7a5634'; c.fillRect(px, py, TILE + 0.5, 14);
+      c.fillStyle = '#9b7247'; c.fillRect(px, py, TILE + 0.5, 5);
+      c.fillStyle = '#5c3f25'; c.fillRect(px + TILE - 3, py, 2, 14);
+      if (tileAt(x, y + 1) === T_WATER || tileAt(x, y + 1) === T_EMPTY) { c.fillStyle = '#5c3f25'; if (x % 3 === 0) c.fillRect(px + 16, py + 14, 6, 30); }
+    } else if (t === T_WATER) {
+      const surface = tileAt(x, y - 1) !== T_WATER;
+      c.fillStyle = th.water; c.globalAlpha = 0.9; c.fillRect(px, py, TILE + 0.5, TILE + 0.5); c.globalAlpha = 1;
+      if (surface) {
+        c.fillStyle = 'rgba(255,255,255,0.55)';
+        const o = Math.sin(time * 3 + x) * 3;
+        c.fillRect(px, py + 2 + o * 0.3, TILE + 0.5, 3);
+        c.fillRect(px + 8 + o, py + 12, 12, 2);
+      }
+    } else if (t === T_MARK) {
+      const m = L.cellMark.get(y * L.W + x);
+      drawMarker(px, py - m.bump * 12, save.read.includes(`${L.world.id}-${m.idx}`));
+    } else if (t === T_HIDDEN) {
+      const m = L.cellMark.get(y * L.W + x);
+      if (m.revealed) drawSecret(px, py - m.bump * 12);
+      else if ((time % 3.5) < 0.5) { // faint glint
+        const a = Math.sin((time % 3.5) / 0.5 * Math.PI);
+        c.fillStyle = `rgba(255,255,255,${0.55 * a})`;
+        star(px + 26, py + 12, 6 * a);
+      }
+    }
+  }
+}
+function star(x, y, r) { const c = ctx; c.beginPath(); for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, rr2 = i % 2 ? r * 0.35 : r; c.lineTo(x + Math.cos(a) * rr2, y + Math.sin(a) * rr2); } c.closePath(); c.fill(); }
+function drawMarker(px, py, read) {
+  const c = ctx;
+  c.fillStyle = 'rgba(0,0,0,0.18)'; rr(c, px + 2, py + 4, 38, 38, 7); c.fill();
+  c.fillStyle = read ? '#E4DDA6' : C.gold; rr(c, px, py, 40, 40, 7); c.fill();
+  c.strokeStyle = read ? '#a59c5a' : '#8f8436'; c.lineWidth = 2.5; rr(c, px + 1.5, py + 1.5, 37, 37, 6); c.stroke();
+  c.fillStyle = 'rgba(255,255,255,0.35)'; c.fillRect(px + 5, py + 5, 30, 3);
+  c.fillStyle = read ? '#8f8436' : C.ink;
+  c.font = '700 24px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(read ? '✓' : '?', px + 20, py + 22);
+  if (!read) { // shine sweep
+    const s = (time * 0.7 + px * 0.001) % 2.4;
+    if (s < 0.5) { c.save(); rr(c, px, py, 40, 40, 7); c.clip(); c.fillStyle = 'rgba(255,255,255,0.45)'; c.beginPath(); const sx = px - 20 + s * 160; c.moveTo(sx, py); c.lineTo(sx + 10, py); c.lineTo(sx - 10, py + 40); c.lineTo(sx - 20, py + 40); c.fill(); c.restore(); }
+  }
+}
+function drawSecret(px, py) {
+  const c = ctx;
+  c.fillStyle = C.purple; rr(c, px, py, 40, 40, 7); c.fill();
+  c.strokeStyle = '#6f61a0'; c.lineWidth = 2.5; rr(c, px + 1.5, py + 1.5, 37, 37, 6); c.stroke();
+  c.fillStyle = C.ink; star(px + 20, py + 20, 11);
+}
+function drawItem(it) {
+  const c = ctx, item = L.world.items[it.idx];
+  if (!item) return;
+  const got = save.items.includes(item.id);
+  if (it.taken && got) { c.globalAlpha = 0.25; }
+  const bx = it.x * TILE + 7, by = it.y * TILE + 4 + Math.sin(time * 3 + it.t) * 5;
+  // glow
+  if (!it.taken) { const g = c.createRadialGradient(bx + 13, by + 16, 2, bx + 13, by + 16, 34); g.addColorStop(0, 'rgba(176,163,208,0.55)'); g.addColorStop(1, 'rgba(176,163,208,0)'); c.fillStyle = g; c.fillRect(bx - 22, by - 18, 70, 70); }
+  // scroll (rolled prompt)
+  c.fillStyle = '#efeaf8'; rr(c, bx, by + 4, 26, 26, 5); c.fill();
+  c.fillStyle = C.purple; rr(c, bx - 3, by, 32, 8, 4); c.fill(); rr(c, bx - 3, by + 26, 32, 8, 4); c.fill();
+  c.fillStyle = '#8a7cb8'; c.fillRect(bx + 5, by + 13, 16, 2); c.fillRect(bx + 5, by + 18, 12, 2);
+  c.fillStyle = C.gold; c.fillRect(bx + 11, by + 2, 4, 30);
+  // twinkle
+  if (!it.taken) { c.fillStyle = '#fff'; const s = (Math.sin(time * 5 + it.t) + 1) * 2.5; star(bx + 30, by - 2, s + 1); }
+  c.globalAlpha = 1;
+}
+function drawSign(px, base, text, arrow) {
+  const c = ctx;
+  c.font = '800 15px Archivo, sans-serif';
+  const w = Math.max(120, c.measureText(text).width + 30 + (arrow ? 18 : 0));
+  c.fillStyle = '#5c3f25'; c.fillRect(px + 16, base - 70, 8, 70);
+  c.fillStyle = '#7a5634'; rr(c, px + 20 - w / 2, base - 104, w, 38, 6); c.fill();
+  c.fillStyle = '#9b7247'; rr(c, px + 23 - w / 2, base - 101, w - 6, 32, 4); c.fill();
+  c.fillStyle = '#FFF8DF'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText(text + (arrow ? '  →' : ''), px + 20, base - 84);
+}
+function drawRanger(r) {
+  const c = ctx, px = r.x * TILE - 40, base = (r.y + 1) * TILE;
+  // hut
+  c.fillStyle = '#7a5634'; c.fillRect(px, base - 92, 130, 92);
+  c.fillStyle = '#6a4a2c'; for (let i = 0; i < 6; i++) c.fillRect(px, base - 92 + i * 16, 130, 2);
+  c.fillStyle = '#3d2a1a'; c.fillRect(px + 50, base - 54, 30, 54);
+  c.fillStyle = '#cfe0ea'; c.fillRect(px + 12, base - 70, 28, 22); c.fillRect(px + 92, base - 70, 26, 22);
+  c.fillStyle = C.red; c.beginPath(); c.moveTo(px - 14, base - 90); c.lineTo(px + 65, base - 140); c.lineTo(px + 144, base - 90); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(0,0,0,0.15)'; c.fillRect(px - 10, base - 92, 150, 4);
+  // sign plate
+  c.fillStyle = C.gold; rr(c, px + 22, base - 122, 86, 22, 4); c.fill();
+  c.fillStyle = C.ink; c.font = '700 11px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillText('RANGER', px + 65, base - 110);
+  // flagpole
+  const fx = px + 168, top = base - 220;
+  c.fillStyle = '#d8d4cc'; c.fillRect(fx, top, 5, 220);
+  c.fillStyle = C.gold; c.beginPath(); c.arc(fx + 2.5, top, 6, 0, 7); c.fill();
+  const fy = lerp(base - 46, top + 6, easeOut(r.flag));
+  const wave = Math.sin(time * 6) * 4;
+  if (r.flag > 0.02 || r.raised) {
+    c.fillStyle = C.red; c.beginPath(); c.moveTo(fx + 5, fy); c.quadraticCurveTo(fx + 35, fy - 4 + wave, fx + 64, fy + 2 + wave); c.lineTo(fx + 64, fy + 38 + wave); c.quadraticCurveTo(fx + 35, fy + 32 + wave, fx + 5, fy + 36); c.closePath(); c.fill();
+    c.fillStyle = C.gold; c.beginPath(); c.moveTo(fx + 5, fy + 12); c.lineTo(fx + 64, fy + 14 + wave); c.lineTo(fx + 64, fy + 24 + wave); c.lineTo(fx + 5, fy + 22); c.closePath(); c.fill();
+  } else {
+    c.fillStyle = '#a9a49c'; c.fillRect(fx + 5, fy, 10, 36);
+  }
+}
+const easeOut = t => 1 - Math.pow(1 - t, 3);
+function drawCamp(cp) {
+  const c = ctx, x = cp.x * TILE + 20, base = (cp.y + 1) * TILE;
+  // tent
+  c.fillStyle = C.purple; c.beginPath(); c.moveTo(x - 110, base); c.lineTo(x - 62, base - 70); c.lineTo(x - 14, base); c.closePath(); c.fill();
+  c.fillStyle = '#7d6fa6'; c.beginPath(); c.moveTo(x - 74, base); c.lineTo(x - 62, base - 40); c.lineTo(x - 50, base); c.closePath(); c.fill();
+  // glow
+  const g = c.createRadialGradient(x, base - 20, 4, x, base - 20, 110); g.addColorStop(0, 'rgba(255,214,120,0.45)'); g.addColorStop(1, 'rgba(255,214,120,0)'); c.fillStyle = g; c.fillRect(x - 120, base - 130, 240, 140);
+  // stones + logs
+  c.fillStyle = '#6d6961'; for (let i = -2; i <= 2; i++) { c.beginPath(); c.ellipse(x + i * 11, base - 3, 7, 5, 0, 0, 7); c.fill(); }
+  c.fillStyle = '#6b4a2c'; c.save(); c.translate(x, base - 8); c.rotate(0.25); c.fillRect(-22, -4, 44, 8); c.rotate(-0.5); c.fillRect(-22, -4, 44, 8); c.restore();
+  // flames
+  const f = (k, w, h, col) => { const fl = Math.sin(time * 14 + k) * 0.12 + 1; c.fillStyle = col; c.beginPath(); c.moveTo(x - w, base - 10); c.quadraticCurveTo(x - w, base - 10 - h * 0.6 * fl, x + Math.sin(time * 9 + k) * 3, base - 10 - h * fl); c.quadraticCurveTo(x + w, base - 10 - h * 0.6 * fl, x + w, base - 10); c.closePath(); c.fill(); };
+  f(0, 14, 40, C.red); f(1, 10, 30, '#d9762a'); f(2, 6, 18, C.gold);
+  if (Math.random() < 0.15) parts.push({ x: x + (Math.random() - 0.5) * 10, y: base - 30, vx: (Math.random() - 0.5) * 20, vy: -60 - Math.random() * 40, life: 1, max: 1, size: 2, color: C.gold, type: 'spark', g: -10 });
+}
+function drawPlayer() {
+  const c = ctx, x = P.x + P.w / 2, base = P.y + P.h;
+  c.save(); c.translate(Math.round(x), Math.round(base)); c.scale(P.sx * P.face, P.sy);
+  // shadow
+  c.fillStyle = 'rgba(0,0,0,0.18)'; c.beginPath(); c.ellipse(0, 0, 14, 3.5, 0, 0, 7); c.fill();
+  const moving = P.ground && Math.abs(P.vx) > 20;
+  const sw = moving ? Math.sin(P.walk * 2.2) : 0;
+  const air = !P.ground;
+  // legs
+  c.fillStyle = '#3a3631';
+  c.fillRect(-7 + sw * 4, -16, 6, 16 - (air ? 4 : 0));
+  c.fillRect(2 - sw * 4, -16, 6, 16 - (air ? 0 : 0));
+  c.fillStyle = '#6b4a2c'; c.fillRect(-9 + sw * 4, -4 - (air ? 4 : 0), 9, 4); c.fillRect(1 - sw * 4, -4, 9, 4);
+  // backpack (behind, on the back)
+  const bob = moving ? Math.abs(sw) * 1.5 : 0;
+  c.fillStyle = '#9c9140'; rr(c, -21, -46 - bob, 16, 30, 5); c.fill();
+  c.fillStyle = C.gold; rr(c, -22, -48 - bob, 15, 28, 5); c.fill();
+  c.fillStyle = '#b5aa4c'; c.fillRect(-21, -38 - bob, 13, 3);
+  c.fillStyle = C.purple; c.fillRect(-19, -54 - bob, 9, 7); // bedroll
+  // body
+  c.fillStyle = '#efe9dc'; rr(c, -9, -36, 18, 22, 5); c.fill();
+  c.fillStyle = C.red; c.fillRect(-9, -36, 4, 20); // strap
+  // arm
+  c.fillStyle = '#e2c49e'; c.save(); c.translate(3, -32); c.rotate(air ? -1.4 : sw * 0.6); c.fillRect(-2, 0, 5, 13); c.restore();
+  // head
+  c.fillStyle = '#e8c9a0'; c.beginPath(); c.arc(1, -44, 9, 0, 7); c.fill();
+  c.fillStyle = C.ink; c.fillRect(5, -46, 2.5, 3.5);
+  // cap
+  c.fillStyle = C.red; c.beginPath(); c.arc(1, -47, 9.5, Math.PI, 0); c.fill();
+  c.fillRect(4, -49, 11, 3.5);
+  c.fillStyle = C.gold; c.fillRect(-1, -56, 4, 3);
+  c.restore();
+}
+function drawParticles() {
+  const c = ctx;
+  for (const p of parts) {
+    const a = clamp(p.life / p.max, 0, 1);
+    if (p.type === 'dust') { c.fillStyle = p.color + (a * 0.8) + ')'; c.beginPath(); c.arc(p.x, p.y, p.size, 0, 7); c.fill(); }
+    else if (p.type === 'conf') { c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.globalAlpha = Math.min(1, a * 2); c.fillStyle = p.color; c.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); c.restore(); }
+    else { c.globalAlpha = a; c.fillStyle = p.color; star(p.x, p.y, p.size * (0.6 + a * 0.6)); c.globalAlpha = 1; }
+  }
+}
+function drawPrompt() {
+  if (!nearTarget || overlayOpen) return;
+  const c = ctx, x = nearTarget.x, y = nearTarget.y - 24 + Math.sin(time * 5) * 2;
+  c.font = '700 13px "IBM Plex Mono", monospace';
+  const label = nearTarget.label, w = c.measureText(label).width + 44;
+  c.fillStyle = C.ink; rr(c, x - w / 2, y - 16, w, 30, 9); c.fill();
+  c.beginPath(); c.moveTo(x - 6, y + 14); c.lineTo(x + 6, y + 14); c.lineTo(x, y + 21); c.fill();
+  c.fillStyle = C.gold; rr(c, x - w / 2 + 6, y - 11, 22, 20, 5); c.fill();
+  c.fillStyle = C.ink; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('E', x - w / 2 + 17, y);
+  c.fillStyle = C.card; c.textAlign = 'left'; c.fillText(label, x - w / 2 + 34, y);
+}
+
+function render() {
+  const c = ctx;
+  c.setTransform(res, 0, 0, res, 0, 0);
+  if (!L) { c.fillStyle = '#cfe0ea'; c.fillRect(0, 0, VW, VH); return; }
+  const th = THEMES[L.world.id] || THEMES[1];
+  drawBackground(th, L.world.id);
+  const sx = shake ? (Math.random() - 0.5) * shake * 2 : 0, sy = shake ? (Math.random() - 0.5) * shake * 2 : 0;
+  c.save(); c.translate(Math.round(-cam.x + sx), Math.round(-cam.y + sy));
+  for (const p of L.pines) if (p.x * TILE > cam.x - 100 && p.x * TILE < cam.x + VW + 100) drawPine(c, p.x * TILE + 20, (p.y + 1) * TILE, p.h, th.pine);
+  for (const s of L.signs) drawSign(s.x * TILE, (s.y + 1) * TILE, L.world.stage);
+  if (L.exit) { const nxt = CONTENT.worlds[worldIdx + 1]; drawSign(L.exit.x * TILE, (L.exit.y + 1) * TILE, nxt ? nxt.place : 'Summit', true); }
+  if (L.ranger) drawRanger(L.ranger);
+  for (const cp of L.camps) drawCamp(cp);
+  drawTiles(th);
+  for (const it of L.items) drawItem(it);
+  drawPlayer();
+  drawParticles();
+  drawPrompt();
+  c.restore();
+}
+
+/* ---------------- loop ---------------- */
+let last = performance.now(), acc = 0;
+function frame(now) {
+  let dt = (now - last) / 1000; last = now;
+  if (dt > 0.1) dt = 0.1;
+  acc += dt;
+  while (acc >= STEP) { if (L) update(STEP); acc -= STEP; }
+  render();
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- HUD ---------------- */
+function updateHud() {
+  const total = allItems().length;
+  $('#packCount').textContent = `${save.items.length}/${total}`;
+  if (!L) return;
+  const w = L.world;
+  $('#worldtag').innerHTML = `<b>World ${w.id}</b> ${esc(w.place)} · ${esc(w.topic)}`;
+  const read = w.cards.filter((_, i) => save.read.includes(`${w.id}-${i}`)).length;
+  const got = w.items.filter(it => save.items.includes(it.id)).length;
+  $('#progress').innerHTML = `<span class="chip"><span class="dot"></span>Markers ${read}/${w.cards.length}</span>` +
+    (w.items.length ? `<span class="chip"><span class="dot p"></span>Items ${got}/${w.items.length}</span>` : '') +
+    (w.quiz ? `<span class="chip">${save.quiz.includes(w.id) ? '⚑ Flag raised' : '⚐ Ranger quiz'}</span>` : '');
+  const s = $('#btnSound'); s.textContent = save.sound ? 'Sound on' : 'Sound off'; s.setAttribute('aria-pressed', save.sound);
+}
+let toastT = 0;
+function toast(msg) {
+  const t = $('#toast'); t.innerHTML = `<i></i>${esc(msg)}`; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ---------------- overlays ---------------- */
+const layer = $('#layer');
+let current = null; // {node, kind, onClose, enterCloses, cleanup}
+function openOverlay(node, opts = {}) {
+  closeOverlay(true);
+  layer.appendChild(node);
+  current = { node, ...opts };
+  overlayOpen = true;
+  keys.left = keys.right = keys.jump = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => node.classList.add('show')));
+  return current;
+}
+function closeOverlay(silent) {
+  if (!current) return;
+  const cur = current; current = null;
+  if (cur.cleanup) cur.cleanup();
+  cur.node.remove();
+  overlayOpen = false;
+  if (!silent && cur.onClose) cur.onClose();
+}
+
+/* card */
+function openCard(card, meta = {}) {
+  const v = card.visual && VISUALS[card.visual];
+  const node = el(`<div class="overlay"><div class="panel card ${meta.secret ? 'purple' : ''}" role="dialog" aria-modal="true" aria-label="${esc(card.title)}">
+    <div class="eyebrow"><span class="tag ${meta.secret ? 'purple' : 'gold'}">${esc(meta.eyebrow || '')}</span>${card.section ? esc(card.section) : ''}</div>
+    <h2>${inline(card.title)}</h2>
+    <div class="lines">${card.lines.map(l => `<p>${inline(l)}</p>`).join('')}</div>
+    ${card.tag ? `<span class="tagline">${inline(card.tag)}</span>` : ''}
+    ${v ? `<div class="visual"><button class="replay" type="button">↻ Replay</button><div class="vx"></div></div>` : ''}
+    ${PRESENTER && card.talk ? `<div class="talk"><b>Talk track</b>${inline(card.talk)}</div>` : ''}
+    <div class="foot"><span class="closehint">Close <kbd>Enter</kbd> <kbd>Esc</kbd> or click</span><span class="closehint">Backpack <kbd>B</kbd> · Map <kbd>M</kbd></span></div>
+  </div></div>`);
+  let cleanup = null;
+  const run = () => { if (cleanup) cleanup(); const host = $('.vx', node); host.innerHTML = ''; cleanup = v(host); };
+  const o = openOverlay(node, { kind: 'card', enterCloses: true, cleanup: () => cleanup && cleanup() });
+  if (v) { run(); $('.replay', node).addEventListener('click', e => { e.stopPropagation(); run(); }); }
+  node.addEventListener('click', e => { if (!e.target.closest('button,code,a')) closeOverlay(); });
+  return o;
+}
+
+/* backpack item */
+function openItem(item, fresh) {
+  const node = el(`<div class="overlay"><div class="panel item purple" role="dialog" aria-modal="true" aria-label="${esc(item.title)}">
+    <div class="eyebrow"><span class="tag purple">${fresh ? 'New backpack item' : 'Backpack item'}</span>Copy it now, or any time from the Backpack</div>
+    <h2>${esc(item.title)}</h2>
+    ${item.note ? `<span class="note">${esc(item.note)}</span>` : ''}
+    <pre class="prompt">${promptHTML(item.text)}</pre>
+    <div class="btnrow"><button class="btn gold" data-copy>Copy</button><button class="btn ghost" data-close>Back to the trail</button><span class="copied" aria-live="polite"></span></div>
+    <div class="foot" style="display:flex;justify-content:space-between"><span class="closehint">Close <kbd>Enter</kbd> <kbd>Esc</kbd></span><span class="closehint">Saved to your Backpack <kbd>B</kbd></span></div>
+  </div></div>`);
+  wireCopy(node, item.text);
+  $('[data-close]', node).addEventListener('click', () => closeOverlay());
+  node.addEventListener('click', e => { if (e.target === node) closeOverlay(); });
+  openOverlay(node, { kind: 'item', enterCloses: true });
+}
+function wireCopy(root, text) {
+  root.querySelectorAll('[data-copy]').forEach(btn => btn.addEventListener('click', async e => {
+    e.stopPropagation();
+    const out = btn.parentElement.querySelector('.copied') || btn.closest('.pitem, .litem, .item').querySelector('.copied');
+    const pre = btn.closest('.pitem, .litem, .item').querySelector('.prompt');
+    const t = btn.dataset.text ? decodeURIComponent(btn.dataset.text) : text;
+    let ok = false;
+    try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(t); ok = true; } } catch (err) {}
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+        ok = document.execCommand('copy'); ta.remove();
+      } catch (err) {}
+    }
+    if (ok) { if (out) out.textContent = 'Copied. Paste it into Claude.'; btn.textContent = 'Copied'; sfx.open(); setTimeout(() => btn.textContent = 'Copy', 1600); }
+    else if (pre) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); if (out) out.textContent = 'Selected. Press Ctrl+C or Cmd+C to copy.'; }
+    btn.blur();
+  }));
+}
+
+/* backpack panel */
+function openBackpack() {
+  const items = allItems();
+  const got = items.filter(i => save.items.includes(i.id)).length;
+  const node = el(`<div class="overlay"><div class="panel pack" role="dialog" aria-modal="true" aria-label="Backpack">
+    <div class="eyebrow"><span class="tag purple">Backpack</span>${got} of ${items.length} collected</div>
+    <h2>Your kit</h2>
+    <div class="packlist">${items.map(i => save.items.includes(i.id) ? `
+      <div class="pitem"><h3>${esc(i.title)} <small>World ${i.world}</small></h3>
+      ${i.note ? `<span class="note" style="align-self:flex-start">${esc(i.note)}</span>` : ''}
+      <pre class="prompt">${promptHTML(i.text)}</pre>
+      <div class="btnrow"><button class="btn gold small" data-copy data-text="${encodeURIComponent(i.text)}">Copy</button><span class="copied" aria-live="polite"></span></div></div>` : `
+      <div class="pitem locked"><span class="ph-lock">?</span><div><b>Still on the trail</b><br><span class="mono" style="font-size:12.5px">Find it in World ${i.world}: ${esc(CONTENT.worlds.find(w => w.id === i.world).place)}</span></div></div>`).join('')}</div>
+    <div class="foot" style="display:flex;justify-content:space-between"><span class="closehint">Close <kbd>B</kbd> <kbd>Esc</kbd></span><button class="btn ghost small" data-close>Back to the trail</button></div>
+  </div></div>`);
+  wireCopy(node);
+  $('[data-close]', node).addEventListener('click', () => closeOverlay());
+  node.addEventListener('click', e => { if (e.target === node) closeOverlay(); });
+  openOverlay(node, { kind: 'pack', enterCloses: false });
+}
+
+/* ranger quiz */
+function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function openQuiz() {
+  const w = L.world, q = w.quiz; if (!q) return;
+  const done = save.quiz.includes(w.id);
+  const opts = shuffle(q.options);
+  const node = el(`<div class="overlay"><div class="panel quiz red" role="dialog" aria-modal="true" aria-label="Ranger station">
+    <div class="eyebrow"><span class="tag red">Ranger station</span>World ${w.id} check-in${done ? ' · flag already raised' : ''}</div>
+    <h2>${inline(q.question)}</h2>
+    <div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}"><kbd>${i + 1}</kbd><span>${inline(o.text)}</span></button>`).join('')}</div>
+    <div class="why" aria-live="polite"></div>
+    <div class="foot" style="display:flex;justify-content:space-between;align-items:center"><span class="closehint">Answer with <kbd>1</kbd>-<kbd>4</kbd> · Skip <kbd>Esc</kbd></span><button class="btn gold" data-raise style="display:none">Raise the flag</button></div>
+  </div></div>`);
+  const why = $('.why', node), raise = $('[data-raise]', node);
+  let solved = false;
+  const pick = i => {
+    if (solved) return;
+    const o = opts[i], b = node.querySelectorAll('.opt')[i];
+    if (!o) return;
+    if (o.correct) {
+      solved = true; b.classList.add('right');
+      node.querySelectorAll('.opt').forEach(x => x.disabled = true);
+      why.className = 'why show good'; why.innerHTML = `<b>That's it.</b> ${inline(o.why)}`;
+      raise.style.display = ''; raise.focus(); sfx.right();
+    } else {
+      b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong');
+      why.className = 'why show bad'; why.innerHTML = `<b>Not quite.</b> ${inline(o.why)} Try again.`;
+      sfx.wrong();
+    }
+  };
+  node.querySelectorAll('.opt').forEach((b, i) => b.addEventListener('click', () => pick(i)));
+  const finish = () => { closeOverlay(); };
+  raise.addEventListener('click', finish);
+  const cur = openOverlay(node, { kind: 'quiz', enterCloses: false, pick, onClose: () => { if (solved) raiseFlag(); } });
+  cur.raiseReady = () => solved;
+}
+function raiseFlag() {
+  const w = L.world, r = L.ranger;
+  const first = !save.quiz.includes(w.id);
+  mark('quiz', w.id); updateHud();
+  if (r) { r.raised = true; r.flag = first ? 0 : r.flag; }
+  shake = 9;
+  if (r) { const fx = r.x * TILE - 40 + 168; setTimeout(() => confetti(fx, (r.y + 1) * TILE - 200, 80), 500); }
+  toast('Flag raised. Onward.');
+}
+
+/* basecamp */
+function openBasecamp(idx) {
+  const w = L.world, bc = (w.basecamps || [])[idx];
+  if (!bc) return;
+  const node = el(`<div class="overlay"><div class="panel camp" role="dialog" aria-modal="true" aria-label="Basecamp">
+    <div class="eyebrow"><span class="tag red">Basecamp</span>Demo stop</div>
+    <div class="fire"><div class="glow"></div><div class="log a"></div><div class="log b"></div><div class="fl f1"></div><div class="fl f2"></div><div class="fl f3"></div></div>
+    <h2>${esc(CONTENT.basecampHeadline).replace('Eyes up:', '<em>Eyes up:</em>')}</h2>
+    <p>${inline(bc.text)}</p>
+    <button class="btn gold" data-go>Continue</button>
+  </div></div>`);
+  $('[data-go]', node).addEventListener('click', () => closeOverlay());
+  mark('camps', `${w.id}-${idx}`);
+  openOverlay(node, { kind: 'camp', enterCloses: false });
+}
+
+/* world complete */
+function completeWorld() {
+  const w = L.world;
+  mark('done', w.id);
+  const read = w.cards.filter((_, i) => save.read.includes(`${w.id}-${i}`)).length;
+  const got = w.items.filter(it => save.items.includes(it.id)).length;
+  const next = CONTENT.worlds[worldIdx + 1];
+  confetti(P.x, P.y - 40, 50); sfx.right();
+  const node = el(`<div class="overlay"><div class="panel done" role="dialog" aria-modal="true" aria-label="World complete">
+    <div class="eyebrow"><span class="tag gold">World ${w.id} complete</span>${esc(w.stage)}</div>
+    <h2>${esc(w.topic)}: done.</h2>
+    <p>${next ? `Next on the trail: ${esc(next.stage)}.` : ''}</p>
+    <div class="stats"><span class="chip"><span class="dot"></span>Markers ${read}/${w.cards.length}</span>${w.items.length ? `<span class="chip"><span class="dot p"></span>Items ${got}/${w.items.length}</span>` : ''}${w.quiz ? `<span class="chip">${save.quiz.includes(w.id) ? '⚑ Flag raised' : '⚐ Quiz skipped'}</span>` : ''}</div>
+    <div class="btnrow" style="justify-content:center;margin-top:6px">
+      ${next ? `<button class="btn gold" data-next>Continue to World ${next.id}</button>` : ''}
+      <button class="btn ghost" data-map>Open the map</button>
+      <button class="btn ghost" data-stay>Stay here</button>
+    </div>
+  </div></div>`);
+  if (next) $('[data-next]', node).addEventListener('click', () => { closeOverlay(true); if (!loadWorld(next.id)) openMap(next.id); });
+  $('[data-map]', node).addEventListener('click', () => openMap(next ? next.id : w.id));
+  $('[data-stay]', node).addEventListener('click', () => closeOverlay());
+  openOverlay(node, { kind: 'done', enterCloses: false });
+}
+
+/* world map */
+// [x, y, labelX, labelY, anchor]
+const MAP_NODES = [[150, 628, 150, 590, 'middle'], [318, 596, 342, 634, 'start'], [460, 548, 436, 520, 'end'], [588, 474, 564, 446, 'end'], [790, 290, 766, 262, 'end'], [1046, 186, 1030, 144, 'end']];
+function openMap(highlight) {
+  const cur = L ? L.world.id : 1;
+  const hl = highlight || cur;
+  const trail = 'M 150 628 C 220 640 260 600 318 596 S 420 560 460 548 S 560 500 588 474 C 640 430 700 380 790 290 C 860 230 960 190 1046 186';
+  const node = el(`<div class="map" role="dialog" aria-modal="true" aria-label="World map">
+    <svg viewBox="0 0 1280 720" aria-hidden="false">
+      <defs>
+        <linearGradient id="msky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F6F5"/><stop offset="1" stop-color="#F4EDD0"/></linearGradient>
+        <linearGradient id="mdome" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9c4bb"/><stop offset="1" stop-color="#a39e94"/></linearGradient>
+      </defs>
+      <rect width="1280" height="720" fill="url(#msky)"/>
+      <circle cx="1150" cy="120" r="60" fill="#D2C663" opacity=".35"/>
+      <path d="M0 660 C 200 640 320 610 420 560 Q 520 470 600 462 Q 640 458 650 440 C 700 300 830 176 980 166 C 1040 162 1080 176 1100 196 L 1106 420 L 1116 600 L 1280 660 L 1280 720 L 0 720 Z" fill="url(#mdome)"/>
+      <path d="M1100 196 L 1106 420 L 1116 600 L 1150 640 L 1160 600 L 1130 410 L 1112 200 Z" fill="#8f8a80" opacity=".6"/>
+      <path d="M0 690 C 300 670 700 690 1280 680 L1280 720 L0 720Z" fill="#7a9a6a"/>
+      <path d="M0 704 C 200 694 500 712 1280 700" stroke="#5f9fbe" stroke-width="6" fill="none" opacity=".7"/>
+      <g fill="#3d5a40">${[40, 80, 230, 270, 380, 1190, 1230].map((x, i) => `<path d="M${x} 690 l-14 0 l14 -${40 + i % 3 * 10} l14 ${40 + i % 3 * 10}z"/>`).join('')}</g>
+      <path d="${trail}" fill="none" stroke="#1A1917" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>
+      ${CONTENT.worlds.map((w, i) => {
+        const [x, y, lx, ly, anchor] = MAP_NODES[i]; const done = save.done.includes(w.id); const built = !!w.level; const isHl = w.id === hl;
+        return `<g class="node" tabindex="0" role="button" data-w="${w.id}" aria-label="World ${w.id}: ${esc(w.place)}, ${esc(w.topic)}${built ? '' : ' (opening soon)'}">
+          ${isHl ? `<circle class="pulse" cx="${x}" cy="${y}" r="20" fill="${C.red}"/>` : ''}
+          <circle class="nring" cx="${x}" cy="${y}" r="20" fill="${done ? C.gold : built ? '#fff' : '#ECEAE6'}" stroke="${isHl ? C.red : '#1A1917'}" stroke-width="3"/>
+          <text x="${x}" y="${y + 6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="16" fill="#1A1917">${done ? '✓' : w.id}</text>
+          <text class="nlabel" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(w.place)}</text>
+          <text class="nsub" x="${lx}" y="${ly + 16}" text-anchor="${anchor}">${esc(w.topic.toUpperCase())}${built ? '' : ' · SOON'}</text>
+        </g>`;
+      }).join('')}
+    </svg>
+    <div class="mhead"><span class="eyebrow"><span class="tag gold">World map</span>The Half Dome hike</span><h2>Pick any stage.</h2><p>Click a stop to jump there, or use a link like <span class="mono">#world-3</span>. Your backpack comes with you.</p></div>
+    <div class="mclose">${L ? '<button class="btn ghost small" data-close>Back to the trail <kbd style="font-family:var(--mono);font-size:11px;margin-left:6px">M</kbd></button>' : ''}<button class="btn small" data-list>List view</button></div>
+  </div>`);
+  node.querySelectorAll('.node').forEach(n => {
+    const go = () => { const id = +n.dataset.w; const w = CONTENT.worlds.find(x => x.id === id); if (!w.level) { toast(`World ${id} opens in the next build`); return; } closeOverlay(true); loadWorld(id); };
+    n.addEventListener('click', go);
+    n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); go(); } });
+  });
+  const cl = $('[data-close]', node); if (cl) cl.addEventListener('click', () => closeOverlay());
+  $('[data-list]', node).addEventListener('click', () => openList());
+  openOverlay(node, { kind: 'map', enterCloses: false, onClose: () => { started = true; if (!L) loadWorld(1); } });
+}
+
+/* title */
+function openTitle() {
+  const node = el(`<div class="title" role="dialog" aria-label="${esc(CONTENT.title)}">
+    <div class="kick">${esc(CONTENT.kicker)}</div>
+    <h1>Summit <span>Half Dome</span></h1>
+    <p>${esc(CONTENT.intro)}</p>
+    <div class="btnrow"><button class="btn gold" data-start>Start the hike</button><button class="btn ghost" data-map>World map</button><button class="btn ghost" data-list>Read it as a list</button></div>
+    <div class="keys"><span><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd></span><span>Move</span><span><kbd>Space</kbd> or <kbd>↑</kbd></span><span>Jump</span><span><kbd>E</kbd> or <kbd>Enter</kbd></span><span>Read a trail marker (or hit it from below)</span><span><kbd>M</kbd> <kbd>B</kbd> <kbd>L</kbd></span><span>Map, Backpack, List view</span></div>
+  </div>`);
+  $('[data-start]', node).addEventListener('click', () => { closeOverlay(true); started = true; });
+  $('[data-map]', node).addEventListener('click', () => openMap(1));
+  $('[data-list]', node).addEventListener('click', () => openList());
+  openOverlay(node, { kind: 'title', enterCloses: true, onClose: () => { started = true; } });
+}
+
+/* ---------------- list view ---------------- */
+const list = $('#list');
+function buildList() {
+  const W = CONTENT.worlds;
+  let h = `<div class="list"><div class="lhead"><div class="wordmark">halfdome</div><button class="btn small" data-back>Back to the game <kbd style="font-family:var(--mono);font-size:11px;margin-left:6px;background:#fff;color:#1A1917;border-radius:4px;padding:1px 5px">L</kbd></button></div>
+    <h1>${esc(CONTENT.title)}</h1><p class="lede">${esc(CONTENT.kicker)}. Every card, prompt and question from the game, as plain text.</p>
+    <nav class="lnav">${W.map(w => `<a href="#list-w${w.id}">${w.id}. ${esc(w.place)}</a>`).join('')}</nav>`;
+  for (const w of W) {
+    h += `<section id="list-w${w.id}"><div class="wsub">World ${w.id} · ${esc(w.stage)}</div><h2>${esc(w.topic)}</h2>${w.intro ? `<p>${inline(w.intro)}</p>` : ''}`;
+    let sec = null, ci = 0;
+    const camps = w.basecamps || [];
+    w.cards.forEach((c, i) => {
+      if (c.section && c.section !== sec) {
+        if (sec !== null && w.id === 5 && camps[ci]) { h += campHTML(camps[ci++]); }
+        sec = c.section; h += `<h4>${esc(sec)}</h4>`;
+        if (w.id === 5) h += itemsFor(w, sec);
+      }
+      h += `<div class="lcard"><h3>${inline(c.title)}</h3>${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}</div>`;
+    });
+    if (w.id !== 5) w.items.forEach(it => h += itemHTML(it));
+    if (w.id === 5) while (ci < camps.length) h += campHTML(camps[ci++]);
+    if (w.quiz) h += `<h4>Ranger station</h4><p><b>${inline(w.quiz.question)}</b></p><ul>${w.quiz.options.map(o => `<li>${inline(o.text)}</li>`).join('')}</ul><details><summary>Show the answer</summary><p><b>${inline(w.quiz.options.find(o => o.correct).text)}.</b> ${inline(w.quiz.options.find(o => o.correct).why)}</p></details>`;
+    while (ci < camps.length) h += campHTML(camps[ci++]);
+    if (w.summit) {
+      const s = w.summit;
+      h += `<h4>Summit</h4><h3>${esc(s.heading)}</h3><p><b>Next steps</b></p><ol>${s.nextSteps.map(x => `<li>${inline(x)}</li>`).join('')}</ol><p><b>Always</b></p><ul>${s.always.map(x => `<li>${inline(x)}</li>`).join('')}</ul><p style="font-size:22px;font-weight:800;margin-top:14px">${esc(s.closing)}</p>`;
+    }
+    if (w.id === 1) h += `<details><summary>${esc(CONTENT.easterEgg.title)}</summary>${CONTENT.easterEgg.lines.map(l => `<p>${inline(l)}</p>`).join('')}</details>`;
+    h += `</section>`;
+  }
+  h += `</div>`;
+  list.innerHTML = h;
+  wireCopy(list);
+  $('[data-back]', list).addEventListener('click', () => toggleList(false));
+  list.querySelectorAll('.lnav a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = $(a.getAttribute('href'), list); if (t) list.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); }));
+  function campHTML(bc) { return `<div class="camp-l"><b>Basecamp.</b> ${esc(CONTENT.basecampHeadline)}. ${inline(bc.text)}</div>`; }
+  function itemHTML(it) { return `<div class="litem"><h3>${esc(it.title)} <button class="btn gold small" data-copy data-text="${encodeURIComponent(it.text)}">Copy</button></h3>${it.note ? `<p class="note" style="display:inline-block;margin-bottom:8px">${esc(it.note)}</p>` : ''}<pre class="prompt">${promptHTML(it.text)}</pre><span class="copied" aria-live="polite"></span></div>`; }
+  function itemsFor(w, sec) { const map = { '5a': 'week-ahead', '5b': 'mi-to-monday', '5c': 'wip-wrapup' }; const id = map[sec.slice(0, 2)]; const it = w.items.find(i => i.id === id); return it ? itemHTML(it) : ''; }
+}
+function openList() { toggleList(true); }
+function toggleList(on) {
+  if (on) { buildList(); list.classList.add('on'); list.scrollTop = 0; overlayOpen = true; $('[data-back]', list).focus(); }
+  else { list.classList.remove('on'); overlayOpen = !!current; }
+}
+
+/* ---------------- card visuals ---------------- */
+const VISUALS = {
+  prefs(host) {
+    host.className = 'vx v-prefs';
+    host.innerHTML = `<div class="win"><div class="bar"><i></i><i></i><i></i><span>Settings › Personal preferences</span></div><div class="ta"><span class="t"></span><span class="caret"></span></div></div>
+      <div class="sw"><b style="background:#D2C663"></b><b style="background:#8E1C02"></b><b style="background:#B0A3D0"></b></div>
+      <div class="reach"><div class="lbl">Applies to</div><div class="pill">every chat</div><div class="pill">every artifact</div><div class="pill">every project</div></div>`;
+    const text = 'Use our brand colours as accents: Gold #D2C663, Red #8E1C02, Purple #B0A3D0. #F7F6F5 for slides, white for everything else.';
+    const t = $('.t', host), sw = host.querySelectorAll('.sw b'), pills = host.querySelectorAll('.pill');
+    let i = 0; const timers = [];
+    const iv = setInterval(() => {
+      i++; t.textContent = text.slice(0, i);
+      if (text.slice(0, i).endsWith('#D2C663')) sw[0].classList.add('on');
+      if (text.slice(0, i).endsWith('#8E1C02')) sw[1].classList.add('on');
+      if (text.slice(0, i).endsWith('#B0A3D0')) sw[2].classList.add('on');
+      if (i >= text.length) { clearInterval(iv); pills.forEach((p, k) => timers.push(setTimeout(() => p.classList.add('on'), 300 + k * 450))); }
+    }, 26);
+    return () => { clearInterval(iv); timers.forEach(clearTimeout); };
+  },
+  about(host) {
+    host.className = 'vx v-about';
+    host.innerHTML = `<div class="pg">${'<i></i>'.repeat(20)}</div><span class="x">a page</span><div class="arrow">→</div>
+      <div class="tight"><div class="lbl">A tight paragraph</div>${['Role', 'Clients', 'Platforms', 'How you like answers'].map((s, i) => `<span style="animation-delay:${1.6 + i * 0.35}s">${s}</span>`).join('')}</div>
+      <div class="ok">✓ One tight paragraph Claude reads every time</div>`;
+    return null;
+  },
+  memory(host) {
+    host.className = 'vx v-mem';
+    host.innerHTML = `<div class="toggles"><div class="lbl">Settings › Capabilities</div><div class="tg">Memory <span class="sw"></span></div><div class="tg">Search past chats <span class="sw"></span></div></div>
+      <div class="mem"><div class="lbl">What Claude remembers</div>
+      <div class="m"><span>Works on TMC and two retail clients</span><span class="pen">edit</span></div>
+      <div class="m"><span>Prefers bullets over paragraphs</span><span class="pen">edit</span></div>
+      <div class="m"><span>Writes in Australian English</span><span class="pen">edit</span></div>
+      <div class="m"><span>Runs WIPs on Tuesdays</span><span class="pen">edit</span></div></div>`;
+    const sws = host.querySelectorAll('.sw'), ms = host.querySelectorAll('.m'), timers = [];
+    timers.push(setTimeout(() => sws[0].classList.add('on'), 400));
+    timers.push(setTimeout(() => sws[1].classList.add('on'), 900));
+    ms.forEach((m, i) => timers.push(setTimeout(() => m.classList.add('on'), 1400 + i * 380)));
+    timers.push(setTimeout(() => { ms[3].classList.add('edit'); }, 3400));
+    timers.push(setTimeout(() => { ms[3].firstElementChild.textContent = 'Runs WIPs on Wednesdays'; ms[3].lastElementChild.textContent = 'edited'; }, 4100));
+    timers.push(setTimeout(() => { ms[3].classList.remove('edit'); }, 4900));
+    return () => timers.forEach(clearTimeout);
+  },
+  import(host) {
+    host.className = 'vx v-imp';
+    host.innerHTML = `<div class="box a"><div class="lbl">From</div><h4>ChatGPT</h4></div><div class="rail"></div><div class="box b"><div class="lbl">To</div><h4>Claude</h4></div>
+      ${['Your role', 'Your clients', 'How you write'].map((s, i) => `<span class="tok" style="top:${92 + i * 37}px;animation-delay:${0.3 + i * 0.6}s">${s}</span>`).join('')}`;
+    return null;
+  },
+  folders(host) {
+    host.className = 'vx v-fold';
+    const fs = [['Clients', 't'], ['TMC', 't'], ['Media plans', 't'], ['Downloads', 'n'], ['Personal', 'n'], ['Desktop', 'n']];
+    host.innerHTML = `<div class="grid">${fs.map(([n, k]) => `<div class="f ${k}"><div class="ic"><span class="mk">${k === 't' ? '✓' : 'off'}</span></div>${n}</div>`).join('')}</div><div class="cap lbl">Claude desktop app · trusted folders only</div>`;
+    const f = host.querySelectorAll('.f'), timers = [];
+    f.forEach((x, i) => timers.push(setTimeout(() => x.classList.add('show'), 300 + i * 260)));
+    return () => timers.forEach(clearTimeout);
+  },
+  origin(host) {
+    host.className = 'vx v-origin';
+    host.innerHTML = `<svg viewBox="0 0 740 236" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="og" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4E3B0"/><stop offset="1" stop-color="#F7F6F5"/></linearGradient></defs>
+      <rect width="740" height="236" fill="url(#og)"/><circle cx="600" cy="70" r="40" fill="#D2C663" opacity=".5"/>
+      <path d="M120 236 C 200 220 250 190 290 150 C 340 70 430 46 500 48 C 530 49 548 56 556 64 L 558 140 L 566 236 Z" fill="#a39e94"/>
+      <path d="M556 64 L 558 140 L 566 236 L 590 236 L 572 140 L 566 70 Z" fill="#8f8a80"/>
+      <line x1="520" y1="50" x2="520" y2="14" stroke="#1A1917" stroke-width="3"/><path d="M520 14 L 552 22 L 520 30 Z" fill="#8E1C02"/>
+      <g fill="#1A1917"><circle cx="496" cy="34" r="5"/><rect x="492" y="39" width="8" height="12" rx="3"/><circle cx="476" cy="36" r="5"/><rect x="472" y="41" width="8" height="12" rx="3"/></g>
+      <text x="40" y="60" font-family="IBM Plex Mono" font-size="12" font-weight="600" fill="#55524E" letter-spacing="1.5">YOSEMITE · HALF DOME</text></svg>`;
+    return null;
+  }
+};
+
+/* ---------------- keyboard ---------------- */
+const isListOpen = () => list.classList.contains('on');
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (isListOpen()) {
+    if (k === 'escape' || (k === 'l' && !e.target.closest('input,textarea'))) { e.preventDefault(); toggleList(false); }
+    return;
+  }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (current) {
+    if (e.repeat) return;
+    if (k === 'escape') { e.preventDefault(); closeOverlay(); return; }
+    if (k === 'enter' && current.enterCloses && !e.target.closest('button,a')) { e.preventDefault(); closeOverlay(); return; }
+    if (k === 'enter' && current.kind === 'quiz' && current.raiseReady && current.raiseReady()) { e.preventDefault(); closeOverlay(); return; }
+    if (current.kind === 'quiz' && /^[1-4]$/.test(k)) { current.pick(+k - 1); return; }
+    if (k === 'm') { e.preventDefault(); current.kind === 'map' ? closeOverlay() : openMap(); return; }
+    if (k === 'b') { e.preventDefault(); current.kind === 'pack' ? closeOverlay() : openBackpack(); return; }
+    if (k === 'l') { e.preventDefault(); openList(); return; }
+    if (k === ' ' || k.startsWith('arrow')) e.preventDefault();
+    return;
+  }
+  switch (k) {
+    case 'arrowleft': case 'a': keys.left = true; break;
+    case 'arrowright': case 'd': keys.right = true; break;
+    case ' ': case 'arrowup': case 'w': case 'z': if (!e.repeat) jumpQueued = true; keys.jump = true; break;
+    case 'e': case 'enter': if (!e.repeat) actQueued = true; break;
+    case 'm': openMap(); break;
+    case 'b': openBackpack(); break;
+    case 'l': openList(); break;
+    default: return;
+  }
+  e.preventDefault();
+  hideHelpSoon();
+});
+addEventListener('keyup', e => {
+  const k = e.key.toLowerCase();
+  if (k === 'arrowleft' || k === 'a') keys.left = false;
+  if (k === 'arrowright' || k === 'd') keys.right = false;
+  if (k === ' ' || k === 'arrowup' || k === 'w' || k === 'z') keys.jump = false;
+});
+addEventListener('blur', () => { keys.left = keys.right = keys.jump = false; });
+let helpT = 0;
+function hideHelpSoon() { if (helpT) return; helpT = setTimeout(() => $('#help').style.opacity = '0', 9000); }
+
+/* touch */
+const touchEl = $('#touch');
+if (matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window) touchEl.classList.add('on');
+touchEl.querySelectorAll('.tbtn').forEach(b => {
+  const k = b.dataset.k;
+  const down = e => { e.preventDefault(); b.classList.add('down'); if (k === 'left') keys.left = true; if (k === 'right') keys.right = true; if (k === 'jump') { keys.jump = true; jumpQueued = true; } if (k === 'act') actQueued = true; };
+  const up = e => { e.preventDefault(); b.classList.remove('down'); if (k === 'left') keys.left = false; if (k === 'right') keys.right = false; if (k === 'jump') keys.jump = false; };
+  b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up); b.addEventListener('pointercancel', up);
+});
+
+/* HUD buttons */
+$('#btnMap').addEventListener('click', e => { e.currentTarget.blur(); current && current.kind === 'map' ? closeOverlay() : openMap(); });
+$('#btnPack').addEventListener('click', e => { e.currentTarget.blur(); current && current.kind === 'pack' ? closeOverlay() : openBackpack(); });
+$('#btnList').addEventListener('click', e => { e.currentTarget.blur(); openList(); });
+$('#btnSound').addEventListener('click', e => { e.currentTarget.blur(); save.sound = !save.sound; persist(); updateHud(); if (save.sound) sfx.open(); });
+
+/* ---------------- routing + boot ---------------- */
+function worldFromHash() { const m = location.hash.match(/^#world-(\d)/); return m ? +m[1] : 0; }
+addEventListener('hashchange', () => {
+  const id = worldFromHash();
+  if (id && (!L || L.world.id !== id)) { closeOverlay(true); if (isListOpen()) toggleList(false); if (!loadWorld(id)) openMap(id); }
+});
+function boot() {
+  const id = worldFromHash();
+  if (id && CONTENT.worlds.find(w => w.id === id && w.level)) { loadWorld(id); }
+  else {
+    loadWorld(1); started = false;
+    if (id) { openMap(id); toast(`World ${id} opens in the next build`); }
+    else openTitle();
+  }
+  updateHud();
+  requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+}
+// expose a tiny hook for automated checks
+window.__summit = { P, get L() { return L; }, save, loadWorld, keys, get current() { return current; } };
+boot();
+})();
+</script>
+</body>
+</html>
