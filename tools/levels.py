@@ -35,7 +35,7 @@ L.ground(19, 23, 12); L.ground(24, 27, 13)
 L.put(31, 13, 'K'); L.put(27, 9, '?')
 L.ground(39, 41, 12); None
 L.put(47, 13, 'K'); L.put(54, 10, '?')
-L.clear(59, 66, 14, 17); L.fill(59, 66, 15, 17, '~'); L.fill(61, 64, 14, 17, '#')   # Merced crossing
+L.clear(56, 73, 14, 17); L.fill(56, 73, 15, 17, '~')   # Merced crossing: too wide to jump, take the avocado ferry
 L.put(76, 13, 'Y'); L.put(84, 10, '?')
 L.put(92, 13, 'K'); L.fill(97, 101, 11, 11, '='); L.put(103, 10, '?')
 L.put(110, 13, 'K'); L.put(122, 10, '?'); L.put(117, 13, '1')
