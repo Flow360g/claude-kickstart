@@ -79,7 +79,15 @@ code,.mono{font-family:var(--mono)}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px}
 
 /* card */
-.card{width:880px;max-height:700px;overflow:auto;padding:28px 40px 20px;display:flex;flex-direction:column;gap:11px;cursor:pointer}
+.card{width:1200px;max-height:700px;overflow:auto;padding:26px 36px 18px;display:flex;flex-direction:column;gap:12px;cursor:pointer}
+.card:has(.cbody:not(.two)){width:860px}
+.cbody{display:flex;flex-direction:column;gap:12px}
+.cbody.two{display:grid;grid-template-columns:minmax(0,1fr) 590px;gap:26px;align-items:start}
+.cl,.cr{display:flex;flex-direction:column;gap:11px;min-width:0}
+.vwrap{position:relative;width:590px;height:189px;flex:none}
+.vwrap .visual{position:absolute;left:0;top:0;transform:scale(.8);transform-origin:top left}
+.cr .attach{flex-wrap:wrap}
+.cr .attach .ai{flex-basis:300px}
 .card h2{margin:0;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-0.02em;text-wrap:balance}
 .card .lines{display:flex;flex-direction:column;gap:5px}
 .card .lines p{margin:0;font-size:17.5px;line-height:1.42;color:#33312e}
@@ -101,7 +109,7 @@ code,.mono{font-family:var(--mono)}
 .card .tagline{align-self:flex-start;font-family:var(--mono);font-size:13px;font-weight:600;background:var(--gold-soft);border:1px solid var(--gold);border-radius:999px;padding:4px 12px}
 .talk{font-size:15px;line-height:1.4;border:1.5px dashed var(--purple);background:var(--purple-soft);border-radius:10px;padding:8px 12px;color:var(--ink)}
 .talk b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
-.visual{position:relative;height:236px;flex:none;width:738px;align-self:center;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.visual{position:relative;height:236px;flex:none;width:738px;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .replay{position:absolute;right:10px;bottom:10px;z-index:3;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
 .replay:hover{border-color:var(--gold);color:var(--ink)}
 
@@ -351,6 +359,19 @@ code,.mono{font-family:var(--mono)}
 .v-bars .big{font-size:28px;font-weight:900;letter-spacing:-0.02em;opacity:0;transition:opacity .5s .9s}
 .v-bars.go .big{opacity:1}
 .v-bars .date{position:absolute;right:16px;top:14px;font-family:var(--mono);font-size:11px;font-weight:700;background:var(--gold);border-radius:6px;padding:3px 8px}
+/* effort */
+.v-effort .menu{position:absolute;left:30px;top:24px;width:250px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px;display:flex;flex-direction:column;gap:6px}
+.v-effort .mi{font-weight:700;font-size:15px;padding:8px 10px;border-radius:8px;background:var(--white);display:flex;justify-content:space-between;align-items:center}
+.v-effort .mi span{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.v-effort .mi.on{background:var(--red);color:var(--white)}
+.v-effort .mi.on span{color:var(--red-soft)}
+.v-effort .dial{position:absolute;left:310px;right:30px;top:24px;display:flex;flex-direction:column;gap:12px}
+.v-effort .lv{display:flex;gap:6px}
+.v-effort .lv button{flex:1;border:1.5px solid var(--line);background:var(--white);border-radius:10px;padding:10px 4px;font-weight:800;font-size:13px;transition:all .3s}
+.v-effort .lv button.on{background:var(--gold);border-color:#9c9140}
+.v-effort .bar{height:12px;border-radius:999px;background:var(--card);overflow:hidden}
+.v-effort .bar i{display:block;height:100%;background:var(--red);border-radius:999px;transition:width .5s}
+.v-effort .cap{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--muted)}
 /* thumb */
 .v-thumb{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:18px 26px}
 .v-thumb .side{border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;justify-content:space-between;background:var(--card)}
@@ -529,15 +550,21 @@ code,.mono{font-family:var(--mono)}
 /* =====================================================================
    CONTENT
    Edit text here without touching the game code below.
-   - Inline `code` and **bold** work in card lines and checklists.
+   - Inline `code` and **bold** work in card lines, steps and checklists.
+   - Card fields: title, lines (what it is and why it matters), steps (how
+     to do it), tip, tag, visual, item (a backpack prompt shown on the
+     card and added to the backpack when the card is read), talk
+     (presenter mode only: press P, or open #presenter).
    - In prompts, [square brackets] are highlighted as things to fill in.
-   - `talk` lines show only in presenter mode (press P, or open #presenter).
    - Checklist lines can carry a Copy button (`item: '<backpack item id>'`
      or `copy: 'text'`) and a Download button (`download: '<download id>'`).
+   - Menu paths checked against Anthropic's help centre on 6 October 2026.
+     Team plans still choose Chat or Cowork in the message box until the
+     merged "new Claude experience" reaches Team.
    - Level legend (one character = one 40px tile):
        #  granite (solid)          =  log or plank (stand on top)
        ~  water                    ?  trail marker (cards, in order, left to right)
-       !  hidden trail marker      b  backpack item (items, in order, left to right)
+       !  hidden trail marker      b  backpack item pickup (optional)
        P  player start             S  trailhead sign (shows the stage name)
        1-9  sign from `signs`      T  pine tree
        R  ranger station (quiz)    C  campfire checklist (basecamps, in order)
@@ -548,7 +575,7 @@ code,.mono{font-family:var(--mono)}
 const CONTENT = {
   title: 'Summit Half Dome',
   kicker: 'Claude kickstart · Client Solutions',
-  intro: 'Six stages of the Half Dome hike, from the valley floor to the Visor. Read the trail markers, fill your backpack, tick off each campfire checklist, and summit with a kit you can use on Monday.',
+  intro: 'Six stages of the Half Dome hike, from the valley floor to the Visor. Read the trail markers, collect the prompts, tick off each campfire checklist, and summit with a kit you can use on Monday.',
 
   campHeading: 'Campfire checklist',
   campSub: 'Do these now, while Harry shows them. Ticks save on this laptop.',
@@ -567,53 +594,60 @@ const CONTENT = {
       stage: 'Happy Isles trailhead',
       topic: 'Set Claude up once',
       cards: [
-        { title: 'Add the brand colours', item: 'brand-block',
-          lines: ['Paste the palette into your personal preferences, and every artifact comes out on brand.'],
-          visual: 'prefs',
-          talk: 'Do this live, screen shared, everyone following along. Steps 1 and 2 use the two blocks in the backpack.' },
-        { title: 'Tell it about your job', item: 'about-you-block',
-          lines: ['Role, clients, platforms, and how you like answers.', 'A tight paragraph beats a page.'],
-          visual: 'about',
-          talk: 'Push people to be specific about what they own and what good looks like. That changes the answers most.' },
+        { title: 'Tell Claude about your job, once',
+          lines: ['**Instructions for Claude** (it used to be called personal preferences) is one box that Claude reads before every chat, artifact and project.', 'Put in your role, your clients, the platforms you use and how you like answers. A tight paragraph beats a page: Claude follows five clear lines better than fifty vague ones.'],
+          steps: ['Click your initials, bottom left, then **Settings**.', 'Find **Instructions for Claude** (on some accounts it still reads "What personal preferences should Claude consider in responses?").', 'Paste the About-you block below, fill in the brackets, and save.'],
+          tip: '**Settings** is about you. **Customize** holds connectors and skills. **Organization settings** is for admins.',
+          visual: 'about', item: 'about-you-block',
+          talk: 'Do this live, screen shared, everyone following along. Push people to be specific about what they own and what good looks like. That changes the answers most.' },
+        { title: 'Make every artifact come out on brand',
+          lines: ['Add the Half Dome palette to the same Instructions box, under your About-you paragraph. From then on, every doc, dashboard and artifact Claude builds for Half Dome uses gold, red and purple, and leaves unrelated work alone.', 'For decks and designs the whole team shares, the Half Dome **design system** does the heavy lifting. You will meet it at Nevada Fall.'],
+          steps: ['Copy the Brand block below.', 'Paste it into **Instructions for Claude**, on its own line under your About-you paragraph.', 'Test it: ask for "a one-page summary of my week as an artifact".'],
+          visual: 'prefs', item: 'brand-block' },
         { title: 'Turn on memory and chat search',
-          lines: ['It remembers across chats, and you can see and edit every memory.'],
+          lines: ['With memory on, Claude builds up what it knows about your work across chats, so you stop re-explaining clients and preferences. Chat search lets it look back at earlier conversations when you ask.', 'You can see and edit every memory. Each project keeps its own separate memory, so client work stays in its lane.'],
+          steps: ['Go to **Settings > Memory** and switch on **Generate memory from chats**.', 'Switch on **Search and reference chats**.', 'Open **Topics** to read, edit or delete anything Claude has remembered.'],
+          tip: 'Sensitive client chat? Use an incognito chat (the ghost icon, top right) and nothing is remembered.',
           visual: 'memory',
-          talk: 'Memory is off by default for Team organisations, so confirm it is on at org level. Show they can see and edit every memory topic.' },
-        { title: 'Import from ChatGPT',
-          lines: ['Bring across what it already knows about you.'],
+          talk: 'Memory is off for each member on Team until an Owner enables it in Organization settings > Capabilities, so confirm that before the session. Turning org memory off later deletes everyone\'s memory.' },
+        { title: 'Import what ChatGPT already knows',
+          lines: ['If you have used ChatGPT or another assistant, you can bring its memory of you across in about two minutes. Claude gives you a prompt to run there, then reads the answer back in.', 'The import is still experimental. Claude keeps mostly work-related details, so check what it learned afterwards.'],
+          steps: ['Go to **Settings > Memory** and choose **Start import**.', 'Copy the prompt Claude shows you, run it in ChatGPT, and copy ChatGPT\'s answer.', 'Paste it back into Claude and choose **Add to memory**, then **See what Claude learned about you**.'],
           visual: 'import' },
-        { title: 'Trusted folders (desktop app)',
-          lines: ['Only the folders Claude should work in.'],
+        { title: 'Trusted folders on your laptop',
+          lines: ['In the desktop app, Cowork can read and write files on your laptop, but only in folders you hand it, and only while the app is open. Folders you always allow become **trusted folders**.', 'Anthropic\'s advice: give Claude a dedicated working folder (or one client folder), never your whole drive.'],
+          steps: ['In the desktop app, choose **Cowork** in the message box and pick a folder to work in.', 'When Claude asks, choose **Always allow** only for folders it should keep using.', 'Review or remove them in **Settings > Cowork > Trusted Cowork folders > Manage**.'],
+          tip: 'Claude asks before it permanently deletes any file.',
           visual: 'folders',
-          talk: 'Trusted folders are the only parts of their computer Claude can reach.' }
+          talk: 'Claude can only read and write files in the folders people connect. Connectors and the browser reach further, which is World 3.' }
       ],
       items: [
-        { id: 'brand-block', title: 'Brand block', where: 'Paste into your personal preferences.',
-          text: "When creating documents or artifacts for Half Dome, use our brand colours as accents: Gold #D2C663, Red #8E1C02, Purple #B0A3D0. Use #F7F6F5 as the background for slides, and white for everything else. Don't use these colours for unrelated requests." },
-        { id: 'about-you-block', title: 'About-you block', where: 'Fill in the brackets, then paste into your personal preferences.',
-          text: "I'm a [role] in the [team] at Half Dome, an independent performance marketing agency. I work on [clients or projects], and most of my day is [main tasks]. What good looks like in my role: [outcomes you own]. My goals in this role are XYZ. Write in Australian English, be concise and direct, lead with the answer, and show your working on any numbers." }
+        { id: 'about-you-block', title: 'About-you block', where: 'Fill in the brackets, then paste into Instructions for Claude.',
+          text: "I'm a [role] in the [team] at Half Dome, an independent performance marketing agency. I work on [clients or projects], and most of my day is [main tasks]. What good looks like in my role: [outcomes you own]. My goals in this role are XYZ. Write in Australian English, be concise and direct, lead with the answer, and show your working on any numbers." },
+        { id: 'brand-block', title: 'Brand block', where: 'Paste into Instructions for Claude, under your About-you paragraph.',
+          text: "When creating documents or artifacts for Half Dome, use our brand colours as accents: Gold #D2C663, Red #8E1C02, Purple #B0A3D0. Use #F7F6F5 as the background for slides, and white for everything else. Don't use these colours for unrelated requests." }
       ],
       quiz: {
         question: 'Where do the brand colours go so every artifact uses them?',
         options: [
-          { text: 'Your personal preferences', correct: true,
-            why: 'Preferences carry into every chat, every artifact and every project.' },
+          { text: 'Instructions for Claude, in Settings', correct: true,
+            why: 'Instructions for Claude apply to every chat, every artifact and every project.' },
           { text: 'A single chat',
-            why: 'That only helps the chat you pasted it into. Preferences carry into every chat.' },
+            why: 'That only helps the chat you pasted it into. Instructions for Claude carry into every chat.' },
           { text: 'Each project separately',
-            why: "You'd be repeating yourself in every project. Your personal preferences cover all of them at once." },
+            why: "You'd be repeating yourself in every project. Instructions for Claude cover all of them at once." },
           { text: 'A Monday board',
-            why: 'A board is where work lives, not where Claude picks up how you like things. Paste the palette into your personal preferences.' }
+            why: 'A board is where work lives, not where Claude picks up how you like things. Paste the palette into Instructions for Claude.' }
         ]
       },
       basecamps: [
         { title: 'Set Claude up once',
           items: [
-            { text: 'Paste the **Brand block** into your personal preferences.', item: 'brand-block' },
-            { text: 'Fill in the **About-you block** and paste it in under it.', item: 'about-you-block' },
-            { text: 'Turn on memory and chat search.' },
-            { text: 'Used ChatGPT? Import what it already knows about you.' },
-            { text: 'Desktop app: add only the folders Claude should work in.' }
+            { text: 'Fill in the **About-you block** and paste it into Instructions for Claude.', item: 'about-you-block' },
+            { text: 'Paste the **Brand block** under it.', item: 'brand-block' },
+            { text: 'Settings > Memory: turn on memory and chat search.' },
+            { text: 'Used ChatGPT? Settings > Memory > Start import.' },
+            { text: 'Desktop app: give Cowork one working folder, not your whole drive.' }
           ] }
       ],
       level: [
@@ -638,27 +672,30 @@ const CONTENT = {
       topic: 'Pick the model for the job',
       cards: [
         { title: 'Opus 5.5: leave it here',
-          lines: ['Multi-step work, and anything going to a client.', 'The default.'],
+          lines: ['Opus 5.5 is the default, and the right pick for multi-step work and anything going to a client: recaps from a messy WIP, media plan reasoning, a deck narrative, a tricky email.', 'It performs at the level of Fable 5.1 on most work while using far less of your limits.'],
+          steps: ['Click the model name next to the send button.', 'Check it says **Opus 5.5**.', 'Leave it there unless the job clearly fits another model.'],
           visual: 'models', focus: 'opus',
           talk: 'Keep this to two minutes. Up is capability, right is how fast a model eats into your usage limits. Opus 5.5 sits almost level with Fable while using less, which is why it is the default.' },
-        { title: 'Sonnet 5',
-          lines: ['Quick drafts, summaries, one-report reads.'],
+        { title: 'Sonnet 5.5: the fast pair of hands',
+          lines: ['Sonnet 5.5 replaced Sonnet 5 on 28 September. It runs over 30% faster and uses less of your limits.', 'Use it for well-scoped everyday jobs: a quick draft, a summary of one report, reformatting a table, tidying notes, a first pass at a doc or a slide.'],
+          steps: ['Open the model menu and choose **Sonnet 5.5**.', 'Switch back to Opus 5.5 when the job needs judgement or is going to a client.'],
           visual: 'models', focus: 'sonnet' },
-        { title: 'Haiku 4.5',
-          lines: ['Bulk reformatting and simple repeat jobs.'],
-          visual: 'models', focus: 'haiku',
-          talk: 'Haiku is rarely the right pick in chat.' },
-        { title: 'Fable 5.1',
-          lines: ['The rare, very hard, long-running job.'],
-          visual: 'models', focus: 'fable',
-          talk: 'Fable only shows if it is in your picker.' },
+        { title: 'Fable 5.1: the rare, very hard job',
+          lines: ['Fable 5.1 is the most capable model, for the rare, very hard, long-running job, like untangling a full year of messy campaign data.', 'On standard Team seats it runs on paid usage credits rather than your normal limits, so it costs real money. Opus 5.5 handles almost everything we do.'],
+          steps: ['Ask: would Opus 5.5 really struggle with this?', 'If yes, check with your lead before switching to Fable.'],
+          visual: 'models', focus: 'fable' },
+        { title: 'Effort: how hard it thinks',
+          lines: ['The same menu that picks the model has an **Effort** setting, from Low to Max. Higher effort means more thinking time and more of your limits.', 'Medium suits most work. Turn it up for knotty analysis, down for quick reformatting.'],
+          steps: ['Click the model name next to the send button.', 'Choose **Effort** and pick a level.', 'Keep an eye on your limits in **Settings > Usage**.'],
+          visual: 'effort' },
         { title: 'Rule of thumb',
-          lines: ["A senior strategist's job, use Opus.", 'A fast pair of hands, use Sonnet.'],
+          lines: ["A senior strategist's job, use Opus. A fast pair of hands, use Sonnet.", 'Anything a client will read, a number you will quote, or a task with several steps: Opus 5.5. A quick draft, summary or reformat you will check yourself: Sonnet 5.5.'],
           visual: 'thumb' },
-        { title: 'Opus 5.5 landed 22 September 2026 and is the new default', item: 'fresh-chat',
-          lines: ['Around 40% cheaper to run and over 30% faster than Opus 5.', 'Five-hour usage limits are up on Team plans.', 'Tip: a fresh chat per task uses less than one endless thread.'],
-          visual: 'opus55',
-          talk: 'The bars are drawn to those ratios. The launch also gave subscribers a one-off rate limit reset, usable any time up to 22 October.' }
+        { title: 'Opus 5.5 is the new default',
+          lines: ['Opus 5.5 landed on 22 September 2026: around 40% cheaper to run and over 30% faster than Opus 5. Five-hour usage limits went up on Team plans at the same time.', 'Long threads use more of your limits with every message, because Claude rereads the whole thread. A fresh chat per task is cheaper and usually gives better answers.'],
+          steps: ['When a thread gets long or drifts, paste the **Fresh-chat handover** prompt below.', 'Start a new chat and paste in the handover.', 'Check your remaining limits any time in **Settings > Usage**.'],
+          visual: 'opus55', item: 'fresh-chat',
+          talk: 'The bars are drawn to those ratios. The launch also gave subscribers a one-off rate limit reset in Settings > Usage, reported as usable up to 22 October.' }
       ],
       items: [
         { id: 'fresh-chat', title: 'Fresh-chat handover', where: 'Paste at the end of a long thread, then start a new chat with the answer.',
@@ -669,23 +706,24 @@ const CONTENT = {
         options: [
           { text: 'Opus 5.5', correct: true,
             why: "It's multi-step work and it's going to a client. That's Opus, and it's the default." },
-          { text: 'Sonnet 5',
-            why: "Sonnet suits quick drafts and summaries. This one is multi-step and it's going to a client." },
-          { text: 'Haiku 4.5',
-            why: 'Haiku is for bulk reformatting and simple repeat jobs. A client recap needs more than that.' },
+          { text: 'Sonnet 5.5',
+            why: "Sonnet suits quick drafts and summaries you'll check yourself. This one is multi-step and it's going to a client." },
           { text: 'Fable 5.1',
-            why: "Fable is for the rare, very hard, long-running job. A recap doesn't need it." }
+            why: "Fable is for the rare, very hard, long-running job, and on standard seats it costs paid credits. A recap doesn't need it." },
+          { text: 'Whichever model the last chat used',
+            why: 'Pick per job. Multi-step work going to a client is Opus 5.5.' }
         ]
       },
       basecamps: [
         { title: 'Pick the model for the job',
           items: [
-            { text: 'Check your model picker says **Opus 5.5**, and leave it there.' },
-            { text: 'Start a fresh chat for your next new task.' },
+            { text: 'Check your model menu says **Opus 5.5**, and leave it there.' },
+            { text: 'Try **Sonnet 5.5** on your next quick summary.' },
+            { text: 'Look at **Settings > Usage** so you know where your limits sit.' },
             { text: 'Save the **Fresh-chat handover** for when a thread gets long.', item: 'fresh-chat' }
           ] }
       ],
-      signs: { 1: 'Opus 5.5 · main trail', 2: 'Sonnet 5 · quick spur', 3: 'Haiku 4.5 · low path', 4: 'Fable 5.1 · the hard way', 5: 'Vernal Fall lookout' },
+      signs: { 1: 'Opus 5.5 · main trail', 2: 'Sonnet 5.5 · quick spur', 3: 'Effort · low path', 4: 'Fable 5.1 · the hard way', 5: 'Vernal Fall lookout' },
       level: [
         '',
         '',
@@ -717,50 +755,54 @@ const CONTENT = {
       intro: 'Touch each trail post to connect it to the Claude beacon.',
       cards: [
         { title: 'MCPs are APIs for a language model',
-          lines: ['Claude reaches into the system instead of being told about it second hand.'],
+          lines: ['A connector (built on MCP, the Model Context Protocol) lets Claude reach into a tool directly: read the Monday board, search Outlook, open the SharePoint file, list the Granola meetings.', 'Claude reaches into the system instead of being told about it second hand. No more copying and pasting boards and threads into chat, and no stale copies.'],
           visual: 'hub' },
         { title: 'The ones that matter to us',
-          lines: ['Microsoft 365 (SharePoint, Outlook, Teams), Monday.com (briefs and boards), Slack (channels and threads), Granola (call notes and transcripts), plus many more under Settings, Connectors.'],
+          lines: ['**Microsoft 365**: SharePoint, OneDrive, Outlook and Teams. **monday.com**: briefs, boards and items. **Slack**: channels and threads. **Granola**: your meeting notes. Plus many more in the connector directory.', 'Some need admin setup first. Microsoft 365 can only draft emails or save files once an admin switches on its write tools. Slack needs the Claude app installed in our workspace. Granola is read-only, and on Granola\'s free plan it only sees your own notes from the last 30 days.'],
+          steps: ['Go to **Customize > Connectors**.', 'Find the connector and choose **Connect**.', 'Sign in with your own work account.'],
           visual: 'hub',
-          talk: 'Connect these in Settings, Connectors. They are what make the two workflow skills later possible: Claude reads the board, the files and the meeting directly instead of you pasting them in.' },
-        { title: 'Check every one', item: 'connector-check',
-          lines: ['Most can write as well as read.', 'Know which before you ask for changes.'],
-          visual: 'hub', mode: 'write' },
+          talk: 'These are what make the two workflow skills later possible: Claude reads the board, the files and the meeting directly instead of you pasting them in.' },
+        { title: 'Check every one',
+          lines: ['Most connectors can write as well as read: create Monday items, draft emails, post to Slack. Know which before you ask for changes.', 'Each connector has **tool permissions**. Set every tool to **Always allow**, **Needs approval** or **Blocked**. Write tools set to Needs approval are a good default.'],
+          steps: ['Go to **Customize > Connectors** and open a connector.', 'Open **Tool permissions** and set the write tools to **Needs approval**.', 'Run the **Connector check** below in any chat.'],
+          visual: 'hub', mode: 'write', item: 'connector-check' },
         { title: "Read first. Write when you're sure",
-          lines: ['Draft-first flows and approval steps keep a person in charge of changes.'],
-          visual: 'draft',
-          talk: 'Start with questions. When Claude does write, use flows that draft first or ask before changing anything, like the two skills later in the session.' },
+          lines: ['Start with questions: what is due, who asked what, what changed. When Claude does write, use flows that draft first or ask before acting, like the two skills at the Cables.', 'In Cowork, the permission mode sets how much Claude does on its own. **Manual** asks before acting. **Auto** and **Skip** ask less. Stay on Manual for anything client-facing.'],
+          steps: ['Ask a read-only question first: "Read only, don\'t change anything."', 'Check the draft or the plan Claude shows you.', 'Only then say yes to the change.'],
+          visual: 'draft' },
         { title: 'Set up once',
-          lines: ['Your admin switches a connector on for the organisation; each person then signs in with their own account.'],
+          lines: ['Two steps, done once. Your admin switches each connector on for the whole organisation. Then each person signs in with their own account.', 'Switching it on gives nobody access by itself. Claude only ever sees what your own login can see, so client folders and channels you can\'t open stay closed.'],
+          steps: ['Admin: **Organization settings > Connectors > Browse connectors > Add to your team**.', 'You: **Customize > Connectors > Connect**, then sign in.', 'In a chat: **+ > Connectors** to switch one on or off for that chat.'],
           visual: 'setup' },
         { title: 'Design system: raw notes in, on-brand out',
-          lines: ['Feed it our best examples and decks and docs come out in Half Dome style.'],
+          lines: ['A design system teaches Claude Half Dome\'s look: layouts, type, colours and components, learned from our best decks and docs. It goes further than the brand colours.', 'On Team plans it is set up once and everyone\'s decks and designs pick it up. Then paste raw notes, ask for a deck, and download it as PowerPoint or PDF.'],
+          steps: ['Ask for a deck or a design in any chat, or start from a template in the **Artifacts** tab.', 'Check it picks up the Half Dome design system (managed in **Settings > Design systems**).', 'Download it as PowerPoint or PDF.'],
           visual: 'design',
-          talk: 'Feed it our best three or four documents, with varied layouts that use all three colours. Docs, Slides and Design now work inside any conversation, in beta, reaching Pro and Max first with Team to follow.' }
+          talk: 'Feed it our best three or four documents, with varied layouts that use all three colours. Docs, Slides and Design are on by default for Team plans.' }
       ],
       items: [
         { id: 'connector-check', title: 'Connector check', where: 'Paste into any chat with your connectors on.',
           text: "List the connectors I have switched on. For each one, tell me what you can read and what you could change. Then confirm you won't change anything in any of them unless I ask you to in this chat." }
       ],
-      posts: ['Microsoft 365', 'Monday.com', 'Slack', 'Granola'],
+      posts: ['Microsoft 365', 'monday.com', 'Slack', 'Granola'],
       quiz: {
         question: 'A connector can usually...',
         options: [
           { text: 'Read, and often write, so check before asking for changes', correct: true,
-            why: 'Most can write as well as read. Know which before you ask for changes.' },
+            why: 'Most can write as well as read. Check its tool permissions before you ask for changes.' },
           { text: "Only read, so it can't change anything",
             why: 'Most can write as well as read. Check every one before you ask for changes.' },
           { text: 'Work for everyone once one person signs in',
             why: 'Your admin switches it on for the organisation, then each person signs in with their own account.' },
           { text: 'Make changes with no need for a person to check',
-            why: "Read first, write when you're sure. Draft-first flows and approval steps keep a person in charge." }
+            why: "Read first, write when you're sure. Needs approval and Manual mode keep a person in charge." }
         ]
       },
       basecamps: [
         { title: 'Connectors',
           items: [
-            { text: 'Open Settings, Connectors and sign in to Microsoft 365, Monday.com, Slack and Granola.' },
-            { text: 'Run the **Connector check** so you know which ones can write.', item: 'connector-check' },
+            { text: 'Customize > Connectors: connect Microsoft 365, monday.com, Slack and Granola.' },
+            { text: 'Set write tools to **Needs approval**, then run the **Connector check**.', item: 'connector-check' },
             { text: 'Ask one read-only question across two tools.', copy: "Read only, don't change anything: what's due this week on my Monday boards, and has anyone asked about those items in Slack in the last 7 days?" }
           ] }
       ],
@@ -796,23 +838,29 @@ const CONTENT = {
       intro: 'Four big granite steps, each one a block. Most people stop on the first step.',
       cards: [
         { title: 'Artifacts',
-          lines: ['Docs, dashboards and tools built in the thread and iterated in place.'],
+          lines: ['Docs, dashboards and tools built in the thread and iterated in place. Ask for a one-pager, a pacing tracker or a client dashboard, then keep refining it: "make the chart weekly", "add a notes column".', 'Every artifact is saved in the **Artifacts** tab, starts private and can be shared. Docs export to Word, PDF or Google Docs, and decks to PowerPoint or PDF.'],
+          steps: ['Ask for the thing, not the steps: "Build me a one-page WIP tracker for TMC".', 'Refine it in the same thread.', 'Find it again later in the **Artifacts** tab.'],
           tag: 'One thread', visual: 'stairs', step: 1,
           talk: 'Walk up the stairs: one thread, one client, every future task, every week.' },
         { title: 'Projects',
-          lines: ['Files, context and memory shared across every chat.', 'One per client.'],
+          lines: ['A project is a home for one client: instructions and files that every chat in it can use, plus its own memory. One per client.', 'Share it with the team as **Can view** or **Can edit**. Everyone sees the instructions and files, but each person\'s chats and memory stay their own.'],
+          steps: ['Sidebar: **Projects > New project**, named after the client.', 'Add the client playbook as instructions and key files as knowledge (in Cowork projects these are called **Instructions** and **Context**).', '**Share** it with the account team.'],
           tag: 'One client', visual: 'stairs', step: 2,
-          talk: 'Mention the projects redesign Anthropic announced on 17 September: a goal, a coordinator running several threads, shared memory and a library. Beta for Pro and Max first, Team after.' },
-        { title: 'Skills', item: 'make-skill',
-          lines: ['Write the method once; every task after follows the same standard.', 'Type `/` to run one by name.', 'Three ways to make one: let Claude build it with `/skill-creator`, record yourself doing the task, or say "turn this conversation into a skill".'],
-          tag: 'Every future task. The highest leverage step.', visual: 'stairs', step: 3,
-          talk: 'The highest-leverage stop. Record a skill lives in the plus menu of the desktop app: record your screen, talk through it, and Claude turns it into a skill.' },
+          talk: 'Anthropic announced a projects redesign on 17 September: a goal, a coordinator running parallel threads, shared memory and a library. It starts in Claude Code for some Pro and Max users, with Team after, so it is not in our chat yet.' },
+        { title: 'Skills',
+          lines: ['Write the method once; every task after follows the same standard. A skill is a saved method: the steps, checks and format for a job you do again and again. Type `/` to run one by name.', 'Three ways to make one: let Claude build it with `/skill-creator`, record yourself doing the task, or say "turn this conversation into a skill".'],
+          steps: ['See yours in **Customize > Skills**.', 'Add one: **+ > Create skill > Upload a skill** (for a .zip), or ask Claude to make it.', 'Recording works in Cowork on the Mac app: **+ > Record a skill**.'],
+          tag: 'Every future task. The highest leverage step.', visual: 'stairs', step: 3, item: 'make-skill',
+          talk: 'The highest-leverage stop. Recording is Mac only for now. Good skills can be shared to the whole organisation once an Owner allows it.' },
         { title: 'Scheduled tasks',
-          lines: ['Runs on a schedule in the cloud, even with your laptop shut.', 'A **manual** task is a saved prompt with a run button.'],
+          lines: ['A scheduled task runs a prompt for you on a timetable (daily, weekly, weekdays), in the cloud, even with your laptop shut. It uses your own connectors.', 'A **manual** task is a saved prompt with a run button: set the frequency to "manually" and run it on demand.'],
+          steps: ['Open **Cowork** and click **Scheduled** in the sidebar.', 'Choose **New task**, write the prompt and pick a frequency.', 'Or type `/schedule` in a Cowork task.'],
+          tip: 'Tasks that need files on your laptop only run while the desktop app is open.',
           tag: 'Every Monday', visual: 'stairs', step: 4 },
-        { title: 'Anatomy of a skill', item: 'skill-starter',
-          lines: ['A folder with `SKILL.md` (when to use it, the method), and optional `scripts/` and `templates/`.', 'It loads only when a task needs it.'],
-          visual: 'anatomy' }
+        { title: 'Anatomy of a skill',
+          lines: ['A skill is a folder with a `SKILL.md`: a short name and description at the top (Claude reads these to decide when the skill applies), then the method. Optional extras sit beside it, like `scripts/` it can run or reference files and templates it fills in.', 'It loads only when a task needs it, so having lots of skills doesn\'t slow Claude down.'],
+          steps: ['Start from the **SKILL.md starter** below.', 'Keep the description specific: what it does and when to use it.', 'Zip the folder and upload it in **Customize > Skills**.'],
+          visual: 'anatomy', item: 'skill-starter' }
       ],
       items: [
         { id: 'make-skill', title: 'Turn this into a skill', where: 'Paste at the end of any chat that went well.',
@@ -892,67 +940,71 @@ const CONTENT = {
         { id: '5c', title: '5c. /wip-wrapup: one WIP, four outputs' }
       ],
       cards: [
-        { section: '5a', title: 'Who sees what', item: 'week-ahead',
-          lines: ['Instructions: everyone. Context: everyone. Memory: only you.', 'Scheduled tasks: whoever sets them up. Connectors: each person signs in.'],
-          visual: 'lanes',
+        { section: '5a', title: 'Who sees what',
+          lines: ['In a shared client project: **Instructions**, everyone. **Context**, everyone. **Memory**, only you.', '**Scheduled tasks**: whoever sets them up, and they run with that person\'s connectors. **Connectors**: each person signs in. Your own chats in the project stay private too.'],
+          tip: 'The Week-ahead task below is a good first scheduled task for any client project.',
+          visual: 'lanes', item: 'week-ahead',
           talk: 'Memory is only yours, so it is not a team brain. Scheduled tasks run as the person who created them, using their connectors.' },
-        { section: '5a', title: 'Instructions = the client playbook', item: 'project-instructions',
-          lines: ['Contacts, tone, rules for Claude, and where the Monday board, Slack channel and SharePoint folder live.'],
-          visual: 'playbook' },
-        { section: '5a', title: 'Context = the client context doc', item: 'client-context',
-          lines: ['One template for every client.', 'The Client Solutions Director fills it in and re-uploads it each month.'],
-          visual: 'contextdoc',
+        { section: '5a', title: 'Instructions = the client playbook',
+          lines: ['Instructions are the rules every chat in the project follows: who the contacts are, the tone we use with them, rules for Claude, and where the Monday board, Slack channel and SharePoint folder live.', 'The two skills read these, so a good playbook means /wip-wrapup finds the right board and channel without asking.'],
+          steps: ['Copy or download the template below.', 'Fill it in for one client.', 'Paste it into the project\'s **Instructions** (in a chat project: **Set project instructions**).'],
+          visual: 'playbook', item: 'project-instructions' },
+        { section: '5a', title: 'Context = the client context doc',
+          lines: ['Context is the reference material every chat can draw on. One template for every client: goals, priorities, audiences, what we run, key dates and sensitivities.', 'The Client Solutions Director fills it in and re-uploads it each month, so everyone works from the same picture.'],
+          steps: ['Download the template below.', 'Fill it in, or ask Claude to draft it from recent WIP notes and the brief.', 'Upload it to the project\'s **Context** (in a chat project: **project knowledge**).'],
+          visual: 'contextdoc', item: 'client-context',
           talk: 'Show the client context doc, then a manual task: a saved prompt with a run button.' },
         { section: '5a', title: 'Memory is personal',
-          lines: ['Anything the whole team needs goes in Instructions or Context.'],
+          lines: ['Memory is yours alone, even inside a shared project. Your colleagues can\'t see it, and you can\'t see theirs.', 'Anything the whole team needs goes in Instructions or Context. If you catch yourself telling Claude the same client fact twice, it belongs in the playbook.'],
           visual: 'lanes' },
 
         { section: '5b', title: 'The problem',
-          lines: ['Agencies and client creative teams fill in an Excel MI sheet.', 'Retyping it into Monday is slow and error-prone.'],
+          lines: ['Agencies and client creative teams fill in an Excel MI sheet. Retyping it into Monday is slow and error-prone.', 'The sheets are built for people, not machines: month banners, the header repeated each month, deadlines as formulas, notes in random cells. A straight import breaks on all of it.'],
           visual: 'mi', stage: 'problem',
           talk: 'This is the request from the CS team about Carman\'s and TMC: agencies keep using Excel, we stop retyping it into Monday.' },
-        { section: '5b', title: 'What Claude does', item: 'mi-to-monday',
-          lines: ['Reads the messy sheet (month banners, repeated headers, formulas), shows a plan, waits for a yes, then builds the board.'],
-          visual: 'mi',
+        { section: '5b', title: 'What Claude does',
+          lines: ['Reads the messy sheet (month banners, repeated headers, formulas), QAs every row, shows a plan, waits for a yes, then builds the board or a new group on an existing board.', 'It works for OOH and digital MIs, names items consistently, and adds an import key so a later sheet updates items instead of duplicating them.'],
+          steps: ['Attach the MI sheet in a chat.', 'Type the command below with the board name.', 'Read the plan, say yes, then open the board link.'],
+          visual: 'mi', item: 'mi-to-monday',
           talk: 'Run it live: attach the sheet, type the command, show the plan, say yes.' },
         { section: '5b', title: 'The TMC test',
-          lines: ['31 rows read, 30 items created, 22 rows flagged for a human.'],
-          visual: 'counts',
-          talk: 'It skipped one exact duplicate and built the 30 items into month groups.' },
+          lines: ['31 rows read, 30 items created, 22 rows flagged for a human.', 'One exact duplicate was skipped. Items landed in month groups with dispatch statuses set from what the sheet said, and every problem row carries a QA flag explaining what to chase.'],
+          visual: 'counts' },
         { section: '5b', title: 'What it catches',
-          lines: ['Portrait on landscape panels, wrong file names, duplicate rows, passed deadlines, copy over character limits.'],
+          lines: ['Portrait on landscape panels, wrong file names, duplicate rows, passed deadlines, copy over character limits.', 'Also missing dates, IDs and URLs, end dates before start dates, and odd flight lengths. For digital it checks copy against the sheet\'s own limits, or Meta\'s: primary text 125, headline 40, description 25 characters.'],
           visual: 'mi', stage: 'flags' },
         { section: '5b', title: "It doesn't fix data silently",
-          lines: ['The QA flags tell a person what to chase.'],
+          lines: ['The QA flags tell a person what to chase. Claude never quietly corrects an orientation or a date: it writes the issue into a **Claude QA Flags** column and lists it in its report.', 'You get counts by issue type, the rows that need a human, and one suggested next step, like "ask the agency to fix orientation on 7 rows".'],
           visual: 'mi', stage: 'flags' },
 
-        { section: '5c', title: 'One command after every WIP', item: 'wip-wrapup',
-          lines: ['Claude reads the Granola note, treating your edited notes as the source of truth.'],
-          visual: 'wip' },
+        { section: '5c', title: 'One command after every WIP',
+          lines: ['Claude reads the Granola note, treating your edited notes as the source of truth. It also reads the client project and the last WIP notes, so it knows what changed since last time.', 'Add context after the client name, like "Kristy is on leave, send to Jess" or "don\'t mention USA in the client email".'],
+          steps: ['Tidy your Granola notes after the WIP.', 'Type the command below in the client project.', 'Answer its one checkpoint question if it asks.'],
+          visual: 'wip', item: 'wip-wrapup' },
         { section: '5c', title: 'Four outputs',
-          lines: ["Notes saved to the client's WIP Notes folder in SharePoint (kept after Granola deletes them); new tasks added to the Monday WIP board; a client email drafted in Outlook; an internal recap drafted in Slack."],
+          lines: ["Notes saved to the client's WIP Notes folder in SharePoint (kept after Granola deletes them); new tasks added to the Monday WIP board; a client email drafted in Outlook; an internal recap drafted in Slack.", 'The notes use the same structure every time: attendees, decisions, actions with owners and dates, changes since last WIP, open questions, internal only, next WIP.'],
           visual: 'wip',
-          talk: 'We are on Granola\'s free plan, so notes vanish after 30 days. Saving them to SharePoint is how the history survives.' },
+          talk: 'On Granola\'s free plan, older notes drop out of reach after 30 days. Saving them to SharePoint is how the history survives. Outlook drafts and SharePoint saves need Microsoft 365 write tools switched on by an admin.' },
         { section: '5c', title: 'Guardrails',
-          lines: ['It asks before changing existing Monday items.', 'Drafts only, nothing is sent.', 'Internal stays internal.'],
+          lines: ['It asks before changing existing Monday items, showing a table of each change and why, for you to approve. Drafts only, nothing is sent. Internal stays internal.', 'New Monday items go straight in, because they change nothing that already exists. Changes it does make get a comment on the item, so the history is kept.'],
           visual: 'wip' },
         { section: '5c', title: 'The traps it handles',
-          lines: ['A task with no owner stays unassigned.', '"Yes in principle" is recorded as conditional.', 'Internal comments never reach the client email.'],
+          lines: ['A task with no owner stays unassigned. "Yes in principle" is recorded as conditional. Internal comments never reach the client email.', 'It also resolves "Wednesday" and "next WIP" to real dates, and never assigns an owner on its own. Anything said after the client left the call is treated as internal.'],
           visual: 'traps',
           talk: 'Point out the traps in the sample WIP.' }
       ],
       items: [
+        { id: 'week-ahead', section: '5a', title: 'Week-ahead scheduled task', where: 'Set it up as a scheduled task in the TMC project, every Monday.',
+          text: 'Every Monday: read the TMC WIP board on Monday.com, #tmc-internal Slack messages from the last 7 days, and Granola meetings with TMC in the title from the last 7 days. Post one message to #tmc-internal with: (1) overdue items with owner, (2) items due this week, (3) client requests with no reply yet, (4) MI material deadlines in the next 14 days. Bullets, no fluff. If nothing is overdue or at risk, say so in one line.' },
         { id: 'project-instructions', section: '5a', title: 'Project instructions template', where: 'Fill in and paste into the client project\'s Instructions.', download: 'project-instructions',
-          text: '# [Client] project instructions\n\n## Who\'s who\n- Client contacts: [name, role, email]\n- Half Dome team: [name, role]\n\n## Tone\n- [How we write to this client]\n\n## Rules for Claude\n- Write in Australian English.\n- Draft first. Never send anything to the client or change a shared tool without asking me.\n- Keep internal comments out of anything client-facing.\n- [Anything else this client needs]\n\n## Where things live\n- SharePoint folder: [Client > General > Client name]\n- Monday WIP board: [board name]\n- Monday MI board: [board name]\n- Internal Slack channel: [#client-internal]\n- Granola folder: [folder name]' },
+          text: '# [Client] project instructions\n\n## Who\'s who\n- Client contacts: [name, role, email]\n- Half Dome team: [name, role]\n\n## Tone\n- [How we write to this client]\n\n## Rules for Claude\n- Write in Australian English.\n- Draft first. Never send anything to the client or change a shared tool without asking me.\n- Keep internal comments out of anything client-facing.\n- [Anything else this client needs]\n\n## Where things live\n- SharePoint folder: [Client > General > Client name]\n- Monday WIP board: [board name]\n- Monday MI board: [board name]\n- Internal Slack channel: [#client-internal]\n- Granola: [how WIP meetings are titled]' },
         { id: 'client-context', section: '5a', title: 'Client context doc template', where: 'The Client Solutions Director fills it in and uploads it to the project\'s Context each month.', download: 'client-context',
           text: '# [Client] context doc\nOwner: Client Solutions Director. Updated: [month year]. Re-upload to the project each month.\n\n## The client in one paragraph\n[Who they are and what they sell]\n\n## Goals this year\n[Business and marketing goals]\n\n## Priorities right now\n[Products, campaigns and launches in focus]\n\n## Audiences\n[Who we are trying to reach]\n\n## What we run for them\n[Performance channels, plus OOH, radio, DOOH and other non-performance media]\n\n## Key dates\n[Campaigns, launches and deadlines in the next three months]\n\n## What good looks like\n[The KPIs they judge us on]\n\n## Brand and tone\n[Rules from their brand guidelines]\n\n## Sensitivities\n[Topics, people or claims to avoid]\n\n## Recent decisions and open questions\n[Carried over from the last month]' },
-        { id: 'week-ahead', section: '5a', title: 'Week-ahead scheduled task', where: 'Set it up as a scheduled task in the TMC project, every Monday.',
-          text: 'Every Monday: read the TMC WIP board on Monday.com, #tmc-internal Slack messages from the last 7 days, and Granola meetings in the TMC folder from the last 7 days. Post one message to #tmc-internal with: (1) overdue items with owner, (2) items due this week, (3) client requests with no reply yet, (4) MI material deadlines in the next 14 days. Bullets, no fluff. If nothing is overdue or at risk, say so in one line.' },
         { id: 'mi-to-monday', section: '5b', title: '/mi-to-monday', note: 'Attach the MI sheet.', download: 'skill-mi-to-monday',
-          where: 'Type it in a chat with the MI sheet attached. Not in your / menu yet? Download the skill and upload the zip in Claude\'s skills settings.',
+          where: 'Type it in a chat with the MI sheet attached. Not in your / menu yet? Download the skill, then Customize > Skills > + > Create skill > Upload a skill.',
           text: '/mi-to-monday TMC OOH Dispatch Sep-Nov' },
         { id: 'wip-wrapup', section: '5c', title: '/wip-wrapup', download: 'skill-wip-wrapup',
-          where: 'Type it after your next WIP. Not in your / menu yet? Download the skill and upload the zip in Claude\'s skills settings.',
+          where: 'Type it after your next WIP. Not in your / menu yet? Download the skill, then Customize > Skills > + > Create skill > Upload a skill.',
           text: '/wip-wrapup TMC' }
       ],
       quiz: {
@@ -972,20 +1024,20 @@ const CONTENT = {
         { title: 'A home for every client', section: '5a',
           items: [
             { text: 'Pick one client and set up a project for it before you leave today.' },
-            { text: 'Paste the **Project instructions template** into Instructions and fill it in.', item: 'project-instructions', download: 'project-instructions' },
+            { text: 'Fill in the **Project instructions template** and add it as Instructions.', item: 'project-instructions', download: 'project-instructions' },
             { text: 'Add the **Client context doc** to Context.', item: 'client-context', download: 'client-context' },
             { text: 'Set up the **Week-ahead scheduled task** for that client.', item: 'week-ahead' }
           ] },
         { title: 'MI sheet to Monday', section: '5b',
           items: [
-            { text: 'Type `/` and check **/mi-to-monday** is there. If not, download it.', download: 'skill-mi-to-monday' },
+            { text: 'Type `/` and check **/mi-to-monday** is there. If not, download and upload it.', download: 'skill-mi-to-monday' },
             { text: 'Attach a real MI sheet and run it.', item: 'mi-to-monday' },
             { text: 'Read the plan before you say yes.' },
             { text: 'Chase the QA flags with the agency or the client.' }
           ] },
         { title: 'One WIP, four outputs', section: '5c',
           items: [
-            { text: 'Type `/` and check **/wip-wrapup** is there. If not, download it.', download: 'skill-wip-wrapup' },
+            { text: 'Type `/` and check **/wip-wrapup** is there. If not, download and upload it.', download: 'skill-wip-wrapup' },
             { text: 'Run it after your next WIP.', item: 'wip-wrapup' },
             { text: 'Read the client email and the Slack recap before anything is sent.' },
             { text: 'Approve or edit any changes to existing Monday items.' }
@@ -1038,17 +1090,20 @@ const CONTENT = {
       topic: 'Beyond the chat, and next steps',
       intro: 'Walk out onto the Visor to finish.',
       cards: [
-        { title: 'Claude in Chrome',
-          lines: ['Works with your logins, on the platforms and dashboards that have no connector.'],
+        { title: 'Claude in the browser',
+          lines: ['Works with your logins, on the platforms and dashboards that have no connector: ad platforms, client portals, publisher dashboards.', 'Two options. **Claude in Chrome** is an extension that works in your own Chrome. The desktop app also has a **built-in browser** for Cowork tasks, which keeps working while you do something else. Claude asks before acting on a new site.'],
+          steps: ['Chrome: install **Claude in Chrome** from the Chrome Web Store, sign in and pin it.', 'Desktop app: choose your browser in **Settings > Cowork > Preferred browser**.'],
           visual: 'chrome',
-          talk: 'A quick nod, not a demo. Chrome is the answer for any platform without a connector.' },
-        { title: 'Claude in Excel',
-          lines: ['Reads the whole model, builds formulas, explains a sheet someone else built.'],
+          talk: 'A quick nod, not a demo. The browser is the answer for any platform without a connector.' },
+        { title: 'Claude for Excel',
+          lines: ['Reads the whole model, builds formulas, explains a sheet someone else built.', 'Answers point to the exact cells they came from, and it can change assumptions while keeping formulas intact, which is ideal for media plans, pacing trackers and budget models. Your skills work there too.'],
+          steps: ['Install **Claude for Microsoft 365** from Microsoft AppSource (or ask IT).', 'Open Claude from the ribbon in Excel and sign in.', 'Try: "Explain how this plan calculates pacing, cell by cell".'],
           visual: 'excel' },
-        { title: 'Claude in Word',
-          lines: ['Drafts and edits in the doc, as tracked changes you accept or reject.'],
+        { title: 'Claude for Word',
+          lines: ['Drafts and edits in the doc, as tracked changes you accept or reject. Switch on tracked changes mode first, so every edit lands as a revision instead of changing the text directly.', 'It also works through comment threads and summarises a client\'s redlines, which is handy for briefs, proposals and contracts.'],
+          steps: ['Open Claude from the ribbon in Word (same Claude for Microsoft 365 add-in).', 'Turn on **tracked changes mode**.', 'Ask for the edit, then accept or reject each change.'],
           visual: 'word',
-          talk: 'Word shows its edits as native tracked changes, which makes review easy.' }
+          talk: 'Word shows its edits as native tracked changes once tracked changes mode is on, which makes review easy.' }
       ],
       items: [],
       quiz: null,
@@ -2001,13 +2056,15 @@ function openCard(card, meta = {}) {
   const node = el(`<div class="overlay"><div class="panel card ${meta.secret ? 'purple' : ''}" role="dialog" aria-modal="true" aria-label="${esc(card.title)}">
     <div class="eyebrow"><span class="tag ${meta.secret ? 'purple' : 'gold'}">${esc(meta.eyebrow || '')}</span>${card.section && w ? esc(sectionTitle(w, card.section)) : ''}</div>
     <h2>${inline(card.title)}</h2>
+    <div class="cbody ${v || card.item ? 'two' : ''}"><div class="cl">
     <div class="lines">${card.lines.map(l => `<p>${inline(l)}</p>`).join('')}</div>
     ${card.steps ? `<div class="steps"><span class="lbl">${esc(card.stepsTitle || 'How to')}</span><ol>${card.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol></div>` : ''}
     ${card.tag ? `<span class="tagline">${inline(card.tag)}</span>` : ''}
     ${card.tip ? `<p class="tip"><b>Tip</b>${inline(card.tip)}</p>` : ''}
-    ${v ? `<div class="visual"><button class="replay" type="button">↻ Replay</button><div class="vx"></div></div>` : ''}
+    </div>${v || card.item ? `<div class="cr">
+    ${v ? `<div class="vwrap"><div class="visual"><button class="replay" type="button">↻ Replay</button><div class="vx"></div></div></div>` : ''}
     ${attachHTML(card.item)}
-    ${talkHTML(card.talk)}
+    ${talkHTML(card.talk)}</div>` : talkHTML(card.talk)}</div>
     <div class="foot"><span class="closehint">Close <kbd>Enter</kbd> <kbd>Esc</kbd> or click</span><span class="closehint">Backpack <kbd>B</kbd> · Map <kbd>M</kbd></span></div>
   </div></div>`);
   wireActions(node);
@@ -2307,7 +2364,7 @@ const svgNS = 'http://www.w3.org/2000/svg';
 const VISUALS = {
   prefs(host) {
     host.classList.add('v-prefs');
-    host.innerHTML = `<div class="win"><div class="bar"><i></i><i></i><i></i><span>Settings › Personal preferences</span></div><div class="ta"><span class="t"></span><span class="caret"></span></div></div>
+    host.innerHTML = `<div class="win"><div class="bar"><i></i><i></i><i></i><span>Settings › Instructions for Claude</span></div><div class="ta"><span class="t"></span><span class="caret"></span></div></div>
       <div class="sw"><b style="background:#D2C663"></b><b style="background:#8E1C02"></b><b style="background:#B0A3D0"></b></div>
       <div class="reach"><div class="lbl">Applies to</div><div class="pill">every chat</div><div class="pill">every artifact</div><div class="pill">every project</div></div>`;
     const text = 'Use our brand colours as accents: Gold #D2C663, Red #8E1C02, Purple #B0A3D0. #F7F6F5 for slides, white for everything else.';
@@ -2328,7 +2385,7 @@ const VISUALS = {
   },
   memory(host) {
     host.classList.add('v-mem');
-    host.innerHTML = `<div class="toggles"><div class="lbl">Settings</div><div class="tg">Memory <span class="sw2"></span></div><div class="tg">Search past chats <span class="sw2"></span></div></div>
+    host.innerHTML = `<div class="toggles"><div class="lbl">Settings › Memory</div><div class="tg">Generate memory from chats <span class="sw2"></span></div><div class="tg">Search and reference chats <span class="sw2"></span></div></div>
       <div class="mem"><div class="lbl">What Claude remembers</div>
       <div class="m"><span>Works on TMC</span><span class="pen">edit</span></div>
       <div class="m"><span>Prefers bullets over paragraphs</span><span class="pen">edit</span></div>
@@ -2350,7 +2407,7 @@ const VISUALS = {
   folders(host) {
     host.classList.add('v-fold');
     const fs = [['Clients', 't'], ['TMC', 't'], ['Media plans', 't'], ['Downloads', 'n'], ['Personal', 'n'], ['Desktop', 'n']];
-    host.innerHTML = `<div class="grid">${fs.map(([n, k]) => `<div class="f ${k}"><div class="ic"><span class="mk">${k === 't' ? '✓' : 'off'}</span></div>${n}</div>`).join('')}</div><div class="cap lbl">Claude desktop app · trusted folders only</div>`;
+    host.innerHTML = `<div class="grid">${fs.map(([n, k]) => `<div class="f ${k}"><div class="ic"><span class="mk">${k === 't' ? '✓' : 'off'}</span></div>${n}</div>`).join('')}</div><div class="cap lbl">Desktop app · Cowork · trusted folders only</div>`;
     const f = host.querySelectorAll('.f'), timers = [];
     f.forEach((x, i) => later(timers, () => x.classList.add('show'), 300 + i * 260));
     return () => timers.forEach(clearTimeout);
@@ -2368,7 +2425,7 @@ const VISUALS = {
   },
   models(host, card) {
     host.classList.add('v-models');
-    const pts = { haiku: [150, 180, 'Haiku 4.5', 18], sonnet: [300, 118, 'Sonnet 5', 24], opus: [420, 54, 'Opus 5.5', 32], fable: [610, 44, 'Fable 5.1', 30] };
+    const pts = { sonnet: [230, 132, 'Sonnet 5.5', 26], opus: [420, 54, 'Opus 5.5', 32], fable: [610, 44, 'Fable 5.1', 30] };
     const f = card.focus;
     host.innerHTML = `<svg viewBox="0 0 738 236">
       <line x1="60" y1="210" x2="700" y2="210" stroke="#1A1917" stroke-width="2"/><line x1="60" y1="210" x2="60" y2="16" stroke="#1A1917" stroke-width="2"/>
@@ -2386,10 +2443,21 @@ const VISUALS = {
       <text x="520" y="104" font-size="11.5" font-weight="700" fill="#8E1C02" class="fadein" style="animation-delay:1.1s" text-anchor="middle">Near Fable, using less</text>
     </svg>`;
   },
+  effort(host) {
+    host.classList.add('v-effort');
+    const lv = ['Low', 'Medium', 'High', 'Extra high', 'Max'];
+    host.innerHTML = `<div class="menu"><div class="lbl">Model</div><div class="mi on">Opus 5.5 <span>default</span></div><div class="mi">Sonnet 5.5</div><div class="mi">Fable 5.1 <span>credits</span></div></div>
+      <div class="dial"><div class="lbl">Effort</div><div class="lv">${lv.map((l, i) => `<button type="button" tabindex="-1" class="${i === 1 ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <div class="bar"><i></i></div><div class="cap"><span>Faster, uses less</span><span>Thinks longer, uses more</span></div></div>`;
+    const bs = host.querySelectorAll('.lv button'), bar = $('.bar i', host), timers = [];
+    const set = i => { bs.forEach((b, k) => b.classList.toggle('on', k === i)); bar.style.width = (20 + i * 20) + '%'; };
+    set(1); [3, 4, 0, 1].forEach((i, k) => later(timers, () => set(i), 700 + k * 800));
+    return () => timers.forEach(clearTimeout);
+  },
   thumb(host) {
     host.classList.add('v-thumb');
     host.innerHTML = `<div class="side rise" style="animation-delay:.1s"><div class="lbl">Thinking job</div><h5>A senior strategist's job</h5><div class="eg">Multi-step work, and anything going to a client.</div><span class="pick o">Opus 5.5</span></div>
-      <div class="side rise" style="animation-delay:.5s"><div class="lbl">Doing job</div><h5>A fast pair of hands</h5><div class="eg">Quick drafts, summaries, one-report reads.</div><span class="pick s">Sonnet 5</span></div>`;
+      <div class="side rise" style="animation-delay:.5s"><div class="lbl">Doing job</div><h5>A fast pair of hands</h5><div class="eg">Quick drafts, summaries, one-report reads.</div><span class="pick s">Sonnet 5.5</span></div>`;
   },
   opus55(host) {
     host.classList.add('v-bars');
@@ -2401,7 +2469,7 @@ const VISUALS = {
   },
   hub(host, card) {
     const write = card.mode === 'write';
-    const apps = [['Microsoft 365', 140, 52, true], ['Monday.com', 140, 184, true], ['Slack', 598, 52, true], ['Granola', 598, 184, false]];
+    const apps = [['Microsoft 365', 140, 52, true], ['monday.com', 140, 184, true], ['Slack', 598, 52, true], ['Granola', 598, 184, false]];
     host.innerHTML = `<svg viewBox="0 0 738 236">
       ${apps.map(([n, x, y, canWrite], i) => {
         const read = `M ${x + (x < 369 ? 70 : -70)} ${y} Q ${(x + 369) / 2} ${(y + 118) / 2 + (y < 118 ? -10 : 10)} 369 118`;
@@ -2552,7 +2620,7 @@ const VISUALS = {
     host.classList.add('v-win');
     host.innerHTML = `<div class="w"><div class="tb"><i></i><i></i><i></i><span class="url">client-portal · signed in as you</span></div>
       <div class="body"><div class="tile">Spend this month <span class="spark"></span></div><div class="tile">Top placements <span class="spark"></span></div><div class="tile">Pacing <span class="spark"></span></div></div>
-      <div class="pane"><div class="lbl">Claude in Chrome</div><div class="msg u" style="animation-delay:.3s">Pull this month's spend by placement into a table</div><div class="msg c" style="animation-delay:1.4s">Done. 12 placements, using the portal you're logged into. No connector needed.</div></div>
+      <div class="pane"><div class="lbl">Claude in the browser</div><div class="msg u" style="animation-delay:.3s">Pull this month's spend by placement into a table</div><div class="msg c" style="animation-delay:1.4s">Done. 12 placements, using the portal you're logged into. No connector needed.</div></div>
       <span class="cursor" style="left:120px;top:90px"></span></div>`;
     const timers = [], cur = $('.cursor', host);
     later(timers, () => { cur.style.left = '300px'; cur.style.top = '120px'; }, 700);
@@ -2564,7 +2632,7 @@ const VISUALS = {
     const r = [['', 'A', 'B', 'C', 'D'], ['1', 'Channel', 'Budget', 'Spend', 'Pacing'], ['2', 'Search', '40,000', '21,400', ''], ['3', 'Social', '25,000', '15,900', ''], ['4', 'OOH', '60,000', '60,000', '']];
     host.innerHTML = `<div class="w"><div class="tb"><i></i><i></i><i></i><span class="url">plan.xlsx</span></div>
       <div class="body" style="padding:0"><div class="fx"><b>fx</b><span class="f"></span></div><div class="grid">${r.map((row, i) => row.map((c, j) => `<span class="${i === 0 || j === 0 ? 'h' : ''}" data-c="${i}-${j}">${c}</span>`).join('')).join('')}</div></div>
-      <div class="pane"><div class="lbl">Claude in Excel</div><div class="msg u" style="animation-delay:.3s">Add pacing for each channel</div><div class="msg c" style="animation-delay:1.2s">Added pacing in D2:D4 using SUMIFS on the spend tab. Social is running ahead.</div></div></div>`;
+      <div class="pane"><div class="lbl">Claude for Excel</div><div class="msg u" style="animation-delay:.3s">Add pacing for each channel</div><div class="msg c" style="animation-delay:1.2s">Added pacing in D2:D4 using SUMIFS on the spend tab. Social is running ahead.</div></div></div>`;
     const timers = [], f = $('.f', host), formula = '=SUMIFS(…)';
     for (let i = 1; i <= formula.length; i++) later(timers, () => { f.textContent = formula.slice(0, i); }, 1200 + i * 60);
     [['2-4', '54%'], ['3-4', '64%'], ['4-4', '100%']].forEach(([k, v], i) => later(timers, () => { const c = host.querySelector(`[data-c="${k}"]`); c.textContent = v; c.classList.add('sel'); }, 2000 + i * 300));
@@ -2574,7 +2642,7 @@ const VISUALS = {
     host.classList.add('v-win');
     host.innerHTML = `<div class="w"><div class="tb"><i></i><i></i><i></i><span class="url">brief.docx · Track changes on</span></div>
       <div class="body" style="right:240px"><div class="page"><del>Launch sometime next week.</del> <ins>Launch Monday 6 October.</ins><div class="accept"><button class="btn tiny gold" type="button" tabindex="-1">Accept</button><button class="btn tiny ghost" type="button" tabindex="-1">Reject</button></div></div></div>
-      <div class="pane"><div class="lbl">Claude in Word</div><div class="msg u" style="animation-delay:.3s">Make the launch date specific</div><div class="msg c" style="animation-delay:1.1s">Suggested as a tracked change. Accept or reject it.</div></div></div>`;
+      <div class="pane"><div class="lbl">Claude for Word</div><div class="msg u" style="animation-delay:.3s">Make the launch date specific</div><div class="msg c" style="animation-delay:1.1s">Tracked changes mode is on, so this is a revision. Accept or reject it.</div></div></div>`;
     const timers = [];
     later(timers, () => $('del', host).classList.add('on'), 1300); later(timers, () => $('ins', host).classList.add('on'), 1800);
     $('del', host).style.opacity = 1; $('del', host).style.textDecoration = 'none'; $('del', host).style.color = 'inherit';
