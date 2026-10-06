@@ -23,6 +23,8 @@ Deploy: `vercel deploy` from this folder, or drag the folder into Vercel.
 - **Backpack items**: prompts to copy, plus downloads: both Half Dome skills as `.zip` files ready to upload, a SKILL.md starter, the project instructions template and the client context doc template. The summit card and the Backpack also download everything as one `.md` kit.
 - **Ranger stations**: one question per world. Wrong answers explain why. Esc skips.
 - **Campfire checklists**: what to do now, with Copy and Download buttons on each line. Ticks save on that laptop.
+- **Whole Potential donut**: fills as people read cards and finish worlds. Reaching the summit plays the ending: the ring fills to the dome in the halfdome logo, then closes into a full circle: "Unlocked Whole Potential!"
+- **Sound and music**: effects and a looping trail tune, both on by default, each with its own toggle in the top bar.
 - **List view** (L): every card, prompt, checklist and question as a plain page, with the same buttons.
 
 ## Edit the words
