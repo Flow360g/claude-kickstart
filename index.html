@@ -122,7 +122,7 @@ code,.mono{font-family:var(--mono)}
 .card .steps li{font-size:15.5px;line-height:1.4;color:#33312e}
 .card .steps .lbl,.attach .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
 .card .tip{margin:0;font-size:15.5px;line-height:1.4;color:#33312e}
-.card .tip b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);border-radius:5px;padding:2px 7px;margin-right:8px}
+.card .tip .tl{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);border-radius:5px;padding:2px 7px;margin-right:8px}
 .attach{display:flex;gap:12px;align-items:center;background:var(--purple-soft);border:1px solid var(--purple);border-radius:12px;padding:10px 12px;cursor:default}
 .attach .tag{flex:none;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--purple);border-radius:6px;padding:3px 8px}
 .attach .ai{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -153,6 +153,7 @@ code,.mono{font-family:var(--mono)}
 .btn.purple:hover{background:#9f90c7}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
 .btn.ghost:hover{border-color:var(--ink)}
+.btn.try{text-decoration:none;border:1.5px solid var(--ink)}
 .btn.small{padding:7px 12px;font-size:13.5px;border-radius:10px}
 .btn.tiny{padding:4px 9px;font-size:12px;border-radius:8px;font-weight:700}
 .copied{font-family:var(--mono);font-size:13px;color:var(--green);font-weight:600}
@@ -732,7 +733,7 @@ const CONTENT = {
           talk: 'The bars are drawn to those ratios. The launch also gave subscribers a one-off rate limit reset in Settings > Usage, reported as usable up to 22 October.' }
       ],
       items: [
-        { id: 'fresh-chat', title: 'Fresh-chat handover', where: 'Paste at the end of a long thread, then start a new chat with the answer.',
+        { id: 'fresh-chat', try: true, title: 'Fresh-chat handover', where: 'Paste at the end of a long thread, then start a new chat with the answer.',
           text: 'Summarise this chat as a short handover I can paste into a fresh chat: the goal, the decisions so far, the files and links we used, and what is left to do. Keep it under 200 words.' }
       ],
       quiz: {
@@ -815,7 +816,7 @@ const CONTENT = {
           talk: 'Feed it our best three or four documents, with varied layouts that use all three colours. Docs, Slides and Design are on by default for Team plans.' }
       ],
       items: [
-        { id: 'connector-check', title: 'Connector check', where: 'Paste into any chat with your connectors on.',
+        { id: 'connector-check', try: true, title: 'Connector check', where: 'Paste into any chat with your connectors on.',
           text: "List the connectors I have switched on. For each one, tell me what you can read and what you could change. Then confirm you won't change anything in any of them unless I ask you to in this chat." }
       ],
       posts: ['Microsoft 365', 'monday.com', 'Slack', 'Granola'],
@@ -874,7 +875,8 @@ const CONTENT = {
         { title: 'Artifacts',
           lines: ['Docs, dashboards and tools built in the thread and iterated in place. Ask for a one-pager, a pacing tracker or a client dashboard, then keep refining it: "make the chart weekly", "add a notes column".', 'Every artifact is saved in the **Artifacts** tab, starts private and can be shared. Docs export to Word, PDF or Google Docs, and decks to PowerPoint or PDF.'],
           steps: ['Ask for the thing, not the steps: "Build me a one-page WIP tracker for TMC".', 'Refine it in the same thread.', 'Find it again later in the **Artifacts** tab.'],
-          tag: 'One thread', visual: 'stairs', step: 1,
+          tag: 'One thread', visual: 'stairs', step: 1, item: 'wip-prep',
+          tip: 'Ask for an **interactive HTML artifact** when you need to explore information, not just read it. The WIP prep prompt below has Claude pull your Monday board, Slack channel, Outlook and Granola into one page you can filter: likely client questions, follow-ups from the last WIP, unanswered emails.',
           talk: 'Walk up the stairs: one thread, one client, every future task, every week.' },
         { title: 'Projects',
           lines: ['A project is a home for one client: instructions and files that every chat in it can use, plus its own memory. One per client.', 'Share it with the team as **Can view** or **Can edit**. Everyone sees the instructions and files, but each person\'s chats and memory stay their own.'],
@@ -897,9 +899,13 @@ const CONTENT = {
           visual: 'anatomy', item: 'skill-starter' }
       ],
       items: [
+        { id: 'wip-prep', title: 'WIP prep artifact', download: 'skill-wip-prep', try: true,
+          where: 'Use it as a prompt, or download it as a skill and run /wip-prep before every WIP.',
+          text: "Build me an interactive HTML artifact to prep for my next [client] WIP on [date]. Read only: don't change anything in any tool.\n\nPull from:\n- the [client] WIP board on Monday.com: open, overdue and recently changed items\n- #[client]-internal on Slack: the last 14 days\n- my Outlook emails with [client] contacts: the last 14 days\n- Granola notes from the last two [client] WIPs\n\nIn the artifact, include:\n1. A one-screen agenda for the WIP.\n2. Questions the client is likely to ask, with a suggested answer and the source for each.\n3. Follow-ups from the last WIP and whether each one was done.\n4. Client emails and Slack requests with no reply yet.\n5. Risks, dates at risk and anything we should raise first.\n\nMake it interactive: filter by status and owner, expand any item to see where it came from, and tick items off as I go. Use the Half Dome brand colours." },
         { id: 'make-skill', title: 'Turn this into a skill', where: 'Paste at the end of any chat that went well.',
+          try: true,
           text: 'Turn this conversation into a skill. First ask me what should trigger it and what the output should look like. Then write the SKILL.md with the method we just used, step by step, and tell me what to check the first time I run it.' },
-        { id: 'skill-starter', title: 'SKILL.md starter', where: 'A blank SKILL.md to fill in, or hand to /skill-creator.', download: 'skill-starter',
+        { id: 'skill-starter', template: true, title: 'SKILL.md starter', where: 'A blank SKILL.md to fill in, or hand to /skill-creator.', download: 'skill-starter',
           text: '---\nname: [skill-name]\ndescription: [What it does, and when to use it. Claude reads this to decide when the skill applies.]\n---\n\n# [Skill name]\n\n## When to use it\n[The request or situation that should trigger this skill.]\n\n## What you need\n[Files, connectors or details Claude should gather first. Ask once if anything is missing.]\n\n## The method\n1. [First step]\n2. [Second step]\n3. [Show a plan and wait for a yes before changing anything in a shared tool.]\n\n## The output\n[What good looks like: format, length, where it goes.]\n\n## Rules\n- Write in Australian English.\n- Draft first. Nothing is sent and nothing changes without a person checking it.' }
       ],
       quiz: {
@@ -920,6 +926,7 @@ const CONTENT = {
           items: [
             { text: 'Type `/` in a chat and look at the skills you already have.' },
             { text: 'Try `/skill-creator` on a task you do every week.', copy: '/skill-creator' },
+            { text: 'Build a **WIP prep artifact** before your next WIP.', item: 'wip-prep', download: 'skill-wip-prep' },
             { text: 'After your next good chat, use **Turn this into a skill**.', item: 'make-skill' },
             { text: 'Keep the **SKILL.md starter** for writing your own.', item: 'skill-starter', download: 'skill-starter' }
           ] }
@@ -1030,9 +1037,9 @@ const CONTENT = {
       items: [
         { id: 'week-ahead', section: '5a', title: 'Week-ahead scheduled task', where: 'Set it up as a scheduled task in the TMC project, every Monday.',
           text: 'Every Monday: read the TMC WIP board on Monday.com, #tmc-internal Slack messages from the last 7 days, and Granola meetings with TMC in the title from the last 7 days. Post one message to #tmc-internal with: (1) overdue items with owner, (2) items due this week, (3) client requests with no reply yet, (4) MI material deadlines in the next 14 days. Bullets, no fluff. If nothing is overdue or at risk, say so in one line.' },
-        { id: 'project-instructions', section: '5a', title: 'Project instructions template', where: 'Fill in and paste into the client project\'s Instructions.', download: 'project-instructions',
+        { id: 'project-instructions', template: true, section: '5a', title: 'Project instructions template', where: 'Fill in and paste into the client project\'s Instructions.', download: 'project-instructions',
           text: '# [Client] project instructions\n\n## Who\'s who\n- Client contacts: [name, role, email]\n- Half Dome team: [name, role]\n\n## Tone\n- [How we write to this client]\n\n## Rules for Claude\n- Write in Australian English.\n- Draft first. Never send anything to the client or change a shared tool without asking me.\n- Keep internal comments out of anything client-facing.\n- [Anything else this client needs]\n\n## Where things live\n- SharePoint folder: [Client > General > Client name]\n- Monday WIP board: [board name]\n- Monday MI board: [board name]\n- Internal Slack channel: [#client-internal]\n- Granola: [how WIP meetings are titled]' },
-        { id: 'client-context', section: '5a', title: 'Client context doc template', where: 'The Client Solutions Director fills it in and uploads it to the project\'s Context each month.', download: 'client-context',
+        { id: 'client-context', template: true, section: '5a', title: 'Client context doc template', where: 'The Client Solutions Director fills it in and uploads it to the project\'s Context each month.', download: 'client-context',
           text: '# [Client] context doc\nOwner: Client Solutions Director. Updated: [month year]. Re-upload to the project each month.\n\n## The client in one paragraph\n[Who they are and what they sell]\n\n## Goals this year\n[Business and marketing goals]\n\n## Priorities right now\n[Products, campaigns and launches in focus]\n\n## Audiences\n[Who we are trying to reach]\n\n## What we run for them\n[Performance channels, plus OOH, radio, DOOH and other non-performance media]\n\n## Key dates\n[Campaigns, launches and deadlines in the next three months]\n\n## What good looks like\n[The KPIs they judge us on]\n\n## Brand and tone\n[Rules from their brand guidelines]\n\n## Sensitivities\n[Topics, people or claims to avoid]\n\n## Recent decisions and open questions\n[Carried over from the last month]' },
         { id: 'mi-to-monday', section: '5b', title: '/mi-to-monday', note: 'Attach the MI sheet.', download: 'skill-mi-to-monday',
           where: 'Type it in a chat with the MI sheet attached. Not in your / menu yet? Download the skill, then Customize > Skills > + > Create skill > Upload a skill.',
@@ -1263,11 +1270,16 @@ function makeZip(files) {
 const DOWNLOADS = {
   'skill-mi-to-monday': { label: 'Download skill (.zip)', filename: 'mi-to-monday.zip', zip: () => ({ 'mi-to-monday/SKILL.md': ASSETS.skills['mi-to-monday'] }) },
   'skill-wip-wrapup': { label: 'Download skill (.zip)', filename: 'wip-wrapup.zip', zip: () => ({ 'wip-wrapup/SKILL.md': ASSETS.skills['wip-wrapup'] }) },
+  'skill-wip-prep': { label: 'Download as skill (.zip)', filename: 'wip-prep.zip', zip: () => ({ 'wip-prep/SKILL.md': wipPrepSkill() }) },
   'skill-starter': { label: 'Download SKILL.md', filename: 'SKILL.md', text: () => itemById('skill-starter').text },
   'project-instructions': { label: 'Download (.md)', filename: 'project-instructions-template.md', text: () => itemById('project-instructions').text },
   'client-context': { label: 'Download (.md)', filename: 'client-context-doc-template.md', text: () => itemById('client-context').text },
   'kit': { label: 'Download your kit (.md)', filename: 'half-dome-claude-kit.md', text: () => kitMarkdown() }
 };
+function wipPrepSkill() {
+  const prompt = itemById('wip-prep').text.replace('Build me', 'Build').replace(/\[client\]/g, '<client>').replace('[date]', '<date, or the next WIP in the calendar>');
+  return `---\nname: wip-prep\ndescription: Build an interactive HTML artifact to prep for a client WIP, from the Monday board, the internal Slack channel, Outlook and Granola. Use for /wip-prep or any request to prep for a WIP.\n---\n\n# WIP prep\n\n## How it is called\n\n\`/wip-prep <client> <optional: date or extra context>\`\n\nUse the client project's instructions to find the right board, channel, contacts and meetings. If anything is missing, ask once.\n\n## The method\n\n${prompt}\n\n## Rules\n- Read only. Never change anything in Monday, Slack, Outlook or Granola.\n- Keep internal comments clearly marked as internal.\n- Show the source for every question, follow-up and risk.\n- Write in Australian English.\n`;
+}
 let dlNS; // the claude.ai viewer's download capability, when this page runs as an artifact
 const dlReady = (window.claude && typeof window.claude.use === 'function') ? Promise.resolve(window.claude.use('downloads')).then(ns => (dlNS = ns)).catch(() => null) : Promise.resolve(null);
 async function download(id) {
@@ -1316,6 +1328,8 @@ function wireActions(root) {
   root.querySelectorAll('[data-dl]').forEach(btn => btn.addEventListener('click', e => { e.stopPropagation(); btn.blur(); download(btn.dataset.dl); }));
 }
 const copyBtn = (text, label = 'Copy', cls = 'gold small') => `<button class="btn ${cls}" type="button" data-copy="${encodeURIComponent(text)}">${label}</button>`;
+const TRY_URL = 'https://claude.ai/new?q=';
+const tryBtn = (it, cls = 'ghost small') => it && it.try && it.text.length < 1800 ? `<a class="btn ${cls} try" href="${TRY_URL + encodeURIComponent(it.text)}" target="_blank" rel="noopener" title="Opens a new Claude chat with this prompt filled in">Try in Claude ↗</a>` : '';
 const dlBtn = (id, cls = 'purple small', label) => DOWNLOADS[id] ? `<button class="btn ${cls}" type="button" data-dl="${id}">${esc(label || DOWNLOADS[id].label)}</button>` : '';
 
 /* ---------------- sound effects and music (WebAudio, nothing to download) ---------------- */
@@ -2193,7 +2207,7 @@ function openCard(card, meta = {}) {
     <div class="lines">${card.lines.map(l => `<p>${inline(l)}</p>`).join('')}</div>
     ${card.steps ? `<div class="steps"><span class="lbl">${esc(card.stepsTitle || 'How to')}</span><ol>${card.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol></div>` : ''}
     ${card.tag ? `<span class="tagline">${inline(card.tag)}</span>` : ''}
-    ${card.tip ? `<p class="tip"><b>Tip</b>${inline(card.tip)}</p>` : ''}
+    ${card.tip ? `<p class="tip"><span class="tl">Tip</span>${inline(card.tip)}</p>` : ''}
     </div>${v || card.item ? `<div class="cr">
     ${v ? `<div class="vwrap"><div class="visual"><button class="replay" type="button">↻ Replay</button><div class="vx"></div></div></div>` : ''}
     ${attachHTML(card.item)}
@@ -2213,7 +2227,7 @@ function attachHTML(id) {
   const it = id && itemById(id);
   if (!it) return '';
   const peek = it.text.replace(/\s+/g, ' ');
-  return `<div class="attach" data-host><span class="tag">${it.download && !/^\//.test(it.text) ? 'Template' : 'Prompt'}</span><div class="ai"><b>${esc(it.title)}</b><span class="peek">${esc(peek.length > 90 ? peek.slice(0, 88) + '…' : peek)}</span>${it.where ? `<span class="where">${inline(it.where)}</span>` : ''}</div><div class="acts">${copyBtn(it.text, 'Copy', 'gold small')}${it.download ? dlBtn(it.download, 'purple small', 'Download') : ''}<span class="copied" aria-live="polite"></span></div></div>`;
+  return `<div class="attach" data-host><span class="tag">${it.template ? 'Template' : 'Prompt'}</span><div class="ai"><b>${esc(it.title)}</b><span class="peek">${esc(peek.length > 90 ? peek.slice(0, 88) + '…' : peek)}</span>${it.where ? `<span class="where">${inline(it.where)}</span>` : ''}</div><div class="acts">${copyBtn(it.text, 'Copy', 'gold small')}${tryBtn(it)}${it.download ? dlBtn(it.download, 'purple small', it.template ? 'Download' : 'Skill (.zip)') : ''}<span class="copied" aria-live="polite"></span></div></div>`;
 }
 function openItem(item, fresh) {
   const node = el(`<div class="overlay"><div class="panel item purple" role="dialog" aria-modal="true" aria-label="${esc(item.title)}" data-host>
@@ -2222,7 +2236,7 @@ function openItem(item, fresh) {
     ${item.where ? `<p class="sub">${inline(item.where)}</p>` : ''}
     ${item.note ? `<span class="note">${esc(item.note)}</span>` : ''}
     <pre class="prompt">${promptHTML(item.text)}</pre>
-    <div class="btnrow">${copyBtn(item.text, 'Copy', 'gold')}${item.download ? dlBtn(item.download, 'purple') : ''}<button class="btn ghost" type="button" data-close>Back to the trail</button><span class="copied" aria-live="polite"></span></div>
+    <div class="btnrow">${copyBtn(item.text, 'Copy', 'gold')}${tryBtn(item, 'ghost')}${item.download ? dlBtn(item.download, 'purple') : ''}<button class="btn ghost" type="button" data-close>Back to the trail</button><span class="copied" aria-live="polite"></span></div>
     <div class="foot"><span class="closehint">Close <kbd>Enter</kbd> <kbd>Esc</kbd></span><span class="closehint">Saved to your Backpack <kbd>B</kbd></span></div>
   </div></div>`);
   wireActions(node);
@@ -2239,7 +2253,7 @@ function openBackpack() {
       <div class="pitem" data-host><h3>${esc(i.title)} <small>World ${i.world}</small></h3>
       ${i.where ? `<p class="where">${inline(i.where)}</p>` : ''}
       <pre class="prompt">${promptHTML(i.text)}</pre>
-      <div class="btnrow">${copyBtn(i.text)}${i.download ? dlBtn(i.download) : ''}<span class="copied" aria-live="polite"></span></div></div>` : `
+      <div class="btnrow">${copyBtn(i.text)}${tryBtn(i)}${i.download ? dlBtn(i.download) : ''}<span class="copied" aria-live="polite"></span></div></div>` : `
       <div class="pitem locked"><span class="ph-lock">?</span><div><b>Still on the trail</b><br><span class="mono" style="font-size:12.5px">Find it in World ${i.world}: ${esc(W_BY_ID(i.world).place)}</span></div></div>`).join('')}</div>
     <div class="foot"><span class="closehint">Close <kbd>B</kbd> <kbd>Esc</kbd></span><div class="btnrow">${dlBtn('kit', 'gold small', 'Download everything (.md)')}<button class="btn ghost small" type="button" data-close>Back to the trail</button></div></div>
   </div></div>`);
@@ -2295,7 +2309,7 @@ function checklistHTML(w, ci, bc) {
     return `<div class="check ${on ? 'done' : ''}" data-check="${id}" data-host>
       <button class="box" type="button" role="checkbox" aria-checked="${on}" aria-label="${esc(plain(it.text))}">${on ? '✓' : ''}</button>
       <div class="txt">${inline(it.text)}</div>
-      <div class="acts">${copyText2 ? copyBtn(copyText2, 'Copy', 'gold tiny') : ''}${it.download ? dlBtn(it.download, 'purple tiny', 'Download') : ''}<span class="copied" aria-live="polite"></span></div>
+      <div class="acts">${copyText2 ? copyBtn(copyText2, 'Copy', 'gold tiny') : ''}${it.copy && it.copy.length > 20 ? tryBtn({ try: true, text: it.copy }, 'ghost tiny') : src ? tryBtn(src, 'ghost tiny') : ''}${it.download ? dlBtn(it.download, 'purple tiny', 'Download') : ''}<span class="copied" aria-live="polite"></span></div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -2478,7 +2492,7 @@ function openTitle() {
 const list = $('#list');
 const isListOpen = () => list.classList.contains('on');
 function buildList() {
-  const itemHTML = it => `<div class="litem" data-host><h3>${esc(it.title)} <span class="btnrow">${copyBtn(it.text)}${it.download ? dlBtn(it.download) : ''}</span></h3>${it.where ? `<p class="where">${inline(it.where)}</p>` : ''}${it.note ? `<span class="note">${esc(it.note)}</span>` : ''}<pre class="prompt">${promptHTML(it.text)}</pre><span class="copied" aria-live="polite"></span></div>`;
+  const itemHTML = it => `<div class="litem" data-host><h3>${esc(it.title)} <span class="btnrow">${copyBtn(it.text)}${tryBtn(it)}${it.download ? dlBtn(it.download) : ''}</span></h3>${it.where ? `<p class="where">${inline(it.where)}</p>` : ''}${it.note ? `<span class="note">${esc(it.note)}</span>` : ''}<pre class="prompt">${promptHTML(it.text)}</pre><span class="copied" aria-live="polite"></span></div>`;
   const cardHTML = c => `<div class="lcard"><h3>${inline(c.title)}</h3>${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}${c.steps ? `<p><b>${esc(c.stepsTitle || 'How to')}</b></p><ol>${c.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol>` : ''}${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}${c.tip ? `<p><b>Tip:</b> ${inline(c.tip)}</p>` : ''}${talkHTML(c.talk)}</div>${c.item && itemById(c.item) ? itemHTML(itemById(c.item)) : ''}`;
   const onCard = (w, i) => w.cards.some(c => c.item === i.id);
   const campHTML = (w, ci) => { const bc = w.basecamps[ci]; return `<div class="campbox"><h4>${esc(CONTENT.campHeading)} · ${inline(bc.title)}</h4>${checklistHTML(w, ci, bc)}</div>`; };
