@@ -262,40 +262,144 @@ code,.mono{font-family:var(--mono)}
 @keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.1)}}
 
 /* ---------- list view (a normal page, outside the stage) ---------- */
-#list{position:fixed;inset:0;z-index:100;background:var(--white);overflow:auto;display:none;color:var(--ink)}
+#list{position:fixed;inset:0;z-index:100;background:var(--white);overflow:auto;display:none;color:var(--ink);scroll-behavior:smooth}
 #list.on{display:block}
-.list{max-width:880px;margin:0 auto;padding-inline:20px;padding-block:0 80px}
-.lhead{position:sticky;top:env(safe-area-inset-top,0px);background:rgba(255,255,255,.96);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);z-index:2}
-.lhead .logo{width:130px;margin-left:-8px}
-.list h1{font-size:clamp(32px,6vw,46px);font-weight:900;letter-spacing:-0.03em;margin:28px 0 6px;line-height:1}
-.list .lede{color:var(--muted);font-size:18px;margin:0 0 10px;max-width:65ch}
-.lnav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 10px}
-.lnav a{font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:5px 11px}
-.lnav a:hover{border-color:var(--gold);background:var(--gold-soft)}
-.list section{border-top:6px solid var(--gold);margin-top:40px;padding-top:16px}
-.list section:nth-of-type(3n+2){border-top-color:var(--purple)}
-.list section:nth-of-type(3n+3){border-top-color:var(--red)}
-.list h2{font-size:30px;margin:4px 0 2px;letter-spacing:-0.02em;text-wrap:balance}
-.list .wsub{font-family:var(--mono);font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-.list h3{font-size:20px;margin:22px 0 6px}
-.list h4{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin:28px 0 4px;color:var(--red)}
-.list p,.list li{font-size:17px;line-height:1.5;max-width:68ch}
-.list p{margin:4px 0}
-.list .lcard{border-left:3px solid var(--line);padding-left:14px;margin:14px 0}
-.list .lcard h3{margin:0 0 4px}
-.list .ltag{display:inline-block;font-family:var(--mono);font-size:12.5px;background:var(--gold-soft);border-radius:999px;padding:2px 10px;margin-top:4px}
-.list .litem{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0;display:flex;flex-direction:column;gap:8px;min-width:0}
-.list .litem h3{margin:0;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-.list .litem .where{margin:0;color:var(--muted);font-size:15px}
-.list .prompt{font-size:13.5px;max-height:none}
-.list details{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:8px}
-.list summary{cursor:pointer;font-weight:700}
-.list .checks{overflow:visible}
-.list .campbox{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:16px 0}
-.list .campbox h4{margin:0 0 8px}
-.list .check .txt{font-size:16px}
-.list ol,.list ul{padding-left:22px}
-@media (max-width:560px){.list .check{flex-wrap:wrap}.list .check .acts{width:100%;padding-left:40px}}
+.lv-top{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.lv-bar{max-width:1180px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:14px}
+.lv-bar .logo{width:118px;margin-left:-8px;flex:none}
+.lv-search{flex:1;min-width:0;max-width:440px;display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0 12px}
+.lv-search:focus-within{border-color:var(--ink)}
+.lv-search svg{width:16px;height:16px;flex:none;color:var(--muted)}
+.lv-search input{flex:1;min-width:0;border:0;background:transparent;font:500 15px var(--sans);color:var(--ink);padding:10px 0;outline:none}
+.lv-search kbd{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px;background:var(--white)}
+.lv-pot{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.lv-pot svg{width:34px;height:34px}
+.lv-pot b{color:var(--red)}
+.lv-bar .spacer{flex:1}
+.lv-wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:0 120px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:48px}
+.lv-side{position:sticky;top:76px;align-self:start;padding-top:34px;display:flex;flex-direction:column;gap:4px}
+.lv-side .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px 10px}
+.lv-nav a{display:grid;grid-template-columns:28px 1fr;gap:2px 10px;align-items:center;text-decoration:none;color:var(--ink);border-radius:12px;padding:9px 10px;transition:background .15s}
+.lv-nav a:hover{background:var(--card)}
+.lv-nav a.on{background:var(--gold-soft)}
+.lv-nav .n{grid-row:span 2;width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:700;background:var(--white)}
+.lv-nav a.done .n{background:var(--ink);color:var(--gold);border-color:var(--ink)}
+.lv-nav .t{font-weight:800;font-size:14.5px;line-height:1.2}
+.lv-nav .pg{height:4px;border-radius:999px;background:var(--line);overflow:hidden}
+.lv-nav .pg i{display:block;height:100%;background:var(--red);border-radius:999px;transition:width .4s}
+.lv-side .tools{display:flex;flex-direction:column;gap:6px;margin-top:18px;padding:14px 10px 0;border-top:1px solid var(--line)}
+.lv-side .tools .btn{justify-content:center}
+.lv-main{min-width:0;padding-top:30px}
+.lv-hero{display:flex;flex-direction:column;gap:10px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+.lv-hero .kick{font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red)}
+.lv-hero h1{margin:0;font-size:clamp(34px,5vw,56px);line-height:.95;font-weight:900;letter-spacing:-0.04em}
+.lv-hero h1 span{color:var(--red)}
+.lv-hero p{margin:0;font-size:17.5px;line-height:1.5;color:var(--muted);max-width:62ch}
+.lv-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.lv-legend span{font-family:var(--mono);font-size:11.5px;font-weight:600;border-radius:999px;padding:4px 10px;background:var(--card);border:1px solid var(--line)}
+.lv-chips{display:none;gap:8px;overflow-x:auto;padding:4px 0 2px}
+.lv-chips a{flex:none;font-family:var(--mono);font-size:12px;font-weight:600;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--white)}
+.lw{padding-top:42px;scroll-margin-top:70px}
+.lwh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:18px}
+.lwh .num{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font:900 26px var(--sans);letter-spacing:-0.03em;background:var(--ink);color:var(--gold)}
+.lw:nth-of-type(3n+2) .lwh .num{color:var(--purple)}
+.lw:nth-of-type(3n+3) .lwh .num{color:#e8a08c}
+.lwh .wsub{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lwh h2{margin:2px 0 0;font-size:clamp(24px,3vw,32px);line-height:1.05;letter-spacing:-0.025em;text-wrap:balance}
+.lwh .intro{margin:6px 0 0;font-size:15.5px;color:var(--muted)}
+.lwh .stat{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--muted);text-align:right;white-space:nowrap}
+.lwh .stat b{display:block;font:900 22px var(--sans);color:var(--ink);letter-spacing:-0.02em}
+.lsec{font-family:var(--mono);font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--red);margin:26px 0 10px;display:flex;align-items:center;gap:10px}
+.lsec:after{content:"";flex:1;height:1px;background:var(--line)}
+.lcards{display:flex;flex-direction:column;gap:10px}
+.lc{border:1px solid var(--line);border-radius:16px;background:var(--white);transition:border-color .2s,box-shadow .2s}
+.lc:hover{border-color:#c9c4ba}
+.lc[open]{border-color:var(--ink);box-shadow:0 10px 30px rgba(26,25,23,.08)}
+.lc summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:30px minmax(0,1fr) auto 22px;gap:14px;align-items:center;padding:14px 16px}
+.lc summary::-webkit-details-marker{display:none}
+.lc .rd{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--gold);flex:none}
+.lc .rd svg{width:18px;height:10px}
+.lc.read .rd{background:var(--ink);color:var(--gold);font-weight:900;font-size:14px}
+.lc .ttl{font-weight:800;font-size:17px;line-height:1.25}
+.lc .ttl small{display:block;font-weight:500;font-size:14px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lc[open] .ttl small{display:none}
+.lc .pills{display:flex;gap:6px}
+.lc .pill{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-radius:999px;padding:3px 8px;background:var(--purple-soft);color:#4a3d78}
+.lc .pill.g{background:var(--gold-soft);color:#6b6324}
+.lc .chev{width:22px;height:22px;transition:transform .25s;color:var(--muted)}
+.lc[open] .chev{transform:rotate(180deg)}
+.lcb{padding:0 18px 18px 60px;display:flex;flex-direction:column;gap:12px}
+.lcb p{margin:0;font-size:16.5px;line-height:1.55;max-width:68ch}
+.lcb code,.lw code{font-family:var(--mono);font-size:.88em;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.lsteps{background:var(--card);border-radius:12px;padding:12px 16px}
+.lsteps .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.lsteps ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.lsteps li{font-size:15.5px;line-height:1.45}
+.ltip{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;line-height:1.5}
+.ltip .tl{flex:none;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);border-radius:5px;padding:2px 7px;margin-top:2px}
+.ltag{align-self:flex-start;font-family:var(--mono);font-size:12.5px;font-weight:600;background:var(--gold-soft);border:1px solid var(--gold);border-radius:999px;padding:3px 11px}
+.lprompt{border:1px solid var(--purple);background:var(--purple-soft);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.lprompt .ph1{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.lprompt .ph1 b{font-size:15.5px}
+.lprompt .ph1 .tg{font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--purple);border-radius:6px;padding:2px 7px;margin-right:8px}
+.lprompt .where{margin:0;font-size:14px;color:var(--muted)}
+.lprompt .prompt{font-size:13.5px;max-height:220px;background:var(--white)}
+.lprompt .prompt.short{max-height:none}
+.lprompt .more{align-self:flex-start;font-family:var(--mono);font-size:11.5px;font-weight:600;background:none;border:0;padding:0;color:#4a3d78;text-decoration:underline}
+.lcb .talk{max-width:68ch}
+.lblock{margin-top:22px;border-radius:16px;padding:16px 18px;border:1px solid var(--line)}
+.lblock h4{margin:0 0 4px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.lblock h3{margin:0 0 12px;font-size:20px;letter-spacing:-0.01em}
+.lquiz{background:#fdf6f3;border-color:#ecd2c9}
+.lquiz .qopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px}
+.lquiz .qo{text-align:left;font-size:15.5px;font-weight:600;background:var(--white);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink)}
+.lquiz .qo:hover{border-color:var(--ink)}
+.lquiz .qo.right{background:var(--gold);border-color:#9c9140}
+.lquiz .qo.wrong{background:var(--red-soft);border-color:var(--red)}
+.lquiz .qwhy{margin-top:10px;font-size:15.5px;line-height:1.5;display:none}
+.lquiz .qwhy.show{display:block}
+.lcamp{background:var(--card)}
+.lcamp .camptop{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lcamp .meter{height:6px;margin:0 0 12px}
+.lcamp .checks{overflow:visible}
+.lcamp .check .txt{font-size:15.5px}
+.lsummit{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.lsummit h4{color:var(--gold)}
+.lsummit h3{color:var(--white);font-size:28px}
+.lsummit .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px}
+.lsummit .check{background:#2a2825;border-color:#3a3733;color:var(--card)}
+.lsummit .check .box{border-color:var(--card);background:transparent;color:var(--gold)}
+.lsummit .check.done{background:#3a3626;border-color:#6b6324}
+.lsummit .check.done .box{background:var(--gold);color:var(--ink)}
+.lsummit .check.done .txt{color:#cfc9a8}
+.lsummit ul{margin:0;padding-left:20px;font-size:15.5px;line-height:1.7}
+.lsummit .closing{border-top:2px solid var(--gold);margin-top:16px;padding-top:12px;font-size:24px}
+.legg{margin-top:14px;font-size:14.5px;color:var(--muted)}
+.legg summary{cursor:pointer;font-weight:700}
+.lempty{display:none;text-align:center;padding:60px 0;color:var(--muted);font-size:17px}
+.lv-hide{display:none!important}
+mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
+@media (max-width:860px){
+  .lv-wrap{grid-template-columns:1fr;gap:0}
+  .lv-side{display:none}
+  .lv-chips{display:flex}
+  .lv-pot span{display:none}
+  .lv-bar .spacer{display:none}
+  .lv-search{max-width:none}
+  .lcb{padding:0 14px 16px}
+  .lc summary{grid-template-columns:30px minmax(0,1fr) 22px;gap:10px}
+  .lc .pills{display:none}
+  .lwh{grid-template-columns:auto minmax(0,1fr)}
+  .lwh .stat{display:none}
+}
+@media (max-width:560px){
+  .lv-bar .logo{display:none}
+  .lv-search kbd{display:none}
+  .lv-bar{gap:10px}
+  .lv-bar .btn{padding:7px 10px}
+  .check{flex-wrap:wrap}
+  .check .acts{width:100%;padding-left:40px}
+}
 
 /* ---------- card visuals (each lives in a 738 x 236 box) ---------- */
 .vx{position:absolute;inset:0;font-family:var(--sans);color:var(--ink)}
@@ -2491,40 +2595,142 @@ function openTitle() {
 /* ---------------- list view ---------------- */
 const list = $('#list');
 const isListOpen = () => list.classList.contains('on');
+const DOME_SVG = '<svg viewBox="0 0 24 12" aria-hidden="true"><path d="M3 12 A9 9 0 0 1 21 12" fill="none" stroke="#8E1C02" stroke-width="5"/></svg>';
+const CHEV = '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function worldStats(w) {
+  const read = w.cards.filter((_, i) => save.read.includes(`${w.id}-${i}`)).length;
+  const camps = w.basecamps || [], total = camps.reduce((a, b) => a + b.items.length, 0) + (w.summit ? w.summit.nextSteps.length : 0);
+  const ticks = camps.reduce((a, bc, ci) => a + bc.items.filter((_, i) => save.checks.includes(`${w.id}-${ci}-${i}`)).length, 0) + (w.summit ? w.summit.nextSteps.filter((_, i) => save.checks.includes(`${w.id}-s-${i}`)).length : 0);
+  return { read, cards: w.cards.length, ticks, total, frac: (read + ticks) / Math.max(1, w.cards.length + total) };
+}
 function buildList() {
-  const itemHTML = it => `<div class="litem" data-host><h3>${esc(it.title)} <span class="btnrow">${copyBtn(it.text)}${tryBtn(it)}${it.download ? dlBtn(it.download) : ''}</span></h3>${it.where ? `<p class="where">${inline(it.where)}</p>` : ''}${it.note ? `<span class="note">${esc(it.note)}</span>` : ''}<pre class="prompt">${promptHTML(it.text)}</pre><span class="copied" aria-live="polite"></span></div>`;
-  const cardHTML = c => `<div class="lcard"><h3>${inline(c.title)}</h3>${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}${c.steps ? `<p><b>${esc(c.stepsTitle || 'How to')}</b></p><ol>${c.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol>` : ''}${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}${c.tip ? `<p><b>Tip:</b> ${inline(c.tip)}</p>` : ''}${talkHTML(c.talk)}</div>${c.item && itemById(c.item) ? itemHTML(itemById(c.item)) : ''}`;
+  const promptBlock = it => {
+    const short = it.text.length < 420;
+    return `<div class="lprompt" data-host><div class="ph1"><b><span class="tg">${it.template ? 'Template' : 'Prompt'}</span>${esc(it.title)}</b><span class="btnrow">${copyBtn(it.text)}${tryBtn(it)}${it.download ? dlBtn(it.download, 'purple small', it.template ? 'Download' : 'Skill (.zip)') : ''}</span></div>
+      ${it.where ? `<p class="where">${inline(it.where)}</p>` : ''}${it.note ? `<span class="note">${esc(it.note)}</span>` : ''}
+      <pre class="prompt ${short ? 'short' : ''}">${promptHTML(it.text)}</pre>${short ? '' : '<button class="more" type="button">Show all</button>'}<span class="copied" aria-live="polite"></span></div>`;
+  };
+  const searchText = c => plain([c.title, ...c.lines, ...(c.steps || []), c.tip || '', c.tag || '', c.item && itemById(c.item) ? itemById(c.item).title + ' ' + itemById(c.item).text : ''].join(' ')).toLowerCase();
+  const cardHTML = (w, c) => {
+    const i = w.cards.indexOf(c), id = `${w.id}-${i}`, read = save.read.includes(id), it = c.item && itemById(c.item);
+    return `<details class="lc ${read ? 'read' : ''}" data-card="${id}" data-search="${esc(searchText(c))}">
+      <summary><span class="rd">${read ? '✓' : DOME_SVG}</span><span class="ttl">${inline(c.title)}<small>${esc(plain(c.lines[0]))}</small></span><span class="pills">${c.steps ? '<span class="pill g">How to</span>' : ''}${it ? `<span class="pill">${it.template ? 'Template' : 'Prompt'}</span>` : ''}</span>${CHEV}</summary>
+      <div class="lcb">${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}
+        ${c.steps ? `<div class="lsteps"><span class="lbl">${esc(c.stepsTitle || 'How to')}</span><ol>${c.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol></div>` : ''}
+        ${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}
+        ${c.tip ? `<p class="ltip"><span class="tl">Tip</span><span>${inline(c.tip)}</span></p>` : ''}
+        ${it ? promptBlock(it) : ''}${talkHTML(c.talk)}</div></details>`;
+  };
   const onCard = (w, i) => w.cards.some(c => c.item === i.id);
-  const campHTML = (w, ci) => { const bc = w.basecamps[ci]; return `<div class="campbox"><h4>${esc(CONTENT.campHeading)} · ${inline(bc.title)}</h4>${checklistHTML(w, ci, bc)}</div>`; };
-  let h = `<div class="list"><div class="lhead"><img class="logo" src="${ASSETS.logo}" alt="halfdome"><button class="btn small" type="button" data-back>Back to the game</button></div>
-    <h1>${esc(CONTENT.title)}</h1><p class="lede">${esc(CONTENT.kicker)}. Every card, prompt, checklist and question from the game, as plain text. Copy and download buttons work here too.</p>
-    <nav class="lnav">${CONTENT.worlds.map(w => `<a href="#list-w${w.id}">${w.id}. ${esc(w.place)}</a>`).join('')}</nav>`;
+  const campHTML = (w, ci) => {
+    const bc = w.basecamps[ci], n = bc.items.filter((_, i) => save.checks.includes(`${w.id}-${ci}-${i}`)).length;
+    return `<div class="lblock lcamp" data-camp="${w.id}-${ci}" data-n="${bc.items.length}"><div class="camptop"><div><h4>${esc(CONTENT.campHeading)}</h4><h3>${inline(bc.title)}</h3></div><span class="mono cnt" style="font-size:12.5px;font-weight:600">${n} of ${bc.items.length} done</span></div><div class="meter"><i style="width:${n / bc.items.length * 100}%"></i></div>${checklistHTML(w, ci, bc)}</div>`;
+  };
+  const quizHTML = w => `<div class="lblock lquiz" data-quiz="${w.id}"><h4>Ranger station${save.quiz.includes(w.id) ? ' · flag raised' : ''}</h4><h3>${inline(w.quiz.question)}</h3>
+    <div class="qopts">${w.quiz.options.map((o, i) => `<button class="qo" type="button" data-i="${i}">${inline(o.text)}</button>`).join('')}</div><div class="qwhy" aria-live="polite"></div></div>`;
+  const pot = potential(), plen = 81.68;
+  let h = `<div class="lv-top"><div class="lv-bar"><img class="logo" src="${ASSETS.logo}" alt="halfdome">
+      <label class="lv-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><input id="lvq" type="search" placeholder="Search" aria-label="Search cards and prompts" autocomplete="off"><kbd>/</kbd></label>
+      <span class="spacer"></span>
+      <div class="lv-pot" title="Whole Potential"><svg viewBox="0 0 40 40"><path class="wtrack" d="M 7 20 A 13 13 0 0 1 33 20 A 13 13 0 0 1 7 20"/><path class="wfill" id="lvPot" style="stroke-dashoffset:${(plen * (1 - pot)).toFixed(2)}" d="M 7 20 A 13 13 0 0 1 33 20 A 13 13 0 0 1 7 20"/></svg><span>Whole Potential <b id="lvPct">${Math.round(pot * 100)}%</b></span></div>
+      <button class="btn small" type="button" data-back>Back to the game</button></div></div>
+    <div class="lv-wrap"><aside class="lv-side"><div class="lbl">The hike</div><nav class="lv-nav">${CONTENT.worlds.map(w => { const st = worldStats(w); return `<a href="#list-w${w.id}" data-nav="${w.id}" class="${save.done.includes(w.id) ? 'done' : ''}"><span class="n">${save.done.includes(w.id) ? '✓' : w.id}</span><span class="t">${esc(w.topic)}</span><span class="pg"><i style="width:${Math.round(st.frac * 100)}%"></i></span></a>`; }).join('')}</nav>
+      <div class="tools"><button class="btn ghost small" type="button" data-expand>Expand all</button><button class="btn ghost small" type="button" data-collapse>Collapse all</button>${dlBtn('kit', 'gold small', 'Download the kit (.md)')}</div></aside>
+    <main class="lv-main"><div class="lv-hero"><div class="kick">${esc(CONTENT.kicker)}</div><h1>Summit <span>Half Dome</span>, as a list</h1>
+      <p>Every card, prompt, checklist and question from the game. Open a card to read it (it counts towards your Whole Potential), copy or try any prompt, and tick off the campfire checklists.</p>
+      <div class="lv-legend"><span>${CONTENT.worlds.reduce((a, w) => a + w.cards.length, 0)} cards</span><span>${allItems().length} prompts and templates</span><span>${CONTENT.worlds.filter(w => w.quiz).length} ranger questions</span><span>${CONTENT.worlds.reduce((a, w) => a + (w.basecamps || []).length, 0)} checklists</span></div>
+      <nav class="lv-chips">${CONTENT.worlds.map(w => `<a href="#list-w${w.id}" data-nav="${w.id}">${w.id}. ${esc(w.place)}</a>`).join('')}</nav></div>`;
   for (const w of CONTENT.worlds) {
-    h += `<section id="list-w${w.id}"><div class="wsub">World ${w.id} · ${esc(w.stage)}</div><h2>${esc(w.topic)}</h2>${w.intro ? `<p>${inline(w.intro)}</p>` : ''}`;
+    const st = worldStats(w);
+    h += `<section class="lw" id="list-w${w.id}" data-world="${w.id}"><header class="lwh"><div class="num">${String(w.id).padStart(2, '0')}</div><div><div class="wsub">World ${w.id} · ${esc(w.stage)}</div><h2>${esc(w.topic)}</h2>${w.intro ? `<p class="intro">${inline(w.intro)}</p>` : ''}</div><div class="stat"><b data-wread="${w.id}">${st.read}/${st.cards}</b>cards read</div></header>`;
     if (w.sections) {
       for (const sec of w.sections) {
-        h += `<h4>${esc(sec.title)}</h4>`;
-        w.cards.filter(c => c.section === sec.id).forEach(c => h += cardHTML(c));
-        w.items.filter(i => i.section === sec.id && !onCard(w, i)).forEach(i => h += itemHTML(i));
+        h += `<div class="lsec">${esc(sec.title)}</div><div class="lcards">${w.cards.filter(c => c.section === sec.id).map(c => cardHTML(w, c)).join('')}</div>`;
+        h += w.items.filter(i => i.section === sec.id && !onCard(w, i)).map(promptBlock).join('');
         (w.basecamps || []).forEach((bc, ci) => { if (bc.section === sec.id) h += campHTML(w, ci); });
       }
     } else {
-      w.cards.forEach(c => h += cardHTML(c));
-      w.items.filter(i => !onCard(w, i)).forEach(i => h += itemHTML(i));
+      h += `<div class="lcards">${w.cards.map(c => cardHTML(w, c)).join('')}</div>`;
+      h += w.items.filter(i => !onCard(w, i)).map(promptBlock).join('');
     }
-    if (w.quiz) { const ok = w.quiz.options.find(o => o.correct); h += `<h4>Ranger station</h4><p><b>${inline(w.quiz.question)}</b></p><ul>${w.quiz.options.map(o => `<li>${inline(o.text)}</li>`).join('')}</ul><details><summary>Show the answer</summary><p><b>${inline(ok.text)}.</b> ${inline(ok.why)}</p></details>`; }
+    if (w.quiz) h += quizHTML(w);
     if (!w.sections) (w.basecamps || []).forEach((_, ci) => h += campHTML(w, ci));
     if (w.summit) {
-      const s = w.summit;
-      h += `<h4>Summit</h4><h3>${esc(s.heading)}</h3><p><b>Next steps</b></p><div class="checks">${s.nextSteps.map((t, i) => { const id = `${w.id}-s-${i}`, on = save.checks.includes(id); return `<div class="check ${on ? 'done' : ''}" data-check="${id}" data-host><button class="box" type="button" role="checkbox" aria-checked="${on}" aria-label="${esc(t)}">${on ? '✓' : ''}</button><div class="txt">${i + 1}. ${inline(t)}</div><div class="acts"></div></div>`; }).join('')}</div><p><b>Always</b></p><ul>${s.always.map(x => `<li>${inline(x)}</li>`).join('')}</ul><p style="font-size:22px;font-weight:900;margin-top:14px">${esc(s.closing)}</p><div class="btnrow" style="margin-top:10px">${dlBtn('kit', 'gold small')}</div>`;
+      const s2 = w.summit;
+      h += `<div class="lblock lsummit"><h4>Summit</h4><h3>${esc(s2.heading)}</h3><div class="cols"><div><h4>Next steps</h4><div class="checks">${s2.nextSteps.map((t, i) => { const id = `${w.id}-s-${i}`, on = save.checks.includes(id); return `<div class="check ${on ? 'done' : ''}" data-check="${id}" data-host><button class="box" type="button" role="checkbox" aria-checked="${on}" aria-label="${esc(t)}">${on ? '✓' : ''}</button><div class="txt">${inline(t)}</div><div class="acts"></div></div>`; }).join('')}</div></div>
+        <div><h4>Always</h4><ul>${s2.always.map(x => `<li>${inline(x)}</li>`).join('')}</ul></div></div><div class="closing">${esc(s2.closing)}</div></div>`;
     }
-    if (w.id === 1) h += `<details><summary>${esc(CONTENT.easterEgg.title)}</summary>${CONTENT.easterEgg.lines.map(l => `<p>${inline(l)}</p>`).join('')}</details>`;
+    if (w.id === 1) h += `<details class="legg"><summary>${esc(CONTENT.easterEgg.title)}</summary>${CONTENT.easterEgg.lines.map(l => `<p>${inline(l)}</p>`).join('')}</details>`;
     h += `</section>`;
   }
-  list.innerHTML = h + `</div>`;
-  wireChecks(list);
+  h += `<div class="lempty" id="lvEmpty">Nothing matches that search. Try "skill", "Monday" or "memory".</div></main></div>`;
+  list.innerHTML = h;
+  wireChecks(list, () => {
+    list.querySelectorAll('[data-camp]').forEach(b2 => { const [wid, ci] = b2.dataset.camp.split('-'); const n = b2.querySelectorAll('.check.done').length, t = +b2.dataset.n; $('.meter i', b2).style.width = (n / t * 100) + '%'; $('.cnt', b2).textContent = `${n} of ${t} done`; });
+    refreshListStats();
+  });
+  // opening a card counts as reading it
+  list.querySelectorAll('details.lc').forEach(d => d.addEventListener('toggle', () => {
+    if (!d.open) return;
+    if (d.dataset.auto) { delete d.dataset.auto; return; } // opened by search or Expand all, not by the reader
+    const id = d.dataset.card;
+    if (!save.read.includes(id)) { mark('read', id); d.classList.add('read'); $('.rd', d).innerHTML = '✓'; sfx.tick(); refreshListStats(); updateHud(); }
+    const it = CONTENT.worlds.find(w => w.id === +id.split('-')[0]).cards[+id.split('-')[1]].item;
+    if (it && !save.items.includes(it)) { mark('items', it); updateHud(); }
+  }));
+  list.querySelectorAll('.lprompt .more').forEach(b2 => b2.addEventListener('click', () => { const pre = b2.previousElementSibling; const open = pre.classList.toggle('short'); b2.textContent = open ? 'Show less' : 'Show all'; }));
+  list.querySelectorAll('[data-quiz]').forEach(q => {
+    const w = W_BY_ID(+q.dataset.quiz), why = $('.qwhy', q);
+    q.querySelectorAll('.qo').forEach(b2 => b2.addEventListener('click', () => {
+      const o = w.quiz.options[+b2.dataset.i];
+      q.querySelectorAll('.qo').forEach(x => x.classList.remove('wrong'));
+      b2.classList.add(o.correct ? 'right' : 'wrong');
+      why.className = 'qwhy show'; why.innerHTML = `<b>${o.correct ? "That's it." : 'Not quite.'}</b> ${inline(o.why)}${o.correct ? '' : ' Try again.'}`;
+      if (o.correct) { if (!save.quiz.includes(w.id)) { mark('quiz', w.id); updateHud(); } sfx.right(); q.querySelectorAll('.qo').forEach(x => x.disabled = true); } else sfx.wrong();
+    }));
+  });
+  const q = $('#lvq', list), empty = $('#lvEmpty', list);
+  const applySearch = () => {
+    const term = q.value.trim().toLowerCase();
+    list.querySelectorAll('.lv-main mark').forEach(m => m.replaceWith(m.textContent));
+    let any = 0;
+    list.querySelectorAll('section.lw').forEach(sec => {
+      let hits = 0;
+      sec.querySelectorAll('details.lc').forEach(d => { const ok = !term || d.dataset.search.includes(term); d.classList.toggle('lv-hide', !ok); if (ok) hits++; if (term && ok && !d.open) { d.dataset.auto = '1'; d.open = true; } });
+      sec.querySelectorAll('.lblock, .lsec, .legg').forEach(b2 => b2.classList.toggle('lv-hide', !!term));
+      sec.classList.toggle('lv-hide', !!term && !hits); any += hits;
+    });
+    if (term) list.querySelectorAll('details.lc:not(.lv-hide) .ttl, details.lc:not(.lv-hide) .lcb p, details.lc:not(.lv-hide) .lcb li').forEach(el2 => highlight(el2, term));
+    empty.style.display = term && !any ? 'block' : 'none';
+  };
+  q.addEventListener('input', applySearch);
+  q.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); if (q.value) { q.value = ''; applySearch(); } else q.blur(); } });
   $('[data-back]', list).addEventListener('click', () => toggleList(false));
-  list.querySelectorAll('.lnav a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); const t = $(a.getAttribute('href'), list); if (t) list.scrollTo({ top: t.offsetTop - 70, behavior: 'smooth' }); }));
+  $('[data-expand]', list).addEventListener('click', () => list.querySelectorAll('details.lc:not(.lv-hide)').forEach(d => { if (!d.open) { d.dataset.auto = '1'; d.open = true; } }));
+  $('[data-collapse]', list).addEventListener('click', () => list.querySelectorAll('details.lc').forEach(d => d.open = false));
+  list.querySelectorAll('[data-nav]').forEach(a2 => a2.addEventListener('click', e => { e.preventDefault(); const t = $(a2.getAttribute('href'), list); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  // highlight the world you are reading in the sidebar
+  if ('IntersectionObserver' in window) {
+    if (listObs) listObs.disconnect();
+    listObs = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) list.querySelectorAll('.lv-nav a').forEach(a2 => a2.classList.toggle('on', a2.dataset.nav === en.target.dataset.world)); }), { root: list, rootMargin: '-30% 0px -60% 0px' });
+    list.querySelectorAll('section.lw').forEach(sec => listObs.observe(sec));
+  }
+}
+let listObs = null;
+function highlight(node, term) {
+  const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT), hits = [];
+  while (walker.nextNode()) { const t = walker.currentNode; if (t.parentElement.closest('mark,button')) continue; const i = t.nodeValue.toLowerCase().indexOf(term); if (i >= 0) hits.push([t, i]); }
+  for (const [t, i] of hits) { const r = document.createRange(); r.setStart(t, i); r.setEnd(t, i + term.length); const m = document.createElement('mark'); try { r.surroundContents(m); } catch (e) {} }
+}
+function refreshListStats() {
+  const pot = potential();
+  const f = $('#lvPot', list); if (f) f.style.strokeDashoffset = (81.68 * (1 - pot)).toFixed(2);
+  const p2 = $('#lvPct', list); if (p2) p2.textContent = Math.round(pot * 100) + '%';
+  for (const w of CONTENT.worlds) {
+    const st = worldStats(w);
+    const bar = list.querySelector(`.lv-nav a[data-nav="${w.id}"] .pg i`); if (bar) bar.style.width = Math.round(st.frac * 100) + '%';
+    const r = list.querySelector(`[data-wread="${w.id}"]`); if (r) r.textContent = `${st.read}/${st.cards}`;
+  }
 }
 function openList() { toggleList(true); }
 function toggleList(on) {
@@ -2833,7 +3039,9 @@ const VISUALS = {
 addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (isListOpen()) {
-    if (k === 'escape' || k === 'l') { e.preventDefault(); toggleList(false); }
+    const typing = e.target.closest('input,textarea');
+    if (k === '/' && !typing) { e.preventDefault(); const q = $('#lvq', list); if (q) q.focus(); return; }
+    if (!typing && (k === 'escape' || k === 'l')) { e.preventDefault(); toggleList(false); }
     return;
   }
   if (e.metaKey || e.ctrlKey || e.altKey) return;
