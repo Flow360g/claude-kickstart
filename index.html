@@ -79,15 +79,29 @@ code,.mono{font-family:var(--mono)}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px}
 
 /* card */
-.card{width:820px;max-height:680px;padding:32px 40px 24px;display:flex;flex-direction:column;gap:13px;cursor:pointer}
-.card h2{margin:0;font-size:35px;line-height:1.08;font-weight:800;letter-spacing:-0.02em;text-wrap:balance}
+.card{width:880px;max-height:700px;overflow:auto;padding:28px 40px 20px;display:flex;flex-direction:column;gap:11px;cursor:pointer}
+.card h2{margin:0;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-0.02em;text-wrap:balance}
 .card .lines{display:flex;flex-direction:column;gap:5px}
-.card .lines p{margin:0;font-size:19.5px;line-height:1.42;color:#33312e}
+.card .lines p{margin:0;font-size:17.5px;line-height:1.42;color:#33312e}
 .card .lines code,.list code,.check code{font-family:var(--mono);font-size:.88em;background:var(--white);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.card .steps{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 14px}
+.card .steps ol{margin:4px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:3px}
+.card .steps li{font-size:15.5px;line-height:1.4;color:#33312e}
+.card .steps .lbl,.attach .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
+.card .tip{margin:0;font-size:15.5px;line-height:1.4;color:#33312e}
+.card .tip b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);border-radius:5px;padding:2px 7px;margin-right:8px}
+.attach{display:flex;gap:12px;align-items:center;background:var(--purple-soft);border:1px solid var(--purple);border-radius:12px;padding:10px 12px;cursor:default}
+.attach .tag{flex:none;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--purple);border-radius:6px;padding:3px 8px}
+.attach .ai{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.attach .ai b{font-size:15px}
+.attach .peek{font-family:var(--mono);font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attach .where{font-size:12.5px;color:var(--muted)}
+.attach .acts{display:flex;gap:6px;align-items:center;flex:none}
+.attach .copied{display:none}
 .card .tagline{align-self:flex-start;font-family:var(--mono);font-size:13px;font-weight:600;background:var(--gold-soft);border:1px solid var(--gold);border-radius:999px;padding:4px 12px}
 .talk{font-size:15px;line-height:1.4;border:1.5px dashed var(--purple);background:var(--purple-soft);border-radius:10px;padding:8px 12px;color:var(--ink)}
 .talk b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
-.visual{position:relative;height:236px;flex:none;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.visual{position:relative;height:236px;flex:none;width:738px;align-self:center;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .replay{position:absolute;right:10px;bottom:10px;z-index:3;font-family:var(--mono);font-size:11px;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
 .replay:hover{border-color:var(--gold);color:var(--ink)}
 
@@ -553,11 +567,11 @@ const CONTENT = {
       stage: 'Happy Isles trailhead',
       topic: 'Set Claude up once',
       cards: [
-        { title: 'Add the brand colours',
+        { title: 'Add the brand colours', item: 'brand-block',
           lines: ['Paste the palette into your personal preferences, and every artifact comes out on brand.'],
           visual: 'prefs',
           talk: 'Do this live, screen shared, everyone following along. Steps 1 and 2 use the two blocks in the backpack.' },
-        { title: 'Tell it about your job',
+        { title: 'Tell it about your job', item: 'about-you-block',
           lines: ['Role, clients, platforms, and how you like answers.', 'A tight paragraph beats a page.'],
           visual: 'about',
           talk: 'Push people to be specific about what they own and what good looks like. That changes the answers most.' },
@@ -604,10 +618,10 @@ const CONTENT = {
       ],
       level: [
         '', '', '', '', '', '', '', '', '',
-        '                                                                      b     ?',
+        '                                                                            ?',
         '                                                                                 =====',
         '         !     ?             ?                                ?                                   ?',
-        '                    b                                               T                  T',
+        '                                                                    T                  T',
         '                   ###                                            #######################                       ##',
         ' T P  S    T       ###   T          T                      T      #######################      T               ###   T      R        C     T   X  T',
         '#########################################======   =======###############################################   ###########################################',
@@ -641,7 +655,7 @@ const CONTENT = {
         { title: 'Rule of thumb',
           lines: ["A senior strategist's job, use Opus.", 'A fast pair of hands, use Sonnet.'],
           visual: 'thumb' },
-        { title: 'Opus 5.5 landed 22 September 2026 and is the new default',
+        { title: 'Opus 5.5 landed 22 September 2026 and is the new default', item: 'fresh-chat',
           lines: ['Around 40% cheaper to run and over 30% faster than Opus 5.', 'Five-hour usage limits are up on Team plans.', 'Tip: a fresh chat per task uses less than one endless thread.'],
           visual: 'opus55',
           talk: 'The bars are drawn to those ratios. The launch also gave subscribers a one-off rate limit reset, usable any time up to 22 October.' }
@@ -684,7 +698,7 @@ const CONTENT = {
         '                                                     =====                                      ====',
         '',
         '                 ?                                                                                              ?                5T         T',
-        '                                               =====                              b         ###                                #################',
+        '                                               =====                                        ###                                #################',
         '                                ########                              ?          ###        ###                           ######################',
         ' T P   S  T  1      T  #############T###    2               T  3                 ###  T  4  ###          T         T ###########################  T     R    T  C      X  T',
         '#################################################################            ###############################################################################################',
@@ -709,7 +723,7 @@ const CONTENT = {
           lines: ['Microsoft 365 (SharePoint, Outlook, Teams), Monday.com (briefs and boards), Slack (channels and threads), Granola (call notes and transcripts), plus many more under Settings, Connectors.'],
           visual: 'hub',
           talk: 'Connect these in Settings, Connectors. They are what make the two workflow skills later possible: Claude reads the board, the files and the meeting directly instead of you pasting them in.' },
-        { title: 'Check every one',
+        { title: 'Check every one', item: 'connector-check',
           lines: ['Most can write as well as read.', 'Know which before you ask for changes.'],
           visual: 'hub', mode: 'write' },
         { title: "Read first. Write when you're sure",
@@ -763,7 +777,7 @@ const CONTENT = {
         '',
         '                           ?',
         '               ?                                      ?                             ?                  ?                  ?',
-        '                                        b                                                        =====',
+        '                                                                                                 =====',
         '                   #####               ###                                                                                          ####',
         ' T P   S   T       #########   K   T   ###  T  K    T                   T   Y           T   K             T   K   T  1        T ########    T    T    R     T    C      T     X    T',
         '###########################################################  ####  ###################################################################################################################',
@@ -789,14 +803,14 @@ const CONTENT = {
           lines: ['Files, context and memory shared across every chat.', 'One per client.'],
           tag: 'One client', visual: 'stairs', step: 2,
           talk: 'Mention the projects redesign Anthropic announced on 17 September: a goal, a coordinator running several threads, shared memory and a library. Beta for Pro and Max first, Team after.' },
-        { title: 'Skills',
+        { title: 'Skills', item: 'make-skill',
           lines: ['Write the method once; every task after follows the same standard.', 'Type `/` to run one by name.', 'Three ways to make one: let Claude build it with `/skill-creator`, record yourself doing the task, or say "turn this conversation into a skill".'],
           tag: 'Every future task. The highest leverage step.', visual: 'stairs', step: 3,
           talk: 'The highest-leverage stop. Record a skill lives in the plus menu of the desktop app: record your screen, talk through it, and Claude turns it into a skill.' },
         { title: 'Scheduled tasks',
           lines: ['Runs on a schedule in the cloud, even with your laptop shut.', 'A **manual** task is a saved prompt with a run button.'],
           tag: 'Every Monday', visual: 'stairs', step: 4 },
-        { title: 'Anatomy of a skill',
+        { title: 'Anatomy of a skill', item: 'skill-starter',
           lines: ['A folder with `SKILL.md` (when to use it, the method), and optional `scripts/` and `templates/`.', 'It loads only when a task needs it.'],
           visual: 'anatomy' }
       ],
@@ -844,11 +858,11 @@ const CONTENT = {
         '',
         '                                                                                                              ?               ?',
         '',
-        '                                                                                                                      b',
+        '                                                                                                                       ',
         '                                                                                    ?                                               T    R         C      T    X   T',
         '                                                                                                  ####################################################################',
         '                                                                                                  #5##################################################################',
-        '                                                          ?                                b T    ####################################################################',
+        '                                                          ?                                  T    ####################################################################',
         '                                                                        ##############################################################################################',
         '                                                                        #4############################################################################################',
         '                                ?                                 T     ##############################################################################################',
@@ -878,14 +892,14 @@ const CONTENT = {
         { id: '5c', title: '5c. /wip-wrapup: one WIP, four outputs' }
       ],
       cards: [
-        { section: '5a', title: 'Who sees what',
+        { section: '5a', title: 'Who sees what', item: 'week-ahead',
           lines: ['Instructions: everyone. Context: everyone. Memory: only you.', 'Scheduled tasks: whoever sets them up. Connectors: each person signs in.'],
           visual: 'lanes',
           talk: 'Memory is only yours, so it is not a team brain. Scheduled tasks run as the person who created them, using their connectors.' },
-        { section: '5a', title: 'Instructions = the client playbook',
+        { section: '5a', title: 'Instructions = the client playbook', item: 'project-instructions',
           lines: ['Contacts, tone, rules for Claude, and where the Monday board, Slack channel and SharePoint folder live.'],
           visual: 'playbook' },
-        { section: '5a', title: 'Context = the client context doc',
+        { section: '5a', title: 'Context = the client context doc', item: 'client-context',
           lines: ['One template for every client.', 'The Client Solutions Director fills it in and re-uploads it each month.'],
           visual: 'contextdoc',
           talk: 'Show the client context doc, then a manual task: a saved prompt with a run button.' },
@@ -897,7 +911,7 @@ const CONTENT = {
           lines: ['Agencies and client creative teams fill in an Excel MI sheet.', 'Retyping it into Monday is slow and error-prone.'],
           visual: 'mi', stage: 'problem',
           talk: 'This is the request from the CS team about Carman\'s and TMC: agencies keep using Excel, we stop retyping it into Monday.' },
-        { section: '5b', title: 'What Claude does',
+        { section: '5b', title: 'What Claude does', item: 'mi-to-monday',
           lines: ['Reads the messy sheet (month banners, repeated headers, formulas), shows a plan, waits for a yes, then builds the board.'],
           visual: 'mi',
           talk: 'Run it live: attach the sheet, type the command, show the plan, say yes.' },
@@ -912,7 +926,7 @@ const CONTENT = {
           lines: ['The QA flags tell a person what to chase.'],
           visual: 'mi', stage: 'flags' },
 
-        { section: '5c', title: 'One command after every WIP',
+        { section: '5c', title: 'One command after every WIP', item: 'wip-wrapup',
           lines: ['Claude reads the Granola note, treating your edited notes as the source of truth.'],
           visual: 'wip' },
         { section: '5c', title: 'Four outputs',
@@ -987,7 +1001,7 @@ const CONTENT = {
         '',
         '',
         '                                                                                                                                                               I    I  T          R     T     C      T   TX',
-        '                                                                                                                                                       ?    b  #############################################',
+        '                                                                                                                                                       ?       #############################################',
         '                                                                                                                                                          I    #############################################',
         '                                                                                                                                                          ##################################################',
         '                                                                                                                                                     I    ##################################################',
@@ -1002,12 +1016,12 @@ const CONTENT = {
         '                                                                                                 ?                               ###########################################################################',
         '                                                                                                                            I    ###########################################################################',
         '                                                                                 ?     ?                                    ################################################################################',
-        '                                                                                               T        b     T     C   2   ################################################################################',
+        '                                                                                               T              T     C   2   ################################################################################',
         '                                                                  ?     ?                  #################################################################################################################',
-        '                                     b                                         T           #################################################################################################################',
+        '                                                                               T           #################################################################################################################',
         '             ?        ?          ?  ====  ?                                 ################################################################################################################################',
-        '                           b                                        T       ################################################################################################################################',
-        '                          ###                  b              ##############################################################################################################################################',
+        '                                                                    T       ################################################################################################################################',
+        '                          ###                                 ##############################################################################################################################################',
         ' T P   S   T       T      ###  T             T    T  C   1  T ##############################################################################################################################################',
         '############################################################################################################################################################################################################',
         '############################################################################################################################################################################################################',
@@ -1988,17 +2002,28 @@ function openCard(card, meta = {}) {
     <div class="eyebrow"><span class="tag ${meta.secret ? 'purple' : 'gold'}">${esc(meta.eyebrow || '')}</span>${card.section && w ? esc(sectionTitle(w, card.section)) : ''}</div>
     <h2>${inline(card.title)}</h2>
     <div class="lines">${card.lines.map(l => `<p>${inline(l)}</p>`).join('')}</div>
+    ${card.steps ? `<div class="steps"><span class="lbl">${esc(card.stepsTitle || 'How to')}</span><ol>${card.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol></div>` : ''}
     ${card.tag ? `<span class="tagline">${inline(card.tag)}</span>` : ''}
+    ${card.tip ? `<p class="tip"><b>Tip</b>${inline(card.tip)}</p>` : ''}
     ${v ? `<div class="visual"><button class="replay" type="button">↻ Replay</button><div class="vx"></div></div>` : ''}
+    ${attachHTML(card.item)}
     ${talkHTML(card.talk)}
     <div class="foot"><span class="closehint">Close <kbd>Enter</kbd> <kbd>Esc</kbd> or click</span><span class="closehint">Backpack <kbd>B</kbd> · Map <kbd>M</kbd></span></div>
   </div></div>`);
+  wireActions(node);
+  if (card.item && itemById(card.item) && !save.items.includes(card.item)) { mark('items', card.item); updateHud(); setTimeout(() => toast(`${itemById(card.item).title} added to your backpack`), 300); sfx.item(); }
   let cleanup = null;
   const run = () => { if (cleanup) cleanup(); const host = $('.vx', node); host.className = 'vx'; host.innerHTML = ''; cleanup = v(host, card) || null; };
   const o = openOverlay(node, { kind: 'card', enterCloses: true, cleanup: () => cleanup && cleanup() });
   if (v) { run(); $('.replay', node).addEventListener('click', e => { e.stopPropagation(); run(); }); }
   node.addEventListener('click', e => { if (!e.target.closest('button,code,a')) closeOverlay(); });
   return o;
+}
+function attachHTML(id) {
+  const it = id && itemById(id);
+  if (!it) return '';
+  const peek = it.text.replace(/\s+/g, ' ');
+  return `<div class="attach" data-host><span class="tag">${it.download && !/^\//.test(it.text) ? 'Template' : 'Prompt'}</span><div class="ai"><b>${esc(it.title)}</b><span class="peek">${esc(peek.length > 90 ? peek.slice(0, 88) + '…' : peek)}</span>${it.where ? `<span class="where">${inline(it.where)}</span>` : ''}</div><div class="acts">${copyBtn(it.text, 'Copy', 'gold small')}${it.download ? dlBtn(it.download, 'purple small', 'Download') : ''}<span class="copied" aria-live="polite"></span></div></div>`;
 }
 function openItem(item, fresh) {
   const node = el(`<div class="overlay"><div class="panel item purple" role="dialog" aria-modal="true" aria-label="${esc(item.title)}" data-host>
@@ -2238,7 +2263,8 @@ const list = $('#list');
 const isListOpen = () => list.classList.contains('on');
 function buildList() {
   const itemHTML = it => `<div class="litem" data-host><h3>${esc(it.title)} <span class="btnrow">${copyBtn(it.text)}${it.download ? dlBtn(it.download) : ''}</span></h3>${it.where ? `<p class="where">${inline(it.where)}</p>` : ''}${it.note ? `<span class="note">${esc(it.note)}</span>` : ''}<pre class="prompt">${promptHTML(it.text)}</pre><span class="copied" aria-live="polite"></span></div>`;
-  const cardHTML = c => `<div class="lcard"><h3>${inline(c.title)}</h3>${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}${talkHTML(c.talk)}</div>`;
+  const cardHTML = c => `<div class="lcard"><h3>${inline(c.title)}</h3>${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}${c.steps ? `<p><b>${esc(c.stepsTitle || 'How to')}</b></p><ol>${c.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol>` : ''}${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}${c.tip ? `<p><b>Tip:</b> ${inline(c.tip)}</p>` : ''}${talkHTML(c.talk)}</div>${c.item && itemById(c.item) ? itemHTML(itemById(c.item)) : ''}`;
+  const onCard = (w, i) => w.cards.some(c => c.item === i.id);
   const campHTML = (w, ci) => { const bc = w.basecamps[ci]; return `<div class="campbox"><h4>${esc(CONTENT.campHeading)} · ${inline(bc.title)}</h4>${checklistHTML(w, ci, bc)}</div>`; };
   let h = `<div class="list"><div class="lhead"><img class="logo" src="${ASSETS.logo}" alt="halfdome"><button class="btn small" type="button" data-back>Back to the game</button></div>
     <h1>${esc(CONTENT.title)}</h1><p class="lede">${esc(CONTENT.kicker)}. Every card, prompt, checklist and question from the game, as plain text. Copy and download buttons work here too.</p>
@@ -2249,12 +2275,12 @@ function buildList() {
       for (const sec of w.sections) {
         h += `<h4>${esc(sec.title)}</h4>`;
         w.cards.filter(c => c.section === sec.id).forEach(c => h += cardHTML(c));
-        w.items.filter(i => i.section === sec.id).forEach(i => h += itemHTML(i));
+        w.items.filter(i => i.section === sec.id && !onCard(w, i)).forEach(i => h += itemHTML(i));
         (w.basecamps || []).forEach((bc, ci) => { if (bc.section === sec.id) h += campHTML(w, ci); });
       }
     } else {
       w.cards.forEach(c => h += cardHTML(c));
-      w.items.forEach(i => h += itemHTML(i));
+      w.items.filter(i => !onCard(w, i)).forEach(i => h += itemHTML(i));
     }
     if (w.quiz) { const ok = w.quiz.options.find(o => o.correct); h += `<h4>Ranger station</h4><p><b>${inline(w.quiz.question)}</b></p><ul>${w.quiz.options.map(o => `<li>${inline(o.text)}</li>`).join('')}</ul><details><summary>Show the answer</summary><p><b>${inline(ok.text)}.</b> ${inline(ok.why)}</p></details>`; }
     if (!w.sections) (w.basecamps || []).forEach((_, ci) => h += campHTML(w, ci));

@@ -18,7 +18,7 @@ L.put(3, 13, 'P'); L.put(7, 13, 'S'); L.put(13, 13, '1'); L.put(17, 10, '?')
 L.ground(23, 31, 13); L.ground(32, 39, 12)                       # wet granite steps
 L.put(44, 13, '2'); L.fill(47, 51, 11, 11, '='); L.fill(53, 57, 8, 8, '='); L.put(55, 4, '?')   # Sonnet spur
 L.put(63, 13, '3'); L.clear(65, 76, 14, 15); L.put(70, 12, '?')                                   # Haiku dip
-L.ground(81, 83, 12); L.put(82, 11, 'b')
+L.ground(81, 83, 12); None
 L.put(89, 13, '4'); L.ground(92, 94, 11); L.fill(96, 99, 8, 8, '='); L.put(97, 4, '?')            # Fable spur
 L.put(112, 10, '?')
 L.ground(117, 121, 13); L.ground(122, 126, 12); L.ground(127, 143, 11); L.put(134, 7, '?'); L.put(129, 10, '5')
@@ -33,7 +33,7 @@ L.ground(0, 181, 14)
 L.put(3, 13, 'P'); L.put(7, 13, 'S'); L.put(15, 10, '?')
 L.ground(19, 23, 12); L.ground(24, 27, 13)
 L.put(31, 13, 'K'); L.put(27, 9, '?')
-L.ground(39, 41, 12); L.put(40, 11, 'b')
+L.ground(39, 41, 12); None
 L.put(47, 13, 'K'); L.put(54, 10, '?')
 L.clear(59, 66, 14, 17); L.fill(59, 66, 15, 17, '~'); L.fill(61, 64, 14, 17, '#')   # Merced crossing
 L.put(76, 13, 'Y'); L.put(84, 10, '?')
@@ -52,7 +52,7 @@ steps = [(20, 45, 19), (46, 71, 16), (72, 97, 13), (98, 165, 10)]
 for x0, x1, t in steps: L.ground(x0, x1, t)
 L.put(21, 20, '2'); L.put(47, 17, '3'); L.put(73, 14, '4'); L.put(99, 11, '5')   # carved labels on each riser
 L.put(32, 15, '?'); L.put(58, 12, '?'); L.put(84, 9, '?'); L.put(110, 6, '?'); L.put(126, 6, '?')
-L.put(91, 12, 'b'); L.put(118, 8, 'b')
+None; None
 L.put(137, 9, 'R'); L.put(147, 9, 'C'); L.put(159, 9, 'X')
 for x in (1, 11, 17, 40, 66, 93, 132, 154, 163):
     t = next((y for y in range(L.H) if L.g[y][x] == '#'), None)
@@ -64,13 +64,13 @@ L = Lv(204, 34)
 L.ground(0, 203, 30)
 L.put(3, 29, 'P'); L.put(7, 29, 'S')
 # 5a: a home for every client
-L.put(13, 26, '?'); L.put(22, 26, '?'); L.ground(26, 28, 28); L.put(27, 27, 'b'); L.put(33, 26, '?'); L.put(42, 26, '?')
-L.fill(36, 39, 26, 26, '='); L.put(37, 25, 'b'); L.put(47, 28, 'b')
+L.put(13, 26, '?'); L.put(22, 26, '?'); L.ground(26, 28, 28); None; L.put(33, 26, '?'); L.put(42, 26, '?')
+L.fill(36, 39, 26, 26, '='); None; None
 L.put(53, 29, 'C'); L.put(57, 29, '1')
 # 5b: mi-to-monday
 L.ground(62, 75, 28); L.ground(76, 90, 26); L.ground(91, 123, 24)
 L.put(66, 24, '?'); L.put(72, 24, '?'); L.put(81, 22, '?'); L.put(87, 22, '?'); L.put(97, 20, '?')
-L.put(104, 23, 'b'); L.put(116, 23, 'C'); L.put(120, 23, '2')
+None; L.put(116, 23, 'C'); L.put(120, 23, '2')
 # 5c: the cables proper
 y = 24; x = 124; tops = []
 while y > 8:
@@ -78,7 +78,7 @@ while y > 8:
 L.ground(x, 203, 8); L.put(x, 7, 'I')
 for i, (sx, t) in enumerate(tops):
     if i in (1, 3, 5): L.put(sx + 2, t - 4, '?')
-L.put(tops[6][0] + 2, tops[6][1] - 2, 'b')
+None
 L.put(x + 6, 4, '?')
 L.put(x + 14, 7, 'R'); L.put(x + 26, 7, 'C'); L.put(x + 38, 7, 'X')
 for xx in (1, 11, 19, 31, 45, 50, 60, 68, 79, 95, 110, x + 3, x + 20, x + 33, x + 37):
