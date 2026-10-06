@@ -595,7 +595,7 @@ code,.mono{font-family:var(--mono)}
    - Checklist lines can carry a Copy button (`item: '<backpack item id>'`
      or `copy: 'text'`) and a Download button (`download: '<download id>'`).
    - Menu paths checked against Anthropic's help centre on 6 October 2026.
-     Written for the merged Claude experience, where chat and Cowork are one.
+     Written for the merged Claude experience, where chat and Cowork are merged.
    - Level legend (one character = one 40px tile):
        #  granite (solid)          =  log or plank (stand on top)
        ~  water                    ?  trail marker (cards, in order, left to right)
@@ -2566,7 +2566,7 @@ const VISUALS = {
   folders(host) {
     host.classList.add('v-fold');
     const fs = [['Clients', 't'], ['TMC', 't'], ['Media plans', 't'], ['Downloads', 'n'], ['Personal', 'n'], ['Desktop', 'n']];
-    host.innerHTML = `<div class="grid">${fs.map(([n, k]) => `<div class="f ${k}"><div class="ic"><span class="mk">${k === 't' ? '✓' : 'off'}</span></div>${n}</div>`).join('')}</div><div class="cap lbl">Desktop app · Cowork · trusted folders only</div>`;
+    host.innerHTML = `<div class="grid">${fs.map(([n, k]) => `<div class="f ${k}"><div class="ic"><span class="mk">${k === 't' ? '✓' : 'off'}</span></div>${n}</div>`).join('')}</div><div class="cap lbl">Desktop app · folders</div>`;
     const f = host.querySelectorAll('.f'), timers = [];
     f.forEach((x, i) => later(timers, () => x.classList.add('show'), 300 + i * 260));
     return () => timers.forEach(clearTimeout);
