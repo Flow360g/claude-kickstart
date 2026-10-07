@@ -1824,8 +1824,11 @@ function hitMarker(m) {
 function openMarkerCard(idx) {
   const w = L.world, card = w.cards[idx];
   if (!card) return;
-  mark('read', `${w.id}-${idx}`); updateHud();
-  openCard(card, { eyebrow: `World ${w.id} · Card ${idx + 1} of ${w.cards.length}`, world: w });
+  const key = `${w.id}-${idx}`;
+  if (current && current.cardKey === key) return;
+  mark('read', key); updateHud();
+  const o = openCard(card, { eyebrow: `World ${w.id} · Card ${idx + 1} of ${w.cards.length}`, world: w });
+  o.cardKey = key;
 }
 function interact() {
   const pcx = P.x + P.w / 2, pcy = P.y + P.h / 2;
@@ -1896,7 +1899,7 @@ function collectItem(it) {
   mark('items', item.id);
   sparkleBurst(it.x * TILE + 20, it.y * TILE + 20, C.purple, 18); sparkleBurst(it.x * TILE + 20, it.y * TILE + 20, C.gold, 10);
   sfx.item(); updateHud();
-  setTimeout(() => openItem(item, fresh), 220);
+  setTimeout(() => { if (current) toast(`${item.title} added to your backpack`); else openItem(item, fresh); }, 220);
 }
 function connectPost(p) {
   p.on = true;
@@ -2045,13 +2048,13 @@ function touchCritter(m, prevBottom) {
     sparkleBurst(m.x + m.w / 2, m.y + m.h / 2, C.purple, 12); dust(m.x + m.w / 2, m.y + m.h, 5);
     shake = Math.max(shake, 4); sfx.stomp();
     const tips = CONTENT.critterTips || [];
-    if (tips.length) toast(tips[tipIdx++ % tips.length]);
+    if (tips.length) toast(tips[tipIdx++ % tips.length], 4900);
   } else if (P.hurt <= 0) {
     const away = P.x + P.w / 2 < m.x + m.w / 2 ? -1 : 1;
     P.vx = away * 470; P.vy = -430; P.ground = false; P.stun = 0.3; P.hurt = 1.1;
     m.vx = -away * Math.abs(m.vx); shake = Math.max(shake, 6); sfx.ouch();
     for (let i = 0; i < 8; i++) parts.push({ x: P.x + P.w / 2, y: P.y + 20, vx: (Math.random() - 0.5) * 260, vy: -Math.random() * 220, life: 0.5, max: 0.5, size: 3, color: '#9fd3e6', type: 'spark', g: 500 });
-    if (!hurtHinted && CONTENT.hurtHint) { hurtHinted = true; toast(CONTENT.hurtHint); }
+    if (!hurtHinted && CONTENT.hurtHint) { hurtHinted = true; toast(CONTENT.hurtHint, 4000); }
   }
 }
 function catchThief(m) {
@@ -2659,9 +2662,9 @@ function updateHud() {
     (w.quiz ? `<span class="chip">${save.quiz.includes(w.id) ? '⚑ Flag raised' : '⚐ Ranger quiz'}</span>` : '');
 }
 let toastT = 0;
-function toast(msg) {
+function toast(msg, ms = 2400) {
   const t = $('#toast'); t.innerHTML = `<i></i>${esc(msg)}`; t.classList.add('show');
-  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400);
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), ms);
 }
 
 /* ---------------- overlays ---------------- */
@@ -2670,12 +2673,17 @@ let current = null;
 function openOverlay(node, opts = {}) {
   closeOverlay(true);
   layer.appendChild(node);
-  current = { node, ...opts };
+  current = { node, openedAt: performance.now(), ...opts };
   overlayOpen = true; duckMusic(true);
   keys.left = keys.right = keys.jump = false;
+  if (P.vy < 0) P.vy = 0; // don't carry on up into the block after closing
   requestAnimationFrame(() => requestAnimationFrame(() => node.classList.add('show')));
   return current;
 }
+// a card shouldn't vanish from a stray click, tap or key repeat the moment it opens
+const OPEN_GRACE = 700;
+const justOpened = () => current && performance.now() - current.openedAt < OPEN_GRACE;
+function userClose() { if (!justOpened()) closeOverlay(); }
 function closeOverlay(silent) {
   if (!current) return;
   const cur = current; current = null;
@@ -2711,7 +2719,7 @@ function openCard(card, meta = {}) {
   const run = () => { if (cleanup) cleanup(); const host = $('.vx', node); host.className = 'vx'; host.innerHTML = ''; cleanup = v(host, card) || null; };
   const o = openOverlay(node, { kind: 'card', enterCloses: true, cleanup: () => cleanup && cleanup() });
   if (v) { run(); $('.replay', node).addEventListener('click', e => { e.stopPropagation(); run(); }); }
-  node.addEventListener('click', e => { if (!e.target.closest('button,code,a')) closeOverlay(); });
+  node.addEventListener('click', e => { if (!e.target.closest('button,code,a')) userClose(); });
   return o;
 }
 function attachHTML(id) {
@@ -2732,7 +2740,7 @@ function openItem(item, fresh) {
   </div></div>`);
   wireActions(node);
   $('[data-close]', node).addEventListener('click', () => closeOverlay());
-  node.addEventListener('click', e => { if (e.target === node) closeOverlay(); });
+  node.addEventListener('click', e => { if (e.target === node) userClose(); });
   openOverlay(node, { kind: 'item', enterCloses: true });
 }
 function openBackpack() {
@@ -2750,7 +2758,7 @@ function openBackpack() {
   </div></div>`);
   wireActions(node);
   $('[data-close]', node).addEventListener('click', () => closeOverlay());
-  node.addEventListener('click', e => { if (e.target === node) closeOverlay(); });
+  node.addEventListener('click', e => { if (e.target === node) userClose(); });
   openOverlay(node, { kind: 'pack', enterCloses: false });
 }
 function shuffle(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
@@ -3434,8 +3442,8 @@ addEventListener('keydown', e => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
   if (current) {
     if (e.repeat) return;
-    if (k === 'escape') { e.preventDefault(); closeOverlay(); return; }
-    if (k === 'enter' && current.enterCloses && !e.target.closest('button,a,[role="button"]')) { e.preventDefault(); closeOverlay(); return; }
+    if (k === 'escape') { e.preventDefault(); userClose(); return; }
+    if (k === 'enter' && current.enterCloses && !e.target.closest('button,a,[role="button"]')) { e.preventDefault(); userClose(); return; }
     if (k === 'enter' && current.kind === 'quiz' && current.raiseReady && current.raiseReady()) { e.preventDefault(); closeOverlay(); return; }
     if (current.kind === 'quiz' && /^[1-4]$/.test(k)) { current.pick(+k - 1); return; }
     if (k === 'm') { e.preventDefault(); current.kind === 'map' ? closeOverlay() : openMap(); return; }
