@@ -498,6 +498,12 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
 .v-incog .bub{align-self:flex-end;background:var(--purple-soft);color:var(--ink);border-radius:12px;padding:10px 12px;font-weight:700;font-size:15px}
 .v-incog .mem{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green);opacity:0;animation:fadeIn .4s 1.2s forwards}
 .v-incog .mem.off{color:var(--gold);animation-delay:1.6s}
+.v-edit{padding:20px 26px}
+.v-edit .chat{gap:7px;padding:12px 14px}
+.v-edit .bub{font-size:13px;padding:6px 10px}
+.v-edit .chat.n .mem.off{color:var(--red)}
+.v-edit .chat.i .mem{color:var(--gold)}
+.v-edit .ed{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:3px}
 /* effort */
 .v-effort .menu{position:absolute;left:30px;top:24px;width:250px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:10px;display:flex;flex-direction:column;gap:6px}
 .v-effort .mi{font-weight:700;font-size:15px;padding:8px 10px;border-radius:8px;background:var(--white);display:flex;justify-content:space-between;align-items:center}
@@ -832,24 +838,25 @@ const CONTENT = {
       topic: 'Pick the model for the job',
       cards: [
         { open: 'crate', title: 'Opus 5.5: leave it here',
-          lines: ['Opus 5.5 is the default, and the right pick for multi-step work and anything going to a client: recaps from a messy WIP, media plan reasoning, a deck narrative, a tricky email.', 'It performs at the level of Fable 5.1 on most work while using far less of your limits.'],
+          lines: ['Opus 5.5 is the default and the most capable model on our Team plan. Keep it for the important, complex work: recaps from a messy WIP, media plan reasoning, a deck narrative, a tricky email.', 'It uses more of your limits than Sonnet 5.5, so save it for the jobs that need it most.'],
           steps: ['Click the model name next to the send button.', 'Check it says **Opus 5.5**.', 'Leave it there unless the job clearly fits another model.'],
           visual: 'models', focus: 'opus',
-          talk: 'Keep this to two minutes. Up is capability, right is how fast a model eats into your usage limits. Opus 5.5 sits almost level with Fable while using less, which is why it is the default.' },
-        { title: 'Sonnet 5.5: the fast pair of hands',
-          lines: ['Sonnet 5.5 replaced Sonnet 5 on 28 September. It runs over 30% faster and uses less of your limits.', 'Use it for well-scoped everyday jobs: a quick draft, a summary of one report, reformatting a table, tidying notes, a first pass at a doc or a slide.'],
-          steps: ['Open the model menu and choose **Sonnet 5.5**.', 'Switch back to Opus 5.5 when the job needs judgement or is going to a client.'],
+          talk: 'Keep this to two minutes. Up is capability, right is how fast a model eats into your usage limits. Opus 5.5 is the most capable model on our plan. Sonnet 5.5 is close behind and lighter on limits, so it is the one to reach for when limits get tight.' },
+        { title: 'Sonnet 5.5: very capable, lighter on limits',
+          lines: ['Sonnet 5.5 replaced Sonnet 5 on 28 September. It is a very capable model, client work included, and it runs over 30% faster while using less of your limits.', 'Hitting your limits? Switch to Sonnet 5.5 for everyday work (drafts, summaries, emails, client updates, tidying a table) and keep Opus 5.5 for the more important and complex jobs.'],
+          steps: ['Open the model menu and choose **Sonnet 5.5**.', 'Use it for the everyday work, client work included.', 'Switch to Opus 5.5 for the complex, high-stakes jobs.'],
           visual: 'models', focus: 'sonnet' },
-        { open: 'plane', title: 'Fable 5.1: the rare, very hard job',
-          lines: ['Fable 5.1 is the most capable model, for the rare, very hard, long-running job, like untangling a full year of messy campaign data.', 'On standard Team seats it runs on paid usage credits rather than your normal limits, so it costs real money. Opus 5.5 handles almost everything we do.'],
-          steps: ['Ask: would Opus 5.5 really struggle with this?', 'If yes, check with your lead before switching to Fable.'],
-          visual: 'models', focus: 'fable' },
+        { open: 'plane', title: "Edit, don't pile on",
+          lines: ['When an answer misses, it is tempting to reply "no, shorter", then "use bullets", then "drop the budget". Every follow-up makes the thread longer, and Claude rereads all of it each time, misses included.', 'Edit your original message instead. Claude answers again from that point, the missed answer drops out of the conversation, and you use less of your limits.'],
+          steps: ['Hover over the message you sent and click the pencil icon to edit it.', 'Add what was missing: who it is for, the format, the length.', 'Save, and Claude replies again from there.'],
+          tip: 'Better still, put it all in the first message. One clear brief beats five corrections.',
+          visual: 'edit' },
         { title: 'Effort: how hard it thinks',
           lines: ['The same menu that picks the model has an **Effort** setting, from Low to Max. Higher effort means more thinking time and more of your limits.', 'Medium suits most work. Turn it up for knotty analysis, down for quick reformatting.'],
           steps: ['Click the model name next to the send button.', 'Choose **Effort** and pick a level.', 'Keep an eye on your limits in **Settings > Usage**.'],
           visual: 'effort' },
         { open: 'thief', title: 'Rule of thumb',
-          lines: ["A senior strategist's job, use Opus. A fast pair of hands, use Sonnet.", 'Anything a client will read, a number you will quote, or a task with several steps: Opus 5.5. A quick draft, summary or reformat you will check yourself: Sonnet 5.5.'],
+          lines: ['Important and complex, use Opus. Everyday work, use Sonnet.', 'Complex analysis, strategy, or the high-stakes piece a client will scrutinise: Opus 5.5. Drafts, summaries, emails and client updates: Sonnet 5.5 handles them well, and it is the first switch to make when you are close to your limits.'],
           visual: 'thumb' },
         { title: 'Opus 5.5 is the new default',
           lines: ['Opus 5.5 landed on 22 September 2026: around 40% cheaper to run and over 30% faster than Opus 5. Five-hour usage limits went up on Team plans at the same time.', 'Long threads use more of your limits with every message, because Claude rereads the whole thread. A fresh chat per task is cheaper and usually gives better answers.'],
@@ -862,28 +869,29 @@ const CONTENT = {
           text: 'Summarise this chat as a short handover I can paste into a fresh chat: the goal, the decisions so far, the files and links we used, and what is left to do. Keep it under 200 words.' }
       ],
       quiz: {
-        question: "You're drafting a client recap from a messy WIP. Which model?",
+        question: "You keep hitting your usage limits by mid-afternoon. What's the best first move?",
         options: [
-          { text: 'Opus 5.5', correct: true,
-            why: "It's multi-step work and it's going to a client. That's Opus, and it's the default." },
-          { text: 'Sonnet 5.5',
-            why: "Sonnet suits quick drafts and summaries you'll check yourself. This one is multi-step and it's going to a client." },
-          { text: 'Fable 5.1',
-            why: "Fable is for the rare, very hard, long-running job, and on standard seats it costs paid credits. A recap doesn't need it." },
-          { text: 'Whichever model the last chat used',
-            why: 'Pick per job. Multi-step work going to a client is Opus 5.5.' }
+          { text: 'Switch to Sonnet 5.5 for everyday work and keep Opus 5.5 for the complex jobs', correct: true,
+            why: 'Sonnet 5.5 is very capable, client work included, and uses less of your limits. Save Opus for the work that needs it most.' },
+          { text: 'Turn Effort up to Max so it gets things right first time',
+            why: 'Higher effort means more thinking time, and more of your limits. Medium suits most work.' },
+          { text: 'Keep everything in one long thread so Claude has all the context',
+            why: 'Claude rereads the whole thread with every message. A fresh chat per task uses less and usually answers better.' },
+          { text: 'Keep replying with corrections until the answer is right',
+            why: 'Every correction makes the thread longer. Edit your original message instead.' }
         ]
       },
       basecamps: [
         { title: 'Pick the model for the job',
           items: [
             { text: 'Check your model menu says **Opus 5.5**, and leave it there.' },
-            { text: 'Try **Sonnet 5.5** on your next quick summary.' },
+            { text: 'Try **Sonnet 5.5** on your next everyday task, client work included.' },
+            { text: 'Next time an answer misses, **edit your message** instead of replying with a correction.' },
             { text: 'Look at **Settings > Usage** so you know where your limits sit.' },
             { text: 'Save the **Fresh-chat handover** for when a thread gets long.', item: 'fresh-chat' }
           ] }
       ],
-      signs: { 1: 'Opus 5.5 · main trail', 2: 'Sonnet 5.5 · quick spur', 3: 'Effort · low path', 4: 'Fable 5.1 · the hard way', 5: 'Vernal Fall lookout' },
+      signs: { 1: 'Opus 5.5 · main trail', 2: 'Sonnet 5.5 · lighter on limits', 3: 'Effort · low path', 4: "Edit, don't pile on", 5: 'Vernal Fall lookout' },
       critters: [['pill', 28], ['turtle', 44], ['pill', 61], ['pill', 106], ['pill', 140]],
       monument: { art: 'chess', x: 103, h: 110, text: 'Pick your piece' },
       level: [
@@ -3199,7 +3207,7 @@ const VISUALS = {
   },
   models(host, card) {
     host.classList.add('v-models');
-    const pts = { sonnet: [230, 132, 'Sonnet 5.5', 26], opus: [420, 54, 'Opus 5.5', 32], fable: [610, 44, 'Fable 5.1', 30] };
+    const pts = { sonnet: [250, 74, 'Sonnet 5.5', 28], opus: [500, 50, 'Opus 5.5', 32] };
     const f = card.focus;
     host.innerHTML = `<svg viewBox="0 0 738 236">
       <line x1="60" y1="210" x2="700" y2="210" stroke="#1A1917" stroke-width="2"/><line x1="60" y1="210" x2="60" y2="16" stroke="#1A1917" stroke-width="2"/>
@@ -3213,9 +3221,14 @@ const VISUALS = {
           <text x="${x + r + 8}" y="${y + 5}" font-size="${on ? 16 : 13}" font-weight="${on ? 900 : 700}" fill="#1A1917">${name}</text>
         </g>`;
       }).join('')}
-      <line x1="452" y1="70" x2="584" y2="60" stroke="#8E1C02" stroke-width="1.5" stroke-dasharray="3 4" class="fadein" style="animation-delay:1s"/>
-      <text x="520" y="104" font-size="11.5" font-weight="700" fill="#8E1C02" class="fadein" style="animation-delay:1.1s" text-anchor="middle">Near Fable, using less</text>
+      <text x="250" y="130" font-size="11.5" font-weight="700" fill="#8E1C02" class="fadein" style="animation-delay:1s" text-anchor="middle">Very capable, lighter on limits</text>
+      <text x="500" y="110" font-size="11.5" font-weight="700" fill="#8E1C02" class="fadein" style="animation-delay:1.1s" text-anchor="middle">For the complex, high-stakes work</text>
     </svg>`;
+  },
+  edit(host) {
+    host.classList.add('v-incog', 'v-edit');
+    host.innerHTML = `<div class="chat n"><div class="lbl">Piling on</div><div class="bub">Write the TMC recap</div><div class="bub">No, shorter</div><div class="bub">Bullets, and drop the budget</div><div class="mem off">Every reply adds to what Claude rereads</div></div>
+      <div class="chat i"><div class="lbl">Edit instead</div><div class="bub">Write the TMC recap. Short bullets, no budget. <span class="ed">✎ edited</span></div><div class="mem">✓ One clean answer, less of your limit</div></div>`;
   },
   incognito(host) {
     host.classList.add('v-incog');
@@ -3225,7 +3238,7 @@ const VISUALS = {
   effort(host) {
     host.classList.add('v-effort');
     const lv = ['Low', 'Medium', 'High', 'Extra high', 'Max'];
-    host.innerHTML = `<div class="menu"><div class="lbl">Model</div><div class="mi on">Opus 5.5 <span>default</span></div><div class="mi">Sonnet 5.5</div><div class="mi">Fable 5.1 <span>credits</span></div></div>
+    host.innerHTML = `<div class="menu"><div class="lbl">Model</div><div class="mi on">Opus 5.5 <span>default</span></div><div class="mi">Sonnet 5.5 <span>lighter</span></div></div>
       <div class="dial"><div class="lbl">Effort</div><div class="lv">${lv.map((l, i) => `<button type="button" tabindex="-1" class="${i === 1 ? 'on' : ''}">${l}</button>`).join('')}</div>
       <div class="bar"><i></i></div><div class="cap"><span>Faster, uses less</span><span>Thinks longer, uses more</span></div></div>`;
     const bs = host.querySelectorAll('.lv button'), bar = $('.bar i', host), timers = [];
@@ -3235,8 +3248,8 @@ const VISUALS = {
   },
   thumb(host) {
     host.classList.add('v-thumb');
-    host.innerHTML = `<div class="side rise" style="animation-delay:.1s"><div class="lbl">Thinking job</div><h5>A senior strategist's job</h5><div class="eg">Multi-step work, and anything going to a client.</div><span class="pick o">Opus 5.5</span></div>
-      <div class="side rise" style="animation-delay:.5s"><div class="lbl">Doing job</div><h5>A fast pair of hands</h5><div class="eg">Quick drafts, summaries, one-report reads.</div><span class="pick s">Sonnet 5.5</span></div>`;
+    host.innerHTML = `<div class="side rise" style="animation-delay:.1s"><div class="lbl">Important and complex</div><h5>The high-stakes job</h5><div class="eg">Complex analysis, strategy, the piece a client will scrutinise.</div><span class="pick o">Opus 5.5</span></div>
+      <div class="side rise" style="animation-delay:.5s"><div class="lbl">Everyday work</div><h5>Very capable, lighter on limits</h5><div class="eg">Drafts, summaries, emails, client updates.</div><span class="pick s">Sonnet 5.5</span></div>`;
   },
   opus55(host) {
     host.classList.add('v-bars');
