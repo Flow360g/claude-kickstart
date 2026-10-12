@@ -320,6 +320,9 @@ code,.mono{font-family:var(--mono)}
 .lc .rd{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--gold);flex:none}
 .lc .rd svg{width:18px;height:10px}
 .lc.read .rd{background:var(--ink);color:var(--gold);font-weight:900;font-size:14px}
+.lc .rd{cursor:pointer;transition:transform .12s}
+.lc .rd:hover{transform:scale(1.08);box-shadow:0 0 0 2px var(--ink)}
+.ldone{display:flex;justify-content:flex-end;max-width:68ch}
 .lc .ttl{font-weight:800;font-size:17px;line-height:1.25}
 .lc .ttl small{display:block;font-weight:500;font-size:14px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lc[open] .ttl small{display:none}
@@ -1598,12 +1601,18 @@ function setMusic(on) {
   if (on && !musicTimer) { musicNext = actx.currentTime + 0.1; musicTimer = setInterval(musicTick, 100); }
   if (!on && musicTimer) { setTimeout(() => { if (!save.musicOn) { clearInterval(musicTimer); musicTimer = 0; } }, 1200); }
 }
+// music plays only on the trail: not on the title screen or in the list view
+let musicPlaying = false;
+function syncMusic() {
+  const want = !!(actx && actx.state !== 'closed' && save.musicOn && started && !isListOpen() && !(current && current.kind === 'title'));
+  if (want !== musicPlaying) { musicPlaying = want; setMusic(want); }
+}
 function duckMusic(down) { if (actx && musicBus && save.musicOn) musicBus.gain.setTargetAtTime(down ? 0.3 : 0.7, actx.currentTime, 0.25); }
 // browsers only allow sound after the first click or key press
 function unlockAudio() {
   if (!audio()) return;
   if (actx.state === 'suspended') actx.resume();
-  if (save.musicOn) setMusic(true);
+  syncMusic();
   removeEventListener('pointerdown', unlockAudio); removeEventListener('keydown', unlockAudio);
 }
 addEventListener('pointerdown', unlockAudio); addEventListener('keydown', unlockAudio);
@@ -2631,6 +2640,7 @@ function frame(now) {
   acc += dt;
   while (acc >= STEP) { if (L) update(STEP); acc -= STEP; }
   render();
+  syncMusic();
   requestAnimationFrame(frame);
 }
 
@@ -3017,12 +3027,13 @@ function buildList() {
   const cardHTML = (w, c) => {
     const i = w.cards.indexOf(c), id = `${w.id}-${i}`, read = save.read.includes(id), it = c.item && itemById(c.item);
     return `<details class="lc ${read ? 'read' : ''}" data-card="${id}" data-search="${esc(searchText(c))}">
-      <summary><span class="rd">${read ? '✓' : DOME_SVG}</span><span class="ttl">${inline(c.title)}<small>${esc(plain(c.lines[0]))}</small></span><span class="pills">${c.steps ? '<span class="pill g">How to</span>' : ''}${it ? `<span class="pill">${it.template ? 'Template' : 'Prompt'}</span>` : ''}</span>${CHEV}</summary>
+      <summary><span class="rd" role="checkbox" aria-checked="${read}" tabindex="0" title="Mark as done">${read ? '✓' : DOME_SVG}</span><span class="ttl">${inline(c.title)}<small>${esc(plain(c.lines[0]))}</small></span><span class="pills">${c.steps ? '<span class="pill g">How to</span>' : ''}${it ? `<span class="pill">${it.template ? 'Template' : 'Prompt'}</span>` : ''}</span>${CHEV}</summary>
       <div class="lcb">${c.lines.map(l => `<p>${inline(l)}</p>`).join('')}
         ${c.steps ? `<div class="lsteps"><span class="lbl">${esc(c.stepsTitle || 'How to')}</span><ol>${c.steps.map(t => `<li>${inline(t)}</li>`).join('')}</ol></div>` : ''}
         ${c.tag ? `<span class="ltag">${inline(c.tag)}</span>` : ''}
         ${c.tip ? `<p class="ltip"><span class="tl">Tip</span><span>${inline(c.tip)}</span></p>` : ''}
-        ${it ? promptBlock(it) : ''}${talkHTML(c.talk)}</div></details>`;
+        ${it ? promptBlock(it) : ''}${talkHTML(c.talk)}
+        <div class="ldone"><button class="btn small ${read ? 'ghost' : 'gold'}" type="button" data-read>${read ? 'Done ✓' : 'Mark as done'}</button></div></div></details>`;
   };
   const onCard = (w, i) => w.cards.some(c => c.item === i.id);
   const campHTML = (w, ci) => {
@@ -3072,15 +3083,25 @@ function buildList() {
     list.querySelectorAll('[data-camp]').forEach(b2 => { const [wid, ci] = b2.dataset.camp.split('-'); const n = b2.querySelectorAll('.check.done').length, t = +b2.dataset.n; $('.meter i', b2).style.width = (n / t * 100) + '%'; $('.cnt', b2).textContent = `${n} of ${t} done`; });
     refreshListStats();
   });
-  // opening a card counts as reading it
-  list.querySelectorAll('details.lc').forEach(d => d.addEventListener('toggle', () => {
-    if (!d.open) return;
-    if (d.dataset.auto) { delete d.dataset.auto; return; } // opened by search or Expand all, not by the reader
+  // a card only counts as read when the reader ticks it or clicks Done, not when it is opened
+  const setRead = (d, on) => {
     const id = d.dataset.card;
-    if (!save.read.includes(id)) { mark('read', id); d.classList.add('read'); $('.rd', d).innerHTML = '✓'; sfx.tick(); refreshListStats(); updateHud(); }
-    const it = CONTENT.worlds.find(w => w.id === +id.split('-')[0]).cards[+id.split('-')[1]].item;
-    if (it && !save.items.includes(it)) { mark('items', it); updateHud(); }
-  }));
+    if (on) {
+      mark('read', id); sfx.tick();
+      const it = CONTENT.worlds.find(w => w.id === +id.split('-')[0]).cards[+id.split('-')[1]].item;
+      if (it && !save.items.includes(it)) mark('items', it);
+    } else { const i = save.read.indexOf(id); if (i >= 0) { save.read.splice(i, 1); persist(); } sfx.untick(); }
+    d.classList.toggle('read', on);
+    const rd = $('.rd', d); rd.innerHTML = on ? '✓' : DOME_SVG; rd.setAttribute('aria-checked', on);
+    const b = $('[data-read]', d); b.textContent = on ? 'Done ✓' : 'Mark as done'; b.classList.toggle('gold', !on); b.classList.toggle('ghost', on);
+    refreshListStats(); updateHud();
+  };
+  list.querySelectorAll('details.lc').forEach(d => {
+    const rd = $('.rd', d), flip = e => { e.preventDefault(); e.stopPropagation(); setRead(d, !save.read.includes(d.dataset.card)); };
+    rd.addEventListener('click', flip); // the box ticks without opening or closing the card
+    rd.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') flip(e); });
+    $('[data-read]', d).addEventListener('click', e => { e.stopPropagation(); const on = !save.read.includes(d.dataset.card); setRead(d, on); if (on) d.open = false; });
+  });
   list.querySelectorAll('.lprompt .more').forEach(b2 => b2.addEventListener('click', () => { const pre = b2.previousElementSibling; const open = pre.classList.toggle('short'); b2.textContent = open ? 'Show less' : 'Show all'; }));
   list.querySelectorAll('[data-quiz]').forEach(q => {
     const w = W_BY_ID(+q.dataset.quiz), why = $('.qwhy', q);
@@ -3099,7 +3120,7 @@ function buildList() {
     let any = 0;
     list.querySelectorAll('section.lw').forEach(sec => {
       let hits = 0;
-      sec.querySelectorAll('details.lc').forEach(d => { const ok = !term || d.dataset.search.includes(term); d.classList.toggle('lv-hide', !ok); if (ok) hits++; if (term && ok && !d.open) { d.dataset.auto = '1'; d.open = true; } });
+      sec.querySelectorAll('details.lc').forEach(d => { const ok = !term || d.dataset.search.includes(term); d.classList.toggle('lv-hide', !ok); if (ok) hits++; if (term && ok && !d.open) { d.open = true; } });
       sec.querySelectorAll('.lblock, .lsec, .legg').forEach(b2 => b2.classList.toggle('lv-hide', !!term));
       sec.classList.toggle('lv-hide', !!term && !hits); any += hits;
     });
@@ -3109,7 +3130,7 @@ function buildList() {
   q.addEventListener('input', applySearch);
   q.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); if (q.value) { q.value = ''; applySearch(); } else q.blur(); } });
   $('[data-back]', list).addEventListener('click', () => toggleList(false));
-  $('[data-expand]', list).addEventListener('click', () => list.querySelectorAll('details.lc:not(.lv-hide)').forEach(d => { if (!d.open) { d.dataset.auto = '1'; d.open = true; } }));
+  $('[data-expand]', list).addEventListener('click', () => list.querySelectorAll('details.lc:not(.lv-hide)').forEach(d => { if (!d.open) { d.open = true; } }));
   $('[data-collapse]', list).addEventListener('click', () => list.querySelectorAll('details.lc').forEach(d => d.open = false));
   list.querySelectorAll('[data-nav]').forEach(a2 => a2.addEventListener('click', e => { e.preventDefault(); const t = $(a2.getAttribute('href'), list); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   // highlight the world you are reading in the sidebar
@@ -3508,7 +3529,7 @@ $('#btnMap').addEventListener('click', e => { e.currentTarget.blur(); current &&
 $('#btnPack').addEventListener('click', e => { e.currentTarget.blur(); current && current.kind === 'pack' ? closeOverlay() : openBackpack(); });
 $('#btnList').addEventListener('click', e => { e.currentTarget.blur(); openList(); });
 $('#btnSound').addEventListener('click', e => { e.currentTarget.blur(); save.sfxOn = !save.sfxOn; persist(); updateHud(); if (save.sfxOn) sfx.tick(); });
-$('#btnMusic').addEventListener('click', e => { e.currentTarget.blur(); save.musicOn = !save.musicOn; persist(); updateHud(); setMusic(save.musicOn); });
+$('#btnMusic').addEventListener('click', e => { e.currentTarget.blur(); save.musicOn = !save.musicOn; persist(); updateHud(); audio(); syncMusic(); });
 $('#btnPresenter').addEventListener('click', e => { e.currentTarget.blur(); togglePresenter(); });
 
 /* ---------------- routing + boot ---------------- */
@@ -3526,7 +3547,7 @@ function boot() {
   requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
 }
 // a small hook for automated checks
-window.__summit = { P, get L() { return L; }, save, loadWorld, keys, get current() { return current; }, makeZip, kitMarkdown, openCard: (w, i) => { loadWorld(w); openMarkerCard(i); }, openBasecamp: (w, i) => { loadWorld(w); openBasecamp(i); }, openBackpack, reachSummit: () => { loadWorld(6); reachSummit(); } };
+window.__summit = { P, get L() { return L; }, get music() { return musicPlaying; }, save, loadWorld, keys, get current() { return current; }, makeZip, kitMarkdown, openCard: (w, i) => { loadWorld(w); openMarkerCard(i); }, openBasecamp: (w, i) => { loadWorld(w); openBasecamp(i); }, openBackpack, reachSummit: () => { loadWorld(6); reachSummit(); } };
 boot();
 })();
 </script>
