@@ -7,15 +7,19 @@
 <meta name="description" content="A Claude kickstart for Half Dome's Client Solutions team, played as the Half Dome hike.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* One committed look (the hike at golden hour), so colours are set explicitly rather than themed. */
 :root{
   --gold:#D2C663; --red:#8E1C02; --purple:#B0A3D0;
-  --ink:#1A1917; --muted:#55524E; --card:#F7F6F5; --line:#DEDBD6; --white:#FFFFFF;
+  --ink:#0F0F0F; --muted:rgba(15,15,15,.72); --card:#F7F6F5; --line:rgba(15,15,15,.16); --white:#FFFFFF;
   --gold-soft:#EEE8B8; --purple-soft:#E6E0F2; --red-soft:#F1DAD3; --green:#4f6f2f;
-  --sans:'Archivo',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
-  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  /* Half Dome design system: Plus Jakarta Sans for working text, Libre Baskerville for display lines.
+     --mono is the label face (now the sans); --code is kept for prompts and code only. */
+  --sans:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+  --serif:'Libre Baskerville',Georgia,serif;
+  --code:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+  --mono:var(--sans);
   color-scheme:light;
 }
 *{box-sizing:border-box}
@@ -23,6 +27,8 @@ html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-famil
 button{font-family:inherit;cursor:pointer;color:inherit}
 button:focus-visible,.node:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
 code,.mono{font-family:var(--mono)}
+code,.prompt,.attach .peek{font-family:var(--code)}
+html,body{-webkit-font-smoothing:antialiased}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* ---------- stage (designed at 1280 x 720, letterboxed) ---------- */
@@ -116,7 +122,7 @@ code,.mono{font-family:var(--mono)}
 .card h2{margin:0;font-size:32px;line-height:1.08;font-weight:800;letter-spacing:-0.02em;text-wrap:balance}
 .card .lines{display:flex;flex-direction:column;gap:5px}
 .card .lines p{margin:0;font-size:17.5px;line-height:1.42;color:#33312e}
-.card .lines code,.list code,.check code{font-family:var(--mono);font-size:.88em;background:var(--white);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.card .lines code,.list code,.check code{font-family:var(--code);font-size:.88em;background:var(--white);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
 .card .steps{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:10px 14px 10px 14px}
 .card .steps ol{margin:4px 0 0;padding-left:22px;display:flex;flex-direction:column;gap:3px}
 .card .steps li{font-size:15.5px;line-height:1.4;color:#33312e}
@@ -142,7 +148,7 @@ code,.mono{font-family:var(--mono)}
 .item{width:820px;padding:32px 40px 24px;display:flex;flex-direction:column;gap:13px}
 .item h2{margin:0;font-size:34px;font-weight:800;letter-spacing:-0.02em}
 .item .sub{margin:0;font-size:17px;color:var(--muted)}
-.prompt{position:relative;margin:0;font-family:var(--mono);font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;background:var(--white);border:1px solid var(--line);border-left:5px solid var(--purple);border-radius:12px;padding:14px 18px;max-height:280px;overflow:auto;cursor:text;user-select:text;-webkit-user-select:text;color:var(--ink)}
+.prompt{position:relative;margin:0;font-family:var(--code);font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;background:var(--white);border:1px solid var(--line);border-left:5px solid var(--purple);border-radius:12px;padding:14px 18px;max-height:280px;overflow:auto;cursor:text;user-select:text;-webkit-user-select:text;color:var(--ink)}
 .prompt .ph{background:var(--purple-soft);border-radius:4px;padding:0 3px;color:#4a3d78}
 .btnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .btn{border:0;border-radius:12px;padding:12px 18px;font-size:16px;font-weight:800;background:var(--ink);color:var(--card);display:inline-flex;gap:8px;align-items:center;white-space:nowrap}
@@ -261,6 +267,65 @@ code,.mono{font-family:var(--mono)}
 .pulse{animation:pulse 1.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes pulse{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(2.1)}}
 
+/* ---------- Half Dome design system pass: title, popups and HUD ----------
+   Pill buttons and labels, uppercase sequoia eyebrows, serif display lines,
+   no drop shadows, gradients or tinted fills. */
+.hbtn{border-radius:999px;padding:7px 12px;box-shadow:none}
+.hbtn kbd,.help kbd{border-radius:999px;padding:1px 7px}
+.hbtn.on{background:var(--purple);border-color:var(--purple)}
+.panel{box-shadow:none;border:0;border-radius:24px}
+.panel:before{height:6px;border-radius:24px 24px 0 0}
+.overlay{background:rgba(15,15,15,.5)}
+.eyebrow{font:700 13px/16px var(--sans);letter-spacing:.08em;color:var(--red)}
+.eyebrow .tag{border-radius:999px;padding:3px 10px;font-weight:700;letter-spacing:.06em}
+.closehint kbd,.keys kbd{border-bottom-width:1px;border-radius:999px;padding:1px 8px}
+.card h2,.item h2,.pack h2{font-weight:700;letter-spacing:-0.01em}
+.quiz h2{font-weight:700}
+.card .lines p,.card .steps li,.card .tip{color:var(--ink)}
+.card .steps{background:var(--white);border:0;box-shadow:inset 0 0 0 1px var(--line)}
+.card .steps .lbl,.attach .lbl{font:700 12px/16px var(--sans);letter-spacing:.08em}
+.card .tip .tl{font:700 11px/20px var(--sans);letter-spacing:.06em;border-radius:999px;padding:0 10px}
+.card .tagline,.note{font-family:var(--sans);font-weight:600;background:var(--white);border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:999px}
+.attach{background:var(--white);border:0;border-left:4px solid var(--purple);border-radius:0 12px 12px 0}
+.attach .tag{border-radius:999px;padding:2px 10px}
+.talk{background:var(--white);border:2px dashed var(--purple);border-radius:12px}
+.talk b{font-family:var(--sans)}
+.prompt .ph{background:var(--purple);color:var(--ink)}
+.visual{border-radius:12px}
+.btn{border-radius:999px;font-weight:700}
+.btn.small{border-radius:999px;padding:8px 16px}
+.btn.tiny{border-radius:999px;padding:4px 11px}
+.btn.ghost{border:2px solid var(--ink)}
+.btn.ghost:hover{background:var(--card)}
+.btn.try{border:2px solid var(--ink)}
+.opt{border-radius:12px;border:1px solid var(--line)}
+.opt kbd{border-radius:999px;font-family:var(--sans)}
+.opt.wrong{background:var(--white);border:2px solid var(--red);color:var(--red)}
+.opt.right{background:var(--gold);border-color:var(--gold)}
+.why.bad{background:var(--white);border:0;border-left:4px solid var(--red);border-radius:0 12px 12px 0}
+.why.good{background:var(--white);border:0;border-left:4px solid var(--gold);border-radius:0 12px 12px 0}
+.check{border-radius:12px}
+.check .box{border-radius:6px}
+.check.done{background:var(--white);border-color:var(--gold)}
+.check.done .txt{color:var(--muted)}
+.camphead h2,.complete h2,.summit h2,.map .mhead h2{font-weight:800;letter-spacing:-0.02em}
+.summit h3{font:700 13px/16px var(--sans);letter-spacing:.08em}
+.closing{font:italic 400 24px/1.3 var(--serif);letter-spacing:0}
+.pitem{border-radius:12px}
+.pitem.locked{border:1px dashed var(--line)}
+.pitem h3 small{font-family:var(--sans);font-weight:700}
+.finale{background:rgba(15,15,15,.35)}
+.wpo .msg h2{font-weight:800}
+/* title: a flat snow panel instead of a fade, and the title as a serif display line */
+.title{background:none}
+.title:before{content:"";position:absolute;left:0;top:0;bottom:0;width:760px;background:var(--card);border-radius:0 24px 24px 0;z-index:-1}
+.title .kick{font:700 14px/18px var(--sans);letter-spacing:.08em}
+.title h1{font:400 84px/0.98 var(--serif);letter-spacing:-0.02em;margin:14px 0 10px}
+.title h1 span{font-style:italic}
+.title p{font-size:19px;line-height:28px}
+.keys{font-family:var(--sans)}
+.nlabel{font-weight:700}
+
 /* ---------- list view (a normal page, outside the stage) ---------- */
 #list{position:fixed;inset:0;z-index:100;background:var(--white);overflow:auto;display:none;color:var(--ink);scroll-behavior:smooth}
 #list.on{display:block}
@@ -333,7 +398,7 @@ code,.mono{font-family:var(--mono)}
 .lc[open] .chev{transform:rotate(180deg)}
 .lcb{padding:0 18px 18px 60px;display:flex;flex-direction:column;gap:12px}
 .lcb p{margin:0;font-size:16.5px;line-height:1.55;max-width:68ch}
-.lcb code,.lw code{font-family:var(--mono);font-size:.88em;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.lcb code,.lw code{font-family:var(--code);font-size:.88em;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
 .lsteps{background:var(--card);border-radius:12px;padding:12px 16px}
 .lsteps .lbl{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)}
 .lsteps ol{margin:6px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
@@ -1467,7 +1532,7 @@ const ART_SRC = {
 
 const TILE = 40, VW = 1280, VH = 720, STEP = 1 / 120;
 const GRAV = 2500, JUMP_V = 900, RUN = 320, MAXFALL = 1100;
-const C = { gold: '#D2C663', red: '#8E1C02', purple: '#B0A3D0', ink: '#1A1917', card: '#F7F6F5', line: '#DEDBD6' };
+const C = { gold: '#D2C663', red: '#8E1C02', purple: '#B0A3D0', ink: '#0F0F0F', card: '#F7F6F5', line: '#DEDBD6' };
 const $ = (s, el = document) => el.querySelector(s);
 const W_BY_ID = id => CONTENT.worlds.find(w => w.id === id);
 
@@ -2420,7 +2485,7 @@ function drawMarker(px, py, read) {
   c.fillStyle = read ? '#E4DDA6' : C.gold; rr(c, px, py, 40, 40, 7); c.fill();
   c.strokeStyle = read ? '#a59c5a' : '#8f8436'; c.lineWidth = 2.5; rr(c, px + 1.5, py + 1.5, 37, 37, 6); c.stroke();
   c.fillStyle = 'rgba(255,255,255,0.35)'; c.fillRect(px + 5, py + 5, 30, 3);
-  if (read) { c.fillStyle = '#8f8436'; c.font = '700 22px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('✓', px + 20, py + 22); }
+  if (read) { c.fillStyle = '#8f8436'; c.font = '700 22px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('✓', px + 20, py + 22); }
   else domeArc(px + 20, py + 27, 10, 6, C.red); // the dome from the halfdome logo
   if (!read) {
     const s = (time * 0.7 + px * 0.001) % 2.4;
@@ -2457,13 +2522,13 @@ function drawItem(it) {
 function drawSign(s) {
   const c = ctx, px = s.x * TILE, base = (s.y + 1) * TILE;
   if (s.kind === 'carve') { // painted into the granite riser
-    c.font = '800 16px Archivo, sans-serif'; c.textAlign = 'left'; c.textBaseline = 'middle';
+    c.font = '800 16px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'left'; c.textBaseline = 'middle';
     const w = c.measureText(s.text).width + 24;
     c.fillStyle = 'rgba(26,25,23,0.72)'; rr(c, px + 4, py0(s) + 8, w, 28, 6); c.fill();
     c.fillStyle = C.gold; c.fillText(s.text, px + 16, py0(s) + 22.5);
     return;
   }
-  c.font = '800 15px Archivo, sans-serif';
+  c.font = '800 15px "Plus Jakarta Sans", sans-serif';
   const w = Math.max(120, c.measureText(s.text).width + 30 + (s.arrow ? 18 : 0));
   c.fillStyle = '#5c3f25'; c.fillRect(px + 16, base - 70, 8, 70);
   c.fillStyle = '#7a5634'; rr(c, px + 20 - w / 2, base - 104, w, 38, 6); c.fill();
@@ -2481,7 +2546,7 @@ function drawRanger(r) {
   c.fillStyle = C.red; c.beginPath(); c.moveTo(px - 14, base - 90); c.lineTo(px + 65, base - 140); c.lineTo(px + 144, base - 90); c.closePath(); c.fill();
   c.fillStyle = 'rgba(0,0,0,0.15)'; c.fillRect(px - 10, base - 92, 150, 4);
   c.fillStyle = C.gold; rr(c, px + 22, base - 122, 86, 22, 4); c.fill();
-  c.fillStyle = C.ink; c.font = '700 11px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  c.fillStyle = C.ink; c.font = '700 11px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
   c.fillText('RANGER', px + 65, base - 110);
   const fx = px + 168, top = base - 220;
   c.fillStyle = '#d8d4cc'; c.fillRect(fx, top, 5, 220);
@@ -2532,7 +2597,7 @@ function drawPosts() {
     c.save(); c.translate(bx, top); c.rotate(time * (0.3 + lit)); c.fillStyle = lit ? C.gold : '#a9a49c';
     for (let i = 0; i < 8; i++) { c.rotate(Math.PI / 4); c.beginPath(); c.moveTo(-3, 0); c.lineTo(0, -18); c.lineTo(3, 0); c.fill(); }
     c.restore();
-    c.font = '700 12px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '700 12px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
     c.fillStyle = C.ink; rr(c, bx - 56, top + 36, 112, 22, 6); c.fill();
     c.fillStyle = C.card; c.fillText(`CLAUDE · ${n}/${L.posts.length}`, bx, top + 47);
   }
@@ -2543,7 +2608,7 @@ function drawPosts() {
     if (g > 0) { const gr = c.createRadialGradient(x, base - 96, 2, x, base - 96, 46); gr.addColorStop(0, `rgba(210,198,99,${0.7 * g})`); gr.addColorStop(1, 'rgba(210,198,99,0)'); c.fillStyle = gr; c.fillRect(x - 50, base - 146, 100, 100); }
     c.fillStyle = g > 0 ? C.gold : '#a9a49c'; c.beginPath(); c.arc(x, base - 96, 12, 0, 7); c.fill();
     c.strokeStyle = C.ink; c.lineWidth = 2; c.stroke();
-    c.font = '800 13px Archivo, sans-serif'; const w = c.measureText(name).width + 18;
+    c.font = '800 13px "Plus Jakarta Sans", sans-serif'; const w = c.measureText(name).width + 18;
     c.fillStyle = g > 0 ? C.ink : 'rgba(26,25,23,0.65)'; rr(c, x - w / 2, base - 60, w, 24, 6); c.fill();
     c.fillStyle = g > 0 ? C.gold : C.card; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(name, x, base - 47.5);
   }
@@ -2599,7 +2664,7 @@ function drawParticles() {
 }
 function drawMonument(mo) {
   const c = ctx, cx = mo.x * TILE + 20, base = mo.gy * TILE, im = ART[mo.art];
-  c.font = '700 11px "IBM Plex Mono", monospace';
+  c.font = '700 11px "Plus Jakarta Sans", sans-serif';
   const pw = Math.max(120, c.measureText(mo.text.toUpperCase()).width + 28);
   c.fillStyle = 'rgba(0,0,0,0.16)'; c.beginPath(); c.ellipse(cx, base, pw * 0.6, 6, 0, 0, 7); c.fill();
   c.fillStyle = '#8d8980'; rr(c, cx - pw / 2, base - 30, pw, 30, 4); c.fill();
@@ -2670,8 +2735,8 @@ function drawCritters() {
       if (!drawArt('rabbit', -40, -64 + lean, 80, 62, m.face < 0)) { c.fillStyle = '#f2b8cf'; c.beginPath(); c.arc(0, -30, 20, 0, 7); c.fill(); }
       if (!m.leaving) { // the card it ran off with
         c.save(); c.translate(-12, -96 + Math.sin(m.t * 8) * 3); c.scale(0.6, 0.6); drawMarker(0, 0, false); c.restore();
-        if (m.spooked && m.tired < 3) { c.fillStyle = C.red; c.font = '800 20px Archivo, sans-serif'; c.textAlign = 'center'; c.fillText('!', 26, -86); }
-        if (m.tired >= 3) { c.fillStyle = 'rgba(26,25,23,0.6)'; c.font = '700 13px "IBM Plex Mono", monospace'; c.textAlign = 'center'; c.fillText('z', 24 + Math.sin(m.t * 3) * 3, -80 - (m.t * 20 % 14)); }
+        if (m.spooked && m.tired < 3) { c.fillStyle = C.red; c.font = '800 20px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'center'; c.fillText('!', 26, -86); }
+        if (m.tired >= 3) { c.fillStyle = 'rgba(26,25,23,0.6)'; c.font = '700 13px "Plus Jakarta Sans", sans-serif'; c.textAlign = 'center'; c.fillText('z', 24 + Math.sin(m.t * 3) * 3, -80 - (m.t * 20 % 14)); }
       }
     }
     c.restore(); c.globalAlpha = 1;
@@ -2680,7 +2745,7 @@ function drawCritters() {
 function drawPrompt() {
   if (!nearTarget || overlayOpen) return;
   const c = ctx, x = nearTarget.x, y = nearTarget.y - 24 + Math.sin(time * 5) * 2;
-  c.font = '700 13px "IBM Plex Mono", monospace';
+  c.font = '700 13px "Plus Jakarta Sans", sans-serif';
   const label = nearTarget.label;
   if (nearTarget.type === 'hint') { // no key for these: say what to do
     const w = c.measureText(label).width + 24;
@@ -3063,7 +3128,7 @@ function openMap(highlight) {
         return `<g class="node" tabindex="0" role="button" data-w="${w.id}" aria-label="World ${w.id}: ${esc(w.place)}, ${esc(w.topic)}">
           ${isHl ? `<circle class="pulse" cx="${x}" cy="${y}" r="20" fill="${C.red}"/>` : ''}
           <circle class="nring" cx="${x}" cy="${y}" r="20" fill="${done ? C.gold : '#fff'}" stroke="${isHl ? C.red : '#1A1917'}" stroke-width="3"/>
-          <text x="${x}" y="${y + 6}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="16" fill="#1A1917">${done ? '✓' : w.id}</text>
+          <text x="${x}" y="${y + 6}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" font-size="16" fill="#1A1917">${done ? '✓' : w.id}</text>
           <text class="nlabel" x="${lx}" y="${ly}" text-anchor="${anchor}">${esc(w.place)}</text>
           <text class="nsub" x="${lx}" y="${ly + 16}" text-anchor="${anchor}">${esc(w.topic.toUpperCase())}</text>
         </g>`;
@@ -3090,7 +3155,7 @@ function openTitle() {
     <h1>Summit <span>Half Dome</span></h1>
     <p>${esc(CONTENT.intro)}</p>
     <div class="btnrow"><button class="btn gold" type="button" data-start>${save.read.length ? 'Carry on hiking' : 'Start the hike'}</button><button class="btn ghost" type="button" data-map>World map</button><button class="btn ghost" type="button" data-list>Read it as a list</button></div>
-    <div class="keys"><span><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd></span><span>Move</span><span><kbd>Space</kbd> or <kbd>↑</kbd></span><span>Jump</span><span><kbd>E</kbd> or <kbd>Enter</kbd></span><span>Read a trail marker (or hit it from below). Some hide in crates, planes and runaway rabbits</span><span><kbd>M</kbd> <kbd>B</kbd> <kbd>L</kbd></span><span>Map, Backpack, List view</span></div>
+    <div class="keys"><span><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd></span><span>Move</span><span><kbd>Space</kbd> or <kbd>↑</kbd></span><span>Jump</span><span><kbd>E</kbd> or <kbd>Enter</kbd></span><span>Read a trail marker. Some hide in crates, planes and rabbits</span><span><kbd>M</kbd> <kbd>B</kbd> <kbd>L</kbd></span><span>Map, Backpack, List view</span></div>
   </div>`);
   $('[data-start]', node).addEventListener('click', () => { closeOverlay(true); started = true; });
   $('[data-map]', node).addEventListener('click', () => openMap(1));
@@ -3318,7 +3383,7 @@ const VISUALS = {
       <path d="M556 64 L 558 140 L 566 236 L 590 236 L 572 140 L 566 70 Z" fill="#8f8a80"/>
       <path d="M0 236 L0 200 C 60 190 90 200 130 236 Z" fill="#7a9a6a"/>
       <g fill="#3d5a40"><path d="M30 214 l-12 0 l12 -34 l12 34z"/><path d="M64 222 l-10 0 l10 -28 l10 28z"/></g>
-      <text x="36" y="56" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="600" fill="#55524E" letter-spacing="1.5">YOSEMITE</text>
+      <text x="36" y="56" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="600" fill="#55524E" letter-spacing="1.5">YOSEMITE</text>
       <image href="${ASSETS.logo}" x="30" y="70" width="240" height="60"/></svg>`;
   },
   models(host, card) {
@@ -3385,12 +3450,12 @@ const VISUALS = {
           ${write && canWrite ? `<path d="${read}" fill="none" stroke="#B0A3D0" stroke-width="4" stroke-dasharray="10 10" transform="translate(0 ${y < 118 ? 12 : -12})" style="animation:flow 1s linear infinite reverse"/>` : ''}
           <g class="pop" style="animation-delay:${0.1 + i * 0.15}s"><rect x="${x - 70}" y="${y - 22}" width="140" height="44" rx="12" fill="#F7F6F5" stroke="#1A1917" stroke-width="1.5"/>
           <text x="${x}" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="800" fill="#1A1917">${n}</text>
-          ${write ? `<text x="${x}" y="${y + (y < 118 ? -30 : 40)}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="700" fill="${canWrite ? '#6f61a0' : '#8f8436'}">${canWrite ? 'READ + WRITE' : 'READ'}</text>` : ''}</g>`;
+          ${write ? `<text x="${x}" y="${y + (y < 118 ? -30 : 40)}" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10.5" font-weight="700" fill="${canWrite ? '#6f61a0' : '#8f8436'}">${canWrite ? 'READ + WRITE' : 'READ'}</text>` : ''}</g>`;
       }).join('')}
       <circle cx="369" cy="118" r="40" fill="#1A1917"/>
       <g style="transform-origin:369px 118px;animation:throb 2s ease-in-out infinite">${Array.from({ length: 8 }, (_, i) => `<path d="M 366 118 L 369 94 L 372 118 Z" fill="#D2C663" transform="rotate(${i * 45} 369 118)"/>`).join('')}</g>
       <text x="369" y="176" text-anchor="middle" font-size="13" font-weight="900" fill="#1A1917">Claude</text>
-      <g font-family="IBM Plex Mono, monospace" font-size="10.5" font-weight="700"><rect x="280" y="200" width="12" height="4" fill="#D2C663"/><text x="298" y="205" fill="#55524E">READ</text>${write ? `<rect x="350" y="200" width="12" height="4" fill="#B0A3D0"/><text x="368" y="205" fill="#55524E">WRITE</text>` : ''}</g>
+      <g font-family="Plus Jakarta Sans, sans-serif" font-size="10.5" font-weight="700"><rect x="280" y="200" width="12" height="4" fill="#D2C663"/><text x="298" y="205" fill="#55524E">READ</text>${write ? `<rect x="350" y="200" width="12" height="4" fill="#B0A3D0"/><text x="368" y="205" fill="#55524E">WRITE</text>` : ''}</g>
     </svg>`;
   },
   draft(host) {
@@ -3428,10 +3493,10 @@ const VISUALS = {
         return `<g class="rise" style="animation-delay:${0.1 + i * 0.25}s">
           <rect x="${x}" y="${y}" width="166" height="${h}" fill="${on ? (i === 2 ? '#8E1C02' : '#D2C663') : past ? '#CFC9BE' : '#E4DFD6'}" stroke="#1A1917" stroke-width="${on ? 2.5 : 1}"/>
           <text x="${x + 12}" y="${y + 24}" font-size="15" font-weight="900" fill="${on && i === 2 ? '#fff' : '#1A1917'}">${String(i + 1).padStart(2, '0')} ${n}</text>
-          <text x="${x + 12}" y="${y + 42}" font-family="IBM Plex Mono, monospace" font-size="11" font-weight="700" fill="${on && i === 2 ? '#F1DAD3' : '#55524E'}">${pay.toUpperCase()}</text>
+          <text x="${x + 12}" y="${y + 42}" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="${on && i === 2 ? '#F1DAD3' : '#55524E'}">${pay.toUpperCase()}</text>
         </g>`;
       }).join('')}
-      <g class="fadein" style="animation-delay:1.3s"><text x="40" y="232" font-size="11" font-family="IBM Plex Mono, monospace" font-weight="700" fill="#8E1C02">${s === 1 ? 'MOST PEOPLE STOP HERE' : ''}</text></g>
+      <g class="fadein" style="animation-delay:1.3s"><text x="40" y="232" font-size="11" font-family="Plus Jakarta Sans, sans-serif" font-weight="700" fill="#8E1C02">${s === 1 ? 'MOST PEOPLE STOP HERE' : ''}</text></g>
       ${s === 3 ? `<text x="${40 + 2 * 166 + 12}" y="${220 - 134 - 12}" font-size="12" font-weight="900" fill="#8E1C02" class="fadein" style="animation-delay:1.2s">Highest leverage</text>` : ''}
     </svg>`;
   },
