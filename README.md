@@ -1,6 +1,6 @@
 # Summit Half Dome
 
-A browser platformer that replaces the slides for the 45-minute Claude kickstart with Client Solutions. Everyone plays the Half Dome hike on their own laptop while Harry talks over it and runs live examples in Claude as people reach each trail marker.
+A browser platformer that replaces the slides for the 45-minute Claude kickstart for everyone at Half Dome. Everyone plays the Half Dome hike on their own laptop while Harry talks over it and runs live examples in Claude as people reach each trail marker.
 
 ## Run it
 
@@ -16,7 +16,7 @@ Deploy: `vercel deploy` from this folder, or drag the folder into Vercel.
 | 2 | Mist Trail and Vernal Fall | Pick the model for the job |
 | 3 | Nevada Fall and Little Yosemite Valley | Connectors (touch the trail posts to connect them to the Claude beacon) |
 | 4 | Sub Dome stairs | The four building blocks |
-| 5 | The Cables | Client Solutions workflows: the TMC project, `/mi-to-monday`, `/wip-wrapup` |
+| 5 | The Cables | Client workflows: the TMC project, `/mi-to-monday`, `/wip-wrapup` |
 | 6 | The Summit and the Visor | Claude in Chrome, Excel and Word, then the summit card |
 
 - **Trail markers** (gold blocks with the dome): hit from below or press E to open a card with an animation. Some cards open other ways, set per card with `open`:
