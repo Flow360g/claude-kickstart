@@ -19,6 +19,7 @@
   color-scheme:light;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-family:var(--sans);overflow:hidden}
 button{font-family:inherit;cursor:pointer;color:inherit}
 button:focus-visible,.node:focus-visible,summary:focus-visible,input:focus-visible{outline:3px solid var(--red);outline-offset:2px}
@@ -297,8 +298,13 @@ code,.mono{font-family:var(--mono)}
 .lv-hero p{margin:0;font-size:17.5px;line-height:1.5;color:var(--muted);max-width:62ch}
 .lv-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .lv-legend span{font-family:var(--mono);font-size:11.5px;font-weight:600;border-radius:999px;padding:4px 10px;background:var(--card);border:1px solid var(--line)}
-.lv-chips{display:none;gap:8px;overflow-x:auto;padding:4px 0 2px}
-.lv-chips a{flex:none;font-family:var(--mono);font-size:12px;font-weight:600;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--white)}
+.lv-chips{display:none;gap:6px;overflow-x:auto;padding:0 20px 10px;scrollbar-width:none;scroll-padding-inline:20px}
+.lv-chips::-webkit-scrollbar{display:none}
+.lv-chips a{flex:none;font-family:var(--mono);font-size:12px;font-weight:600;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 12px;background:var(--white);transition:background .2s,border-color .2s}
+.lv-chips a.done{border-color:var(--gold)}
+.lv-chips a.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.lv-mtools{display:none;gap:8px;flex-wrap:wrap;margin-top:6px}
+.bk-s{display:none}
 .lw{padding-top:42px;scroll-margin-top:70px}
 .lwh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:18px}
 .lwh .num{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;font:900 26px var(--sans);letter-spacing:-0.03em;background:var(--ink);color:var(--gold)}
@@ -383,7 +389,9 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
   .lv-wrap{grid-template-columns:1fr;gap:0}
   .lv-side{display:none}
   .lv-chips{display:flex}
-  .lv-pot span{display:none}
+  .lv-pot span{font-size:0}
+  .lv-pot span b{font-size:12.5px}
+  .lv-pot{gap:4px}
   .lv-bar .spacer{display:none}
   .lv-search{max-width:none}
   .lcb{padding:0 14px 16px}
@@ -391,15 +399,160 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
   .lc .pills{display:none}
   .lwh{grid-template-columns:auto minmax(0,1fr)}
   .lwh .stat{display:none}
+  .lv-mtools{display:flex}
+  .lw{scroll-margin-top:112px;padding-top:34px}
+  .lv-hero{padding-bottom:20px}
+  .lv-bar,.lv-chips{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .lv-wrap{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right));padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .lv-main{padding-top:22px}
+  .lv-search input{font-size:16px}
+  .lc summary{padding:12px 14px}
+  .lcb p{font-size:16px}
+  .lprompt .prompt{font-size:13px}
+  .check .btn.tiny,.lprompt .btn.small{min-height:36px;padding-inline:12px}
+  .lquiz .qo{min-height:48px}
+  .lblock{padding:14px}
+  .lsummit h3{font-size:24px}
 }
 @media (max-width:560px){
-  .lv-bar .logo{display:none}
+  .bk-l,.lv-bar .logo{display:none}
+  .bk-s{display:inline}
+  .lwh .num{width:48px;height:48px;font-size:21px;border-radius:13px}
+  .lwh{gap:14px}
+  .lcb{padding:0 12px 14px}
+  .lc .rd{width:28px;height:28px}
+  .lc summary{grid-template-columns:28px minmax(0,1fr) 20px}
   .lv-search kbd{display:none}
   .lv-bar{gap:10px}
   .lv-bar .btn{padding:7px 10px}
   .check{flex-wrap:wrap}
   .check .acts{width:100%;padding-left:40px}
 }
+
+/* ---------- phones (body.mob): HUD, controls and panels sit in #ui at real size ---------- */
+.tkeys,.mlist,#ui{display:none}
+.mob #viewport{touch-action:none;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.mob #ui{display:block;position:fixed;inset:0;z-index:10;pointer-events:none}
+.mob #layer>*{pointer-events:auto}
+.mob kbd,.mob .closehint{display:none}
+.mob button:focus-visible{outline:none}
+/* HUD */
+#ui .hud{padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));gap:8px}
+#ui .hud .logo{width:96px;margin:-4px 0 -4px -6px}
+#ui .hudrow{flex-direction:row;flex-wrap:wrap;gap:6px}
+#ui .worldtag,#ui .wp{font-size:11px;padding-block:4px}
+#ui .wp{padding:2px 10px 2px 3px}
+#ui .wp svg{width:24px;height:24px}
+#ui .hud-right{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+#ui .hbtn{min-height:38px;padding:6px 10px;font-size:13px}
+#ui #btnPresenter{display:none}
+#ui #btnSound,#ui #btnMusic{width:38px;justify-content:center;padding:0}
+#ui .hbtn svg{width:20px;height:20px}
+#ui .hbtn .slash{display:none}
+#ui .hbtn.off{color:var(--muted)}
+#ui .hbtn.off .slash{display:inline}
+#ui .hbtn.off .wave{display:none}
+.mob.port #ui .hud{flex-direction:column-reverse;align-items:stretch}
+.mob.port #ui .hud .logo,.mob.port #ui .wt-topic{display:none}
+@media (max-width:960px){.mob:not(.port) #ui .wt-topic{display:none}}
+.mob:not(.port) #ui .hud-right{flex-wrap:nowrap}
+#ui .help{left:50%;right:auto;bottom:auto;top:calc(max(8px,env(safe-area-inset-top)) + 96px);transform:translateX(-50%);font-size:12px;white-space:nowrap}
+#ui .help b{font-family:var(--sans);background:var(--ink);color:var(--card);border-radius:5px;padding:1px 6px}
+.mob.port #ui .help{top:auto;bottom:calc(var(--deck,210px) + 14px)}
+#ui .toast{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom)) + 4px);max-width:calc(100vw - 24px);white-space:normal;font-size:14px}
+/* controls: overlaid on the game sideways, a deck under it upright */
+#ui .touch{display:block;height:auto;inset:auto 0 0 0;padding:0 max(14px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"pad prog act";align-items:end;gap:10px}
+#ui .tbtn{position:static;width:74px;height:74px;font-size:26px;background:rgba(247,246,245,.6);-webkit-tap-highlight-color:transparent}
+#ui .tbtn.down{background:var(--gold);transform:scale(.94)}
+#ui .tbtn[data-k=left]{grid-area:pad;margin-right:84px}
+#ui .tbtn[data-k=right]{grid-area:pad;margin-left:84px}
+#ui .tbtn[data-k=act]{grid-area:act;margin-right:84px;align-self:end;margin-bottom:22px;font-size:22px!important}
+#ui .tbtn[data-k=jump]{grid-area:act;margin-left:84px;width:84px;height:84px}
+#ui .touch .progress{grid-area:prog;position:static;justify-content:center;flex-wrap:wrap;gap:6px;padding-bottom:4px}
+#ui .chip{font-size:11px;padding:4px 9px}
+.mob.port #ui .touch{background:var(--ink);padding-top:12px;grid-template-columns:1fr auto;grid-template-areas:"prog prog" "pad act";row-gap:14px}
+.mob.port #ui .touch .progress{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;pointer-events:auto;touch-action:pan-x}
+.mob.port #ui .touch .chip{flex:none;background:#2a2825;border-color:#3a3733;color:var(--card)}
+.mob.port #ui .tbtn{background:#2a2825;border-color:#4a4641;color:var(--card)}
+.mob.port #ui .tbtn.down{background:var(--gold);color:var(--ink)}
+@media (max-height:420px){.mob:not(.port) #ui .tbtn{width:64px;height:64px}.mob:not(.port) #ui .tbtn[data-k=jump]{width:72px;height:72px}.mob:not(.port) #ui .tbtn[data-k=left]{margin-right:72px}.mob:not(.port) #ui .tbtn[data-k=right]{margin-left:72px}.mob:not(.port) #ui .tbtn[data-k=act]{margin-right:76px;margin-bottom:18px}.mob:not(.port) #ui .tbtn[data-k=jump]{margin-left:76px}}
+/* panels become sheets that scroll */
+#ui .overlay{align-items:flex-end;padding:max(10px,env(safe-area-inset-top)) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
+#ui .panel{width:100%;max-width:680px;max-height:100%;overflow:auto;overscroll-behavior:contain;border-radius:20px 20px 0 0;padding:22px 18px calc(16px + env(safe-area-inset-bottom));gap:12px;transform:translateY(40px)}
+#ui .overlay.show .panel{transform:none}
+#ui .xclose{position:sticky;top:0;align-self:flex-end;flex:none;margin:-8px -6px -44px 0;z-index:4;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--white);font-size:24px;line-height:1;color:var(--ink);box-shadow:0 2px 8px rgba(26,25,23,.12)}
+#ui .panel>.eyebrow,#ui .camphead{padding-right:44px}
+#ui .card h2,#ui .item h2,#ui .pack h2{font-size:25px}
+#ui .card .lines p{font-size:16px}
+#ui .card .steps li,#ui .card .tip{font-size:15px}
+#ui .cbody.two{display:flex;flex-direction:column;align-items:stretch;gap:14px}
+#ui .vwrap{overflow:hidden}
+#ui .vwrap{width:100%;height:calc(236px * var(--vs,.45))}
+#ui .vwrap .visual{transform:scale(var(--vs,.45))}
+#ui .attach,#ui .cr .attach{flex-wrap:wrap}
+#ui .attach .ai{flex-basis:calc(100% - 90px)}
+#ui .attach .acts{margin-left:auto}
+#ui .foot{flex-wrap:wrap}
+#ui .foot:not(:has(button)){display:none}
+#ui .btn{min-height:44px}
+#ui .btn.tiny,#ui .btn.small{min-height:36px}
+#ui .prompt{font-size:13px;max-height:220px}
+#ui .quiz h2{font-size:22px}
+#ui .opts{grid-template-columns:1fr}
+#ui .opt{font-size:16px;min-height:54px}
+#ui .why{font-size:15.5px}
+#ui .camp .fire{display:none}
+#ui .camphead h2{font-size:24px}
+#ui .camp .checks,#ui .packlist{overflow:visible;padding-right:0}
+#ui .check{flex-wrap:wrap}
+#ui .check .txt{font-size:15.5px}
+#ui .check .acts{width:100%;padding-left:40px}
+#ui .campbar{flex-wrap:wrap}
+#ui .campbar .meter{flex-basis:100%}
+#ui .campbar .btn{margin-left:auto}
+#ui .complete{text-align:center;align-items:center}
+#ui .complete h2{font-size:28px}
+#ui .complete p{font-size:16px}
+#ui .finale{justify-content:center;align-items:flex-end;padding:max(10px,env(safe-area-inset-top)) 0 0}
+#ui .summit{margin-top:0}
+#ui .summit h2{font-size:30px}
+#ui .closing{font-size:19px}
+#ui .wpo{padding:20px}
+#ui .wpo svg{width:100%;height:auto}
+#ui .wpo .msg h2{font-size:36px}
+#ui .wpo .msg p{font-size:16px}
+/* title */
+#ui .title{padding:max(24px,env(safe-area-inset-top)) max(22px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(22px,env(safe-area-inset-left));background:rgba(247,246,245,.95);justify-content:flex-start;overflow:auto}
+#ui .title{justify-content:safe center}
+#ui .title .logo{width:150px;margin-left:-10px}
+#ui .title h1{font-size:clamp(46px,13vw,64px)}
+#ui .title p{font-size:16px;margin-bottom:16px}
+#ui .title .btnrow .btn{font-size:16px;padding:12px 18px}
+#ui .title .keys{display:none}
+#ui .title .tkeys{display:block;font-size:14px;margin:20px 0 0;max-width:46ch}
+#ui .tkeys b{color:var(--ink);font-family:var(--sans)}
+.mob:not(.port) #ui .title{background:linear-gradient(90deg,rgba(247,246,245,.97) 0,rgba(247,246,245,.92) 62%,rgba(247,246,245,.5) 100%)}
+.mob:not(.port) #ui .title .logo{width:110px}
+.mob:not(.port) #ui .title h1{font-size:42px}
+.mob:not(.port) #ui .title p{font-size:15px;max-width:56ch}
+@media (max-width:400px){#ui .hbtn .lx{display:none}}
+/* map: the drawing plus a list of stops to tap */
+#ui .map{overflow:auto;display:flex;flex-direction:column;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:12px}
+#ui .map .mhead{position:static;order:-2}
+#ui .map .mhead h2{font-size:28px}
+#ui .map .mhead p{font-size:15px}
+#ui .map svg{position:static;flex:none;width:100%;height:auto;aspect-ratio:16/9;border-radius:14px;order:-1}
+#ui .map .mclose{position:static;flex-wrap:wrap}
+#ui .mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:8px}
+#ui .mstop{display:flex;gap:12px;align-items:center;text-align:left;background:var(--white);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;min-height:58px}
+#ui .mstop .n{flex:none;width:32px;height:32px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font:700 14px var(--mono)}
+#ui .mstop.done .n{background:var(--gold)}
+#ui .mstop.hl{border-color:var(--red)}
+#ui .mstop b{display:block;font-size:15.5px}
+#ui .mstop small{display:block;font-size:13px;color:var(--muted)}
+.mob:not(.port) #ui .map{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);align-content:start}
+.mob:not(.port) #ui .map .mhead,.mob:not(.port) #ui .map .mclose{grid-column:1/-1}
+.mob:not(.port) #ui .mlist{grid-template-columns:1fr}
 
 /* ---------- card visuals (each lives in a 738 x 236 box) ---------- */
 .vx{position:absolute;inset:0;font-family:var(--sans);color:var(--ink)}
@@ -667,7 +820,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
       <div class="hud-right">
         <button class="hbtn" id="btnMap" type="button" title="World map (M)">Map <kbd>M</kbd></button>
         <button class="hbtn" id="btnPack" type="button" title="Backpack (B)">Backpack <span class="count" id="packCount">0</span> <kbd>B</kbd></button>
-        <button class="hbtn" id="btnList" type="button" title="List view (L)">List view <kbd>L</kbd></button>
+        <button class="hbtn" id="btnList" type="button" title="List view (L)">List<span class="lx"> view</span> <kbd>L</kbd></button>
         <button class="hbtn" id="btnPresenter" type="button" title="Presenter talk tracks (P)" aria-pressed="false">Presenter <kbd>P</kbd></button>
         <button class="hbtn" id="btnSound" type="button" title="Sound effects" aria-pressed="true">Sound on</button>
         <button class="hbtn" id="btnMusic" type="button" title="Music" aria-pressed="true">Music on</button>
@@ -684,6 +837,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
     </div>
     <div id="layer"></div>
   </div>
+  <div id="ui"></div>
 </div>
 <div id="list" aria-label="List view"></div>
 
@@ -1360,7 +1514,9 @@ const ART_SRC = {
 (() => {
 'use strict';
 
-const TILE = 40, VW = 1280, VH = 720, STEP = 1 / 120;
+const TILE = 40, STEP = 1 / 120;
+// the view in world pixels: 1280 x 720 on a laptop, sized to the screen on a phone (see fit)
+let VW = 1280, VH = 720;
 const GRAV = 2500, JUMP_V = 900, RUN = 320, MAXFALL = 1100;
 const C = { gold: '#D2C663', red: '#8E1C02', purple: '#B0A3D0', ink: '#1A1917', card: '#F7F6F5', line: '#DEDBD6' };
 const $ = (s, el = document) => el.querySelector(s);
@@ -1604,13 +1760,36 @@ document.addEventListener('visibilitychange', () => { if (actx) document.hidden 
 /* ---------------- canvas + scaling ---------------- */
 const stage = $('#stage'), cv = $('#game'), ctx = cv.getContext('2d');
 let res = 1;
+// Phones get their own layout: the HUD, controls and panels sit outside the scaled stage at real size,
+// and the view is sized to the screen instead of letterboxing 1280 x 720.
+const MOB = /[?&]mobile\b/.test(location.search) || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) <= 820);
+if (MOB) {
+  document.body.classList.add('mob');
+  const ui = $('#ui');
+  ['.hud', '#help', '#toast', '#touch', '#layer'].forEach(q => ui.appendChild($(q)));
+  $('#touch').prepend($('#progress'));
+  $('#help').innerHTML = '<b>&#9664; &#9654;</b> move &nbsp; <b>&#9650;</b> jump &nbsp; <b>E</b> read a marker';
+}
 function fit() {
-  const scale = Math.min(innerWidth / VW, innerHeight / VH);
+  let scale, w = innerWidth, h = innerHeight;
+  if (MOB) {
+    const port = h > w;
+    document.body.classList.toggle('port', port);
+    if (port) { const deck = $('#touch').offsetHeight; h -= deck; document.documentElement.style.setProperty('--deck', deck + 'px'); } // the controller deck sits under the game
+    // about 11 tiles across upright and 13 tiles high sideways, never taller than the 720 the levels are built for
+    scale = Math.min(1.25, Math.max(h / 720, port ? w / 440 : h / 520)); // capped so tablets don't zoom in too far
+    VW = Math.round(w / scale); VH = Math.min(720, Math.round(h / scale));
+    stage.style.width = cv.style.width = VW + 'px'; stage.style.height = cv.style.height = VH + 'px';
+    stage.style.top = (h / 2) + 'px';
+    // card visuals are drawn at 738px wide; this shrinks them to the panel
+    document.documentElement.style.setProperty('--vs', Math.min(1, (Math.min(innerWidth, 680) - 40) / 738).toFixed(4));
+  } else scale = Math.min(w / VW, h / VH);
   stage.style.transform = `translate(-50%,-50%) scale(${scale})`;
   res = clamp(scale * (window.devicePixelRatio || 1), 1, 2);
   cv.width = Math.round(VW * res); cv.height = Math.round(VH * res);
 }
 addEventListener('resize', fit); fit();
+if (MOB) { if (window.ResizeObserver) new ResizeObserver(fit).observe($('#touch')); if (document.fonts) document.fonts.ready.then(fit); }
 
 /* ---------------- world art (time of day moves towards golden hour) ---------------- */
 const THEMES = {
@@ -2152,14 +2331,17 @@ function halfDomePath(c, x, base, s) {
   c.lineTo(x + 150 * s, base - 200 * s); c.lineTo(x + 158 * s, base - 120 * s); c.lineTo(x + 168 * s, base - 40 * s); c.lineTo(x + 250 * s, base);
   c.closePath();
 }
+// the backdrop is drawn in a 720-tall space and scaled to fit the view
+const BH = 720;
+let BW = 1280;
 function ridgeLine(c, par, base, amp, color, seed) {
-  c.fillStyle = color; c.beginPath(); c.moveTo(0, VH);
-  for (let x = 0; x <= VW + 20; x += 20) {
+  c.fillStyle = color; c.beginPath(); c.moveTo(0, BH);
+  for (let x = 0; x <= BW + 20; x += 20) {
     const wx = x + cam.x * par;
     const h = Math.sin(wx * 0.004 + seed) * 0.5 + Math.sin(wx * 0.011 + seed * 2) * 0.3 + Math.sin(wx * 0.023 + seed * 3) * 0.2;
     c.lineTo(x, base - amp * (0.6 + h * 0.5));
   }
-  c.lineTo(VW, VH); c.closePath(); c.fill();
+  c.lineTo(BW, BH); c.closePath(); c.fill();
 }
 function drawPine(c, x, base, h, color) {
   const w = h * 0.42;
@@ -2176,35 +2358,35 @@ function shade(hex, amt) {
 }
 function drawBackground(th, wid) {
   const c = ctx;
-  const g = c.createLinearGradient(0, 0, 0, VH);
+  const g = c.createLinearGradient(0, 0, 0, BH);
   g.addColorStop(0, th.sky[0]); g.addColorStop(1, th.sky[1]);
-  c.fillStyle = g; c.fillRect(0, 0, VW, VH);
+  c.fillStyle = g; c.fillRect(0, 0, BW, BH);
   const [sx, sy, sc] = th.sun;
-  const sg = c.createRadialGradient(VW * sx, VH * sy, 10, VW * sx, VH * sy, th.summit ? 420 : 260);
+  const sg = c.createRadialGradient(BW * sx, BH * sy, 10, BW * sx, BH * sy, th.summit ? 420 : 260);
   sg.addColorStop(0, sc + '0.95)'); sg.addColorStop(0.15, sc + '0.6)'); sg.addColorStop(1, sc + '0)');
-  c.fillStyle = sg; c.fillRect(0, 0, VW, VH);
-  if (th.summit) { c.fillStyle = 'rgba(255,240,200,0.95)'; c.beginPath(); c.arc(VW * sx, VH * sy, 34, 0, 7); c.fill(); }
+  c.fillStyle = sg; c.fillRect(0, 0, BW, BH);
+  if (th.summit) { c.fillStyle = 'rgba(255,240,200,0.95)'; c.beginPath(); c.arc(BW * sx, BH * sy, 34, 0, 7); c.fill(); }
   c.fillStyle = 'rgba(255,255,255,0.55)';
   for (let i = 0; i < 5; i++) {
-    const cx = ((i * 330 + time * (6 + i * 2) - cam.x * 0.03) % (VW + 300) + VW + 300) % (VW + 300) - 150, cy = 70 + (i % 3) * 45;
+    const cx = ((i * 330 + time * (6 + i * 2) - cam.x * 0.03) % (BW + 300) + BW + 300) % (BW + 300) - 150, cy = 70 + (i % 3) * 45;
     c.beginPath(); c.ellipse(cx, cy, 70, 16, 0, 0, 7); c.ellipse(cx + 40, cy - 10, 46, 16, 0, 0, 7); c.ellipse(cx - 36, cy - 4, 40, 12, 0, 0, 7); c.fill();
   }
   if (th.summit) {
     // on top of Half Dome: the valley and the High Sierra far below, in golden-hour haze
     // far High Sierra peaks above the horizon, then the valley far below (seen past the Visor)
     c.fillStyle = 'rgba(214,160,150,0.75)'; c.beginPath(); c.moveTo(0, 460);
-    for (let x = 0; x <= VW + 20; x += 20) { const wx = x + cam.x * 0.02; const h = Math.abs(Math.sin(wx * 0.006 + 1)) * 70 + Math.abs(Math.sin(wx * 0.017)) * 40; c.lineTo(x, 450 - h); }
-    c.lineTo(VW, 460); c.closePath(); c.fill();
+    for (let x = 0; x <= BW + 20; x += 20) { const wx = x + cam.x * 0.02; const h = Math.abs(Math.sin(wx * 0.006 + 1)) * 70 + Math.abs(Math.sin(wx * 0.017)) * 40; c.lineTo(x, 450 - h); }
+    c.lineTo(BW, 460); c.closePath(); c.fill();
     c.fillStyle = 'rgba(255,240,220,0.5)';
-    for (let x = 0; x <= VW; x += 20) { const wx = x + cam.x * 0.02; const h = Math.abs(Math.sin(wx * 0.006 + 1)) * 70 + Math.abs(Math.sin(wx * 0.017)) * 40; if (h > 80) c.fillRect(x, 450 - h, 8, 6); }
+    for (let x = 0; x <= BW; x += 20) { const wx = x + cam.x * 0.02; const h = Math.abs(Math.sin(wx * 0.006 + 1)) * 70 + Math.abs(Math.sin(wx * 0.017)) * 40; if (h > 80) c.fillRect(x, 450 - h, 8, 6); }
     ridgeLine(c, 0.04, 500, 60, '#c0939a', 0.7);
     ridgeLine(c, 0.07, 580, 70, '#a8858f', 2.1);
     ridgeLine(c, 0.11, 650, 50, '#8f7a7f', 3.3);
-    c.fillStyle = '#7d8a68'; c.fillRect(0, 680, VW, 40);
+    c.fillStyle = '#7d8a68'; c.fillRect(0, 680, BW, 40);
     c.strokeStyle = 'rgba(160,200,220,0.7)'; c.lineWidth = 3; c.beginPath();
-    for (let x = 0; x <= VW; x += 20) c.lineTo(x, 696 + Math.sin((x + cam.x * 0.14) * 0.01) * 6); c.stroke();
+    for (let x = 0; x <= BW; x += 20) c.lineTo(x, 696 + Math.sin((x + cam.x * 0.14) * 0.01) * 6); c.stroke();
     const hz = c.createLinearGradient(0, 380, 0, 720); hz.addColorStop(0, 'rgba(255,214,150,0)'); hz.addColorStop(1, 'rgba(255,214,150,0.35)');
-    c.fillStyle = hz; c.fillRect(0, 380, VW, 340);
+    c.fillStyle = hz; c.fillRect(0, 380, BW, 340);
     return;
   }
   ridgeLine(c, 0.05, 500, 110, th.ridge, 1.3);
@@ -2236,12 +2418,12 @@ function drawBackground(th, wid) {
   const cliffTop = sx2 => { const wx = sx2 + cam.x * cliffPar; const n = Math.sin(wx * 0.0024) * 0.65 + Math.sin(wx * 0.0067 + 2) * 0.35; return 575 - Math.max(0, n) * 135; };
   const cg = c.createLinearGradient(0, 430, 0, 600);
   cg.addColorStop(0, shade(th.cliff, 10)); cg.addColorStop(1, th.cliffDark);
-  c.fillStyle = cg; c.beginPath(); c.moveTo(0, VH);
-  for (let x = 0; x <= VW + 20; x += 20) c.lineTo(x, cliffTop(x));
-  c.lineTo(VW, VH); c.closePath(); c.fill();
+  c.fillStyle = cg; c.beginPath(); c.moveTo(0, BH);
+  for (let x = 0; x <= BW + 20; x += 20) c.lineTo(x, cliffTop(x));
+  c.lineTo(BW, BH); c.closePath(); c.fill();
   if (th.falls) {
     const off = (cam.x * cliffPar) % 600;
-    for (let fx = -off - 60; fx < VW + 80; fx += 600) {
+    for (let fx = -off - 60; fx < BW + 80; fx += 600) {
       const top = cliffTop(fx); if (top > 470) continue;
       const w = th.mist ? 26 : 16;
       c.fillStyle = 'rgba(255,255,255,0.82)'; c.fillRect(fx, top, w, 590 - top);
@@ -2251,10 +2433,10 @@ function drawBackground(th, wid) {
     }
   }
   for (let i = 0; i < 26; i++) {
-    const wx = ((i * 97 - cam.x * 0.4) % (VW + 120) + VW + 120) % (VW + 120) - 60;
+    const wx = ((i * 97 - cam.x * 0.4) % (BW + 120) + BW + 120) % (BW + 120) - 60;
     drawPine(c, wx, 590 + (i % 3) * 6, 70 + (i * 37 % 40), th.pineFar);
   }
-  c.fillStyle = th.pineFar; c.fillRect(0, 596, VW, VH);
+  c.fillStyle = th.pineFar; c.fillRect(0, 596, BW, BH);
 }
 
 /* ---------------- drawing: level ---------------- */
@@ -2587,7 +2769,8 @@ function render() {
   c.setTransform(res, 0, 0, res, 0, 0);
   if (!L) { c.fillStyle = '#cfe0ea'; c.fillRect(0, 0, VW, VH); return; }
   const th = THEMES[L.world.id] || THEMES[1];
-  drawBackground(th, L.world.id);
+  const bk = VH / BH; BW = VW / bk;
+  c.save(); c.scale(bk, bk); drawBackground(th, L.world.id); c.restore();
   const sx = shake ? (Math.random() - 0.5) * shake * 2 : 0, sy = shake ? (Math.random() - 0.5) * shake * 2 : 0;
   c.save(); c.translate(Math.round(-cam.x + sx), Math.round(-cam.y + sy));
   for (const p of L.pines) if (p.x * TILE > cam.x - 100 && p.x * TILE < cam.x + VW + 100) drawPine(c, p.x * TILE + 20, (p.y + 1) * TILE, p.h, th.pine);
@@ -2634,6 +2817,8 @@ function potential() {
   return Math.min(1, sum / CONTENT.worlds.length);
 }
 let lastPot = -1;
+const ICON_SOUND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ICON_MUSIC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17V5l11-2v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="2.8" fill="currentColor"/><circle cx="17.5" cy="15.5" r="2.8" fill="currentColor"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 function updateHud() {
   const pot = potential(), len = 81.68;
   $('#wpFill').style.strokeDashoffset = (len * (1 - pot)).toFixed(2);
@@ -2642,11 +2827,15 @@ function updateHud() {
   lastPot = pot;
   $('#packCount').textContent = `${save.items.length}/${allItems().length}`;
   const pb = $('#btnPresenter'); pb.classList.toggle('on', save.presenter); pb.setAttribute('aria-pressed', save.presenter);
-  const s = $('#btnSound'); s.textContent = save.sfxOn ? 'Sound on' : 'Sound off'; s.setAttribute('aria-pressed', save.sfxOn);
-  const mu = $('#btnMusic'); mu.textContent = save.musicOn ? 'Music on' : 'Music off'; mu.setAttribute('aria-pressed', save.musicOn);
+  const s = $('#btnSound'), mu = $('#btnMusic');
+  if (MOB) {
+    s.innerHTML = ICON_SOUND; s.classList.toggle('off', !save.sfxOn); s.setAttribute('aria-label', save.sfxOn ? 'Sound on' : 'Sound off');
+    mu.innerHTML = ICON_MUSIC; mu.classList.toggle('off', !save.musicOn); mu.setAttribute('aria-label', save.musicOn ? 'Music on' : 'Music off');
+  } else { s.textContent = save.sfxOn ? 'Sound on' : 'Sound off'; mu.textContent = save.musicOn ? 'Music on' : 'Music off'; }
+  s.setAttribute('aria-pressed', save.sfxOn); mu.setAttribute('aria-pressed', save.musicOn);
   if (!L) return;
   const w = L.world;
-  $('#worldtag').innerHTML = `<b>World ${w.id}</b> ${esc(w.place)} · ${esc(w.topic)}`;
+  $('#worldtag').innerHTML = `<b>World ${w.id}</b> ${esc(w.place)}<span class="wt-topic"> · ${esc(w.topic)}</span>`;
   const read = w.cards.filter((_, i) => save.read.includes(`${w.id}-${i}`)).length;
   const got = w.items.filter(it => save.items.includes(it.id)).length;
   const camps = w.basecamps || [], totalChecks = camps.reduce((a, b) => a + b.items.length, 0);
@@ -2669,6 +2858,12 @@ const layer = $('#layer');
 let current = null;
 function openOverlay(node, opts = {}) {
   closeOverlay(true);
+  const panel = MOB && opts.kind !== 'whole' && $('.panel', node);
+  if (panel) {
+    const x = el(`<button class="xclose" type="button" aria-label="Close">&times;</button>`);
+    x.addEventListener('click', e => { e.stopPropagation(); closeOverlay(); });
+    panel.prepend(x);
+  }
   layer.appendChild(node);
   current = { node, ...opts };
   overlayOpen = true; duckMusic(true);
@@ -2949,10 +3144,11 @@ function openMap(highlight) {
         </g>`;
       }).join('')}
     </svg>
-    <div class="mhead"><span class="eyebrow"><span class="tag gold">World map</span>The Half Dome hike</span><h2>Pick any stage.</h2><p>Click a stop to jump there, or use a link like <span class="mono">#world-3</span>. Your backpack and ticks come with you.</p></div>
+    <div class="mlist">${CONTENT.worlds.map(w => `<button class="mstop ${save.done.includes(w.id) ? 'done' : ''} ${w.id === hl ? 'hl' : ''}" type="button" data-w="${w.id}"><span class="n">${save.done.includes(w.id) ? '✓' : w.id}</span><span><b>${esc(w.place)}</b><small>${esc(w.topic)}</small></span></button>`).join('')}</div>
+    <div class="mhead"><span class="eyebrow"><span class="tag gold">World map</span>The Half Dome hike</span><h2>Pick any stage.</h2><p>${MOB ? 'Tap a stop to jump there.' : 'Click a stop to jump there, or use a link like <span class="mono">#world-3</span>.'} Your backpack and ticks come with you.</p></div>
     <div class="mclose">${L && started ? '<button class="btn ghost small" type="button" data-close>Back to the trail</button>' : ''}<button class="btn small" type="button" data-list>List view</button></div>
   </div>`);
-  node.querySelectorAll('.node').forEach(n => {
+  node.querySelectorAll('.node, .mstop').forEach(n => {
     const go = () => { closeOverlay(true); loadWorld(+n.dataset.w); };
     n.addEventListener('click', go);
     n.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); go(); } });
@@ -2970,6 +3166,7 @@ function openTitle() {
     <h1>Summit <span>Half Dome</span></h1>
     <p>${esc(CONTENT.intro)}</p>
     <div class="btnrow"><button class="btn gold" type="button" data-start>${save.read.length ? 'Carry on hiking' : 'Start the hike'}</button><button class="btn ghost" type="button" data-map>World map</button><button class="btn ghost" type="button" data-list>Read it as a list</button></div>
+    <p class="tkeys"><b>&#9664; &#9654;</b> move, <b>&#9650;</b> jump (hold it on a turtle to bounce higher), <b>E</b> reads a trail marker. Some markers hide in crates, planes and runaway rabbits. Turn your phone sideways to see more of the trail.</p>
     <div class="keys"><span><kbd>←</kbd><kbd>→</kbd> or <kbd>A</kbd><kbd>D</kbd></span><span>Move</span><span><kbd>Space</kbd> or <kbd>↑</kbd></span><span>Jump</span><span><kbd>E</kbd> or <kbd>Enter</kbd></span><span>Read a trail marker (or hit it from below). Some hide in crates, planes and runaway rabbits</span><span><kbd>M</kbd> <kbd>B</kbd> <kbd>L</kbd></span><span>Map, Backpack, List view</span></div>
   </div>`);
   $('[data-start]', node).addEventListener('click', () => { closeOverlay(true); started = true; });
@@ -3020,13 +3217,14 @@ function buildList() {
       <label class="lv-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><input id="lvq" type="search" placeholder="Search" aria-label="Search cards and prompts" autocomplete="off"><kbd>/</kbd></label>
       <span class="spacer"></span>
       <div class="lv-pot" title="Whole Potential"><svg viewBox="0 0 40 40"><path class="wtrack" d="M 7 20 A 13 13 0 0 1 33 20 A 13 13 0 0 1 7 20"/><path class="wfill" id="lvPot" style="stroke-dashoffset:${(plen * (1 - pot)).toFixed(2)}" d="M 7 20 A 13 13 0 0 1 33 20 A 13 13 0 0 1 7 20"/></svg><span>Whole Potential <b id="lvPct">${Math.round(pot * 100)}%</b></span></div>
-      <button class="btn small" type="button" data-back>Back to the game</button></div></div>
+      <button class="btn small" type="button" data-back><span class="bk-l">Back to the game</span><span class="bk-s">Game</span></button></div>
+      <nav class="lv-chips" aria-label="Worlds">${CONTENT.worlds.map(w => `<a href="#list-w${w.id}" data-nav="${w.id}" class="${save.done.includes(w.id) ? 'done' : ''}">${w.id}. ${esc(w.place)}</a>`).join('')}</nav></div>
     <div class="lv-wrap"><aside class="lv-side"><div class="lbl">The hike</div><nav class="lv-nav">${CONTENT.worlds.map(w => { const st = worldStats(w); return `<a href="#list-w${w.id}" data-nav="${w.id}" class="${save.done.includes(w.id) ? 'done' : ''}"><span class="n">${save.done.includes(w.id) ? '✓' : w.id}</span><span class="t">${esc(w.topic)}</span><span class="pg"><i style="width:${Math.round(st.frac * 100)}%"></i></span></a>`; }).join('')}</nav>
       <div class="tools"><button class="btn ghost small" type="button" data-expand>Expand all</button><button class="btn ghost small" type="button" data-collapse>Collapse all</button>${dlBtn('kit', 'gold small', 'Download the kit (.md)')}</div></aside>
     <main class="lv-main"><div class="lv-hero"><div class="kick">${esc(CONTENT.kicker)}</div><h1>Summit <span>Half Dome</span>, as a list</h1>
       <p>Every card, prompt, checklist and question from the game. Open a card to read it (it counts towards your Whole Potential), copy or try any prompt, and tick off the campfire checklists.</p>
       <div class="lv-legend"><span>${CONTENT.worlds.reduce((a, w) => a + w.cards.length, 0)} cards</span><span>${allItems().length} prompts and templates</span><span>${CONTENT.worlds.filter(w => w.quiz).length} ranger questions</span><span>${CONTENT.worlds.reduce((a, w) => a + (w.basecamps || []).length, 0)} checklists</span></div>
-      <nav class="lv-chips">${CONTENT.worlds.map(w => `<a href="#list-w${w.id}" data-nav="${w.id}">${w.id}. ${esc(w.place)}</a>`).join('')}</nav></div>`;
+      <div class="lv-mtools"><button class="btn ghost small" type="button" data-expand>Expand all</button><button class="btn ghost small" type="button" data-collapse>Collapse all</button>${dlBtn('kit', 'gold small', 'Download the kit (.md)')}</div></div>`;
   for (const w of CONTENT.worlds) {
     const st = worldStats(w);
     h += `<section class="lw" id="list-w${w.id}" data-world="${w.id}"><header class="lwh"><div class="num">${String(w.id).padStart(2, '0')}</div><div><div class="wsub">World ${w.id} · ${esc(w.stage)}</div><h2>${esc(w.topic)}</h2>${w.intro ? `<p class="intro">${inline(w.intro)}</p>` : ''}</div><div class="stat"><b data-wread="${w.id}">${st.read}/${st.cards}</b>cards read</div></header>`;
@@ -3093,13 +3291,19 @@ function buildList() {
   q.addEventListener('input', applySearch);
   q.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); if (q.value) { q.value = ''; applySearch(); } else q.blur(); } });
   $('[data-back]', list).addEventListener('click', () => toggleList(false));
-  $('[data-expand]', list).addEventListener('click', () => list.querySelectorAll('details.lc:not(.lv-hide)').forEach(d => { if (!d.open) { d.dataset.auto = '1'; d.open = true; } }));
-  $('[data-collapse]', list).addEventListener('click', () => list.querySelectorAll('details.lc').forEach(d => d.open = false));
+  list.querySelectorAll('[data-expand]').forEach(b2 => b2.addEventListener('click', () => list.querySelectorAll('details.lc:not(.lv-hide)').forEach(d => { if (!d.open) { d.dataset.auto = '1'; d.open = true; } })));
+  list.querySelectorAll('[data-collapse]').forEach(b2 => b2.addEventListener('click', () => list.querySelectorAll('details.lc').forEach(d => d.open = false)));
   list.querySelectorAll('[data-nav]').forEach(a2 => a2.addEventListener('click', e => { e.preventDefault(); const t = $(a2.getAttribute('href'), list); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   // highlight the world you are reading in the sidebar
   if ('IntersectionObserver' in window) {
     if (listObs) listObs.disconnect();
-    listObs = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) list.querySelectorAll('.lv-nav a').forEach(a2 => a2.classList.toggle('on', a2.dataset.nav === en.target.dataset.world)); }), { root: list, rootMargin: '-30% 0px -60% 0px' });
+    const chips = $('.lv-chips', list);
+    listObs = new IntersectionObserver(es => es.forEach(en => {
+      if (!en.isIntersecting) return;
+      list.querySelectorAll('[data-nav]').forEach(a2 => a2.classList.toggle('on', a2.dataset.nav === en.target.dataset.world));
+      // keep the current world's chip in view on phones
+      const on = $('a.on', chips); if (on && chips.offsetWidth) chips.scrollTo({ left: on.offsetLeft - (chips.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' });
+    }), { root: list, rootMargin: '-30% 0px -60% 0px' });
     list.querySelectorAll('section.lw').forEach(sec => listObs.observe(sec));
   }
 }
@@ -3473,10 +3677,10 @@ function togglePresenter() { save.presenter = !save.presenter; persist(); update
 
 /* touch */
 const touchEl = $('#touch');
-if (matchMedia('(pointer: coarse)').matches) touchEl.classList.add('on');
+if (MOB || matchMedia('(pointer: coarse)').matches) touchEl.classList.add('on');
 touchEl.querySelectorAll('.tbtn').forEach(b => {
   const k = b.dataset.k;
-  const down = e => { e.preventDefault(); b.classList.add('down'); if (k === 'left') keys.left = true; if (k === 'right') keys.right = true; if (k === 'jump') { keys.jump = true; jumpQueued = true; } if (k === 'act') actQueued = true; };
+  const down = e => { e.preventDefault(); hideHelpSoon(); b.classList.add('down'); if (k === 'left') keys.left = true; if (k === 'right') keys.right = true; if (k === 'jump') { keys.jump = true; jumpQueued = true; } if (k === 'act') actQueued = true; };
   const up = e => { e.preventDefault(); b.classList.remove('down'); if (k === 'left') keys.left = false; if (k === 'right') keys.right = false; if (k === 'jump') keys.jump = false; };
   b.addEventListener('pointerdown', down); b.addEventListener('pointerup', up); b.addEventListener('pointerleave', up); b.addEventListener('pointercancel', up);
 });
