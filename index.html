@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Summit Half Dome</title>
-<meta name="description" content="A Claude kickstart for Half Dome's Client Solutions team, played as the Half Dome hike.">
+<meta name="description" content="A Claude kickstart for everyone at Half Dome, played as the Half Dome hike.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
@@ -875,7 +875,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
    ===================================================================== */
 const CONTENT = {
   title: 'Summit Half Dome',
-  kicker: 'Claude kickstart · Client Solutions',
+  kicker: 'Claude kickstart · Half Dome',
   intro: 'Six stages of the Half Dome hike, from the valley floor to the Visor. Read the trail markers, collect the prompts, tick off each campfire checklist, and summit with a kit you can use on Monday.',
 
   campHeading: 'Campfire checklist',
@@ -1265,7 +1265,7 @@ const CONTENT = {
       id: 5,
       place: 'The Cables',
       stage: 'The Cables',
-      topic: 'Client Solutions workflows',
+      topic: 'Client workflows',
       icon: 'icon-team', // list view icon (ART_SRC)
       intro: 'The cables are the skills that pull you up the hardest part.',
       sections: [
@@ -1284,7 +1284,7 @@ const CONTENT = {
           steps: ['Copy or download the template below.', 'Fill it in for one client.', 'Paste it into the project\'s **Instructions**.'],
           visual: 'playbook', item: 'project-instructions' },
         { section: '5a', title: 'Context = the client context doc',
-          lines: ['Context is the reference material every chat can draw on. One template for every client: goals, priorities, audiences, what we run, key dates and sensitivities.', 'The Client Solutions Director fills it in and re-uploads it each month, so everyone works from the same picture.'],
+          lines: ['Context is the reference material every chat can draw on. One template for every client: goals, priorities, audiences, what we run, key dates and sensitivities.', 'The client lead fills it in and re-uploads it each month, so everyone works from the same picture.'],
           steps: ['Download the template below.', 'Fill it in, or ask Claude to draft it from recent WIP notes and the brief.', 'Upload it to the project\'s **Context**.'],
           visual: 'contextdoc', item: 'client-context',
           talk: 'Show the client context doc, then a manual task: a saved prompt with a run button.' },
@@ -1295,7 +1295,7 @@ const CONTENT = {
         { section: '5b', title: 'The problem',
           lines: ['Agencies and client creative teams fill in an Excel MI sheet. Retyping it into Monday is slow and error-prone.', 'The sheets are built for people, not machines: month banners, the header repeated each month, deadlines as formulas, notes in random cells. A straight import breaks on all of it.'],
           visual: 'mi', stage: 'problem',
-          talk: 'This is the request from the CS team about Carman\'s and TMC: agencies keep using Excel, we stop retyping it into Monday.' },
+          talk: 'This came from a team request about Carman\'s and TMC: agencies keep using Excel, we stop retyping it into Monday.' },
         { open: 'thief', section: '5b', title: 'What Claude does',
           lines: ['Reads the messy sheet (month banners, repeated headers, formulas), QAs every row, shows a plan, waits for a yes, then builds the board or a new group on an existing board.', 'It works for OOH and digital MIs, names items consistently, and adds an import key so a later sheet updates items instead of duplicating them.'],
           steps: ['Attach the MI sheet in a chat.', 'Type the command below with the board name.', 'Read the plan, say yes, then open the board link.'],
@@ -1332,8 +1332,8 @@ const CONTENT = {
           text: 'Every Monday: read the TMC WIP board on Monday.com, #tmc-internal Slack messages from the last 7 days, and Granola meetings with TMC in the title from the last 7 days. Post one message to #tmc-internal with: (1) overdue items with owner, (2) items due this week, (3) client requests with no reply yet, (4) MI material deadlines in the next 14 days. Bullets, no fluff. If nothing is overdue or at risk, say so in one line.' },
         { id: 'project-instructions', template: true, section: '5a', title: 'Project instructions template', where: 'Fill in and paste into the client project\'s Instructions.', download: 'project-instructions',
           text: '# [Client] project instructions\n\n## Who\'s who\n- Client contacts: [name, role, email]\n- Half Dome team: [name, role]\n\n## Tone\n- [How we write to this client]\n\n## Rules for Claude\n- Write in Australian English.\n- Draft first. Never send anything to the client or change a shared tool without asking me.\n- Keep internal comments out of anything client-facing.\n- [Anything else this client needs]\n\n## Where things live\n- SharePoint folder: [Client > General > Client name]\n- Monday WIP board: [board name]\n- Monday MI board: [board name]\n- Internal Slack channel: [#client-internal]\n- Granola: [how WIP meetings are titled]' },
-        { id: 'client-context', template: true, section: '5a', title: 'Client context doc template', where: 'The Client Solutions Director fills it in and uploads it to the project\'s Context each month.', download: 'client-context',
-          text: '# [Client] context doc\nOwner: Client Solutions Director. Updated: [month year]. Re-upload to the project each month.\n\n## The client in one paragraph\n[Who they are and what they sell]\n\n## Goals this year\n[Business and marketing goals]\n\n## Priorities right now\n[Products, campaigns and launches in focus]\n\n## Audiences\n[Who we are trying to reach]\n\n## What we run for them\n[Performance channels, plus OOH, radio, DOOH and other non-performance media]\n\n## Key dates\n[Campaigns, launches and deadlines in the next three months]\n\n## What good looks like\n[The KPIs they judge us on]\n\n## Brand and tone\n[Rules from their brand guidelines]\n\n## Sensitivities\n[Topics, people or claims to avoid]\n\n## Recent decisions and open questions\n[Carried over from the last month]' },
+        { id: 'client-context', template: true, section: '5a', title: 'Client context doc template', where: 'The client lead fills it in and uploads it to the project\'s Context each month.', download: 'client-context',
+          text: '# [Client] context doc\nOwner: [client lead]. Updated: [month year]. Re-upload to the project each month.\n\n## The client in one paragraph\n[Who they are and what they sell]\n\n## Goals this year\n[Business and marketing goals]\n\n## Priorities right now\n[Products, campaigns and launches in focus]\n\n## Audiences\n[Who we are trying to reach]\n\n## What we run for them\n[Performance channels, plus OOH, radio, DOOH and other non-performance media]\n\n## Key dates\n[Campaigns, launches and deadlines in the next three months]\n\n## What good looks like\n[The KPIs they judge us on]\n\n## Brand and tone\n[Rules from their brand guidelines]\n\n## Sensitivities\n[Topics, people or claims to avoid]\n\n## Recent decisions and open questions\n[Carried over from the last month]' },
         { id: 'mi-to-monday', section: '5b', title: '/mi-to-monday', note: 'Attach the MI sheet.', download: 'skill-mi-to-monday',
           where: 'Type it in a chat with the MI sheet attached. Not in your / menu yet? Download the skill, then Customize > Skills > + > Create skill > Upload a skill.',
           text: '/mi-to-monday TMC OOH Dispatch Sep-Nov' },
@@ -3528,7 +3528,7 @@ const VISUALS = {
   contextdoc(host) {
     host.innerHTML = `<div class="doc rise" style="left:40px;top:28px;width:220px;height:180px;animation-delay:.1s;border:2px solid #D2C663"><h6>Client context doc</h6><div class="lbl">One template</div>${'<div class="ln2"></div>'.repeat(6)}</div>
       ${['TMC', 'Client 2', 'Client 3'].map((n, i) => `<div class="doc rise" style="left:${330 + i * 130}px;top:${40 + i * 8}px;width:120px;height:150px;animation-delay:${0.6 + i * 0.3}s"><h6>${n}</h6>${'<div class="ln2"></div>'.repeat(4)}<div class="lbl" style="margin-top:10px">Re-uploaded monthly</div></div>`).join('')}
-      <div class="lbl fadein" style="position:absolute;left:330px;top:210px;animation-delay:1.6s">Filled in by the Client Solutions Director</div>`;
+      <div class="lbl fadein" style="position:absolute;left:330px;top:210px;animation-delay:1.6s">Filled in by the client lead</div>`;
   },
   mi(host, card) {
     host.classList.add('v-mi');
