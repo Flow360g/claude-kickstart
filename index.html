@@ -139,6 +139,16 @@ html,body{-webkit-font-smoothing:antialiased}
 .attach .acts{display:flex;gap:6px;align-items:center;flex:none}
 .attach .copied{display:none}
 .card .tagline{align-self:flex-start;font-family:var(--mono);font-size:13px;font-weight:600;background:var(--gold-soft);border:1px solid var(--gold);border-radius:999px;padding:4px 12px}
+.card .w{border-radius:4px;transition:background-color .15s,box-shadow .15s}
+.card .w.say{background:var(--gold);box-shadow:0 0 0 2px var(--gold);color:var(--ink)}
+.card .tl .w.say,.card .tagline .w.say{background:var(--ink);box-shadow:0 0 0 2px var(--ink);color:var(--card)}
+.vmute{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:700 11.5px/1 var(--sans);letter-spacing:.04em;text-transform:none;color:var(--ink);background:var(--white);border:1px solid var(--line);border-radius:999px;padding:5px 11px 5px 8px;cursor:pointer}
+.vmute:hover{border-color:var(--gold)}
+.vmute svg{width:16px;height:16px}
+.vmute .slash{display:none}
+.vmute.off{color:var(--muted)}
+.vmute.off .slash{display:inline}
+.vmute.off .wave{display:none}
 .talk{font-size:15px;line-height:1.4;border:1.5px dashed var(--purple);background:var(--purple-soft);border-radius:10px;padding:8px 12px;color:var(--ink)}
 .talk b{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-right:6px}
 .visual{position:relative;height:236px;flex:none;width:738px;background:var(--white);border:1px solid var(--line);border-radius:14px;overflow:hidden}
@@ -593,8 +603,8 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
 #ui .wp svg{width:24px;height:24px}
 #ui .hud-right{gap:6px;flex-wrap:wrap;justify-content:flex-end}
 #ui .hbtn{min-height:38px;padding:6px 10px;font-size:13px}
-#ui #btnPresenter{display:none}
-#ui #btnSound,#ui #btnMusic{width:38px;justify-content:center;padding:0}
+#ui #btnPresenter,#ui #btnVoice{display:none}
+#ui #btnSound,#ui #btnMusic,#ui #btnVoice{width:38px;justify-content:center;padding:0}
 #ui .hbtn svg{width:20px;height:20px}
 #ui .hbtn .slash{display:none}
 #ui .hbtn.off{color:var(--muted)}
@@ -628,6 +638,9 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
 #ui .overlay{align-items:flex-end;padding:max(10px,env(safe-area-inset-top)) env(safe-area-inset-right) 0 env(safe-area-inset-left)}
 #ui .panel{width:100%;max-width:680px;max-height:100%;overflow:auto;overscroll-behavior:contain;border-radius:20px 20px 0 0;padding:22px 18px calc(16px + env(safe-area-inset-bottom));gap:12px;transform:translateY(40px)}
 #ui .overlay.show .panel{transform:none}
+#ui .card .vmute{margin-right:44px}
+#ui .vmute span{display:none}
+#ui .vmute{padding:7px}
 #ui .xclose{position:sticky;top:0;align-self:flex-end;flex:none;margin:-8px -6px -44px 0;z-index:4;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--white);font-size:24px;line-height:1;color:var(--ink);box-shadow:0 2px 8px rgba(26,25,23,.12)}
 #ui .panel>.eyebrow,#ui .camphead{padding-right:44px}
 #ui .card h2,#ui .item h2,#ui .pack h2{font-size:25px}
@@ -978,6 +991,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
         <button class="hbtn" id="btnPresenter" type="button" title="Presenter talk tracks (P)" aria-pressed="false">Presenter <kbd>P</kbd></button>
         <button class="hbtn" id="btnSound" type="button" title="Sound effects" aria-pressed="true">Sound on</button>
         <button class="hbtn" id="btnMusic" type="button" title="Music" aria-pressed="true">Music on</button>
+        <button class="hbtn" id="btnVoice" type="button" title="Read cards aloud (V)" aria-pressed="true">Voice on</button>
       </div>
     </div>
     <div class="progress" id="progress"></div>
@@ -994,6 +1008,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 1px}
   <div id="ui"></div>
 </div>
 <div id="list" aria-label="List view"></div>
+<script src="narration/narration.js"></script>
 
 <script>
 /* =====================================================================
@@ -1695,7 +1710,7 @@ const W_BY_ID = id => CONTENT.worlds.find(w => w.id === id);
 /* ---------------- storage (per laptop) ---------------- */
 const SAVE_KEY = 'summit-half-dome-v1';
 const save = (() => {
-  const d = { items: [], read: [], quiz: [], done: [], camps: [], checks: [], posts: [], sfxOn: true, musicOn: true, egg: false, presenter: false, summit: false };
+  const d = { items: [], read: [], quiz: [], done: [], camps: [], checks: [], posts: [], sfxOn: true, musicOn: true, voiceOn: true, egg: false, presenter: false, summit: false };
   try { const raw = localStorage.getItem(SAVE_KEY); if (raw) Object.assign(d, JSON.parse(raw)); } catch (e) {}
   for (const k of ['items', 'read', 'quiz', 'done', 'camps', 'checks', 'posts']) if (!Array.isArray(d[k])) d[k] = [];
   return d;
@@ -2999,6 +3014,7 @@ function potential() {
 let lastPot = -1;
 const ICON_SOUND = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 const ICON_MUSIC = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17V5l11-2v12" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="6.5" cy="17.5" r="2.8" fill="currentColor"/><circle cx="17.5" cy="15.5" r="2.8" fill="currentColor"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ICON_VOICE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/><path class="wave" d="M16.5 6.5a4.5 4.5 0 0 1 0 6M19 4a8.2 8.2 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="slash" d="M3 3l18 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
 function updateHud() {
   const pot = potential(), len = 81.68;
   $('#wpFill').style.strokeDashoffset = (len * (1 - pot)).toFixed(2);
@@ -3007,12 +3023,13 @@ function updateHud() {
   lastPot = pot;
   $('#packCount').textContent = `${save.items.length}/${allItems().length}`;
   const pb = $('#btnPresenter'); pb.classList.toggle('on', save.presenter); pb.setAttribute('aria-pressed', save.presenter);
-  const s = $('#btnSound'), mu = $('#btnMusic');
+  const s = $('#btnSound'), mu = $('#btnMusic'), vo = $('#btnVoice');
   if (MOB) {
     s.innerHTML = ICON_SOUND; s.classList.toggle('off', !save.sfxOn); s.setAttribute('aria-label', save.sfxOn ? 'Sound on' : 'Sound off');
     mu.innerHTML = ICON_MUSIC; mu.classList.toggle('off', !save.musicOn); mu.setAttribute('aria-label', save.musicOn ? 'Music on' : 'Music off');
-  } else { s.textContent = save.sfxOn ? 'Sound on' : 'Sound off'; mu.textContent = save.musicOn ? 'Music on' : 'Music off'; }
-  s.setAttribute('aria-pressed', save.sfxOn); mu.setAttribute('aria-pressed', save.musicOn);
+    vo.innerHTML = ICON_VOICE; vo.classList.toggle('off', !save.voiceOn); vo.setAttribute('aria-label', save.voiceOn ? 'Voice on' : 'Voice off');
+  } else { s.textContent = save.sfxOn ? 'Sound on' : 'Sound off'; mu.textContent = save.musicOn ? 'Music on' : 'Music off'; vo.textContent = save.voiceOn ? 'Voice on' : 'Voice off'; }
+  s.setAttribute('aria-pressed', save.sfxOn); mu.setAttribute('aria-pressed', save.musicOn); vo.setAttribute('aria-pressed', save.voiceOn);
   if (!L) return;
   const w = L.world;
   $('#worldtag').innerHTML = `<b>World ${w.id}</b> ${esc(w.place)}<span class="wt-topic"> · ${esc(w.topic)}</span>`;
@@ -3059,6 +3076,7 @@ function userClose() { if (!justOpened()) closeOverlay(); }
 function closeOverlay(silent) {
   if (!current) return;
   const cur = current; current = null;
+  narr.stop();
   if (cur.cleanup) cur.cleanup();
   cur.node.remove();
   overlayOpen = isListOpen();
@@ -3066,13 +3084,155 @@ function closeOverlay(silent) {
   if (!silent && cur.onClose) cur.onClose();
   updateHud();
 }
+/* ---------------- narration: cards are read aloud, word by word ---------------- */
+// The clips are made with ElevenLabs (an Australian voice) by tools/narration.mjs. Each one is narration/<hash>.mp3,
+// where the hash is of the words read, and narration/narration.js lists each clip's word start times so the words
+// light up as they are read. A card edited since its clip was made falls back to the browser's own voice.
+const NARR = window.NARRATION || { voice: '', clips: {} };
+// what is said for a word when that differs from what is shown: '' is silent (the word still lights up)
+const NARR_SAY = { '>': '', '→': '', '·': '', '&': 'and', '+': 'plus', '=': 'is', '/': 'slash' };
+const narrSay = w => w in NARR_SAY ? NARR_SAY[w] : w.replace(/^\/(?=\w)/, 'slash ').replace(/(\w)\/$/, '$1').replace(/\bSKILL\.md\b/, 'skill dot M D').replace(/\bOOH\b/, 'O.O.H.');
+function fnv(str) { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(16).padStart(8, '0'); }
+// wrap every word of a card's text in a span, and work out what to say and where each word starts in it
+function narrPrepare(node) {
+  const tokens = [], segs = [];
+  const wrap = (root, skip, stop) => {
+    const texts = [], walk = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (let t; (t = walk.nextNode());) if (!(skip && skip.contains(t)) && !t.parentElement.closest('button')) texts.push(t);
+    let open = false, first = tokens.length;
+    for (const t of texts) {
+      const frag = document.createDocumentFragment();
+      for (const piece of t.data.split(/(\s+)/)) {
+        if (!piece) continue;
+        if (/^\s/.test(piece)) { frag.append(piece); open = false; continue; }
+        const sp = document.createElement('span'); sp.className = 'w'; sp.textContent = piece; frag.append(sp);
+        if (open) { const tk = tokens[tokens.length - 1]; tk.spans.push(sp); tk.text += piece; }
+        else tokens.push({ spans: [sp], text: piece });
+        open = true;
+      }
+      t.replaceWith(frag);
+    }
+    if (tokens.length > first) segs.push({ from: first, to: tokens.length, stop });
+  };
+  for (const b of node.querySelectorAll('.panel > h2, .cl .lines p, .cl .steps .lbl, .cl .steps li, .cl .tagline, .cl .tip')) {
+    const tl = b.classList.contains('tip') && $('.tl', b);
+    if (tl) wrap(tl, null, ':');
+    wrap(b, tl, b.classList.contains('lbl') ? ':' : '.');
+  }
+  let text = '';
+  const offs = tokens.map(() => -1);
+  for (const sg of segs) for (let i = sg.from; i < sg.to; i++) {
+    let say = narrSay(tokens[i].text);
+    if (!say) { text = text.replace(/([^\s.,!?:;])$/, '$1,'); continue; }
+    if (i === sg.to - 1 && !/[.!?:;,]["'”’)]*$/.test(say)) say += sg.stop;
+    if (text) text += ' ';
+    offs[i] = text.length; text += say;
+  }
+  if (text && !/[.!?:;]["'”’)]*$/.test(text)) text = text.replace(/,?$/, '.');
+  const hash = fnv(NARR.voice + '|' + text);
+  return { tokens, segs, offs, text, hash, times: NARR.clips[hash] || null };
+}
+const narr = (() => {
+  let o = null, au = null, raf = 0, idx = -1, timer = 0, speaking = false;
+  const duck = on => { if (actx && musicBus && save.musicOn) musicBus.gain.setTargetAtTime(on ? 0.12 : overlayOpen ? 0.3 : 0.7, actx.currentTime, 0.25); };
+  function light(i) {
+    if (!o || i === idx) return;
+    const tk = o.narr.tokens;
+    if (tk[idx]) tk[idx].spans.forEach(s => s.classList.remove('say'));
+    idx = i;
+    if (!tk[i]) return;
+    tk[i].spans.forEach(s => s.classList.add('say'));
+    // keep the word in view when the card scrolls (small screens)
+    const sp = tk[i].spans[0], pan = sp.closest('.panel');
+    if (pan && pan.scrollHeight > pan.clientHeight + 4) {
+      const r = sp.getBoundingClientRect(), pr = pan.getBoundingClientRect();
+      if (r.bottom > pr.bottom - 48 || r.top < pr.top + 48) pan.scrollBy({ top: r.top - pr.top - pr.height * 0.35, behavior: 'smooth' });
+    }
+  }
+  function done() { speaking = false; light(-1); duck(false); cancelAnimationFrame(raf); }
+  function tick() {
+    if (!au || !o) return;
+    const t = au.currentTime, ts = o.narr.times;
+    let i = Math.max(idx, 0);
+    while (i + 1 < ts.length && ts[i + 1] <= t) i++;
+    while (i > 0 && ts[i] > t) i--;
+    light(t < ts[0] ? -1 : i);
+    raf = requestAnimationFrame(tick);
+  }
+  function playClip() {
+    if (!au) {
+      au = new Audio(`narration/${o.narr.hash}.mp3`);
+      au.addEventListener('ended', done);
+      au.addEventListener('error', () => { if (o && au && au.error) { au = null; speak(); } });
+    }
+    speaking = true; duck(true);
+    au.play().then(() => { cancelAnimationFrame(raf); tick(); }).catch(() => { if (au && !au.error) done(); });
+  }
+  // fallback: the browser's own voice, Australian if it has one, one block at a time
+  function pickVoice() {
+    const vs = speechSynthesis.getVoices(), en = vs.filter(v => /^en/i.test(v.lang));
+    return en.find(v => /en[-_]AU/i.test(v.lang)) || en.find(v => /en[-_]GB/i.test(v.lang)) || en[0] || null;
+  }
+  function speak() {
+    if (!('speechSynthesis' in window) || !o) return;
+    const n = o.narr, voice = pickVoice();
+    speechSynthesis.cancel();
+    speaking = true; duck(true);
+    n.segs.forEach((sg, k) => {
+      const starts = n.offs.slice(sg.from, sg.to).filter(x => x >= 0);
+      if (!starts.length) return;
+      const base = starts[0], nextSeg = n.segs.slice(k + 1).map(s2 => n.offs.slice(s2.from, s2.to).find(x => x >= 0)).find(x => x != null);
+      const u = new SpeechSynthesisUtterance(n.text.slice(base, nextSeg == null ? undefined : nextSeg).trim());
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else u.lang = 'en-AU';
+      u.rate = 1.02;
+      u.onstart = () => light(sg.from);
+      u.onboundary = e => {
+        if (e.name && e.name !== 'word') return;
+        const at = base + e.charIndex;
+        let i = sg.from;
+        for (let j = sg.from; j < sg.to; j++) if (n.offs[j] >= 0 && n.offs[j] <= at) i = j;
+        light(i);
+      };
+      if (k === n.segs.length - 1) u.onend = done;
+      speechSynthesis.speak(u);
+    });
+  }
+  function begin() { if (!o || !save.voiceOn) return; if (o.narr.times && o.narr.times.length === o.narr.tokens.length) playClip(); else speak(); }
+  function halt() {
+    clearTimeout(timer); cancelAnimationFrame(raf);
+    if (au) au.pause();
+    if (speaking && !au && 'speechSynthesis' in window) speechSynthesis.cancel();
+    speaking = false; light(-1);
+  }
+  return {
+    start(cur) { this.stop(); o = cur; idx = -1; narrButton(); if (save.voiceOn) timer = setTimeout(begin, 450); },
+    stop() { halt(); if (au) { au.removeAttribute('src'); au.load(); } au = null; if (o) duck(false); o = null; },
+    pause() { halt(); duck(false); },
+    resume() { if (!o) return; if (au) playClip(); else begin(); },
+    get active() { return !!o; }
+  };
+})();
+function narrButton() {
+  const b = current && $('.vmute', current.node);
+  if (!b) return;
+  b.innerHTML = ICON_VOICE + `<span>${save.voiceOn ? 'Voice on' : 'Voice off'}</span>`;
+  b.classList.toggle('off', !save.voiceOn);
+  b.setAttribute('aria-pressed', save.voiceOn);
+  b.setAttribute('aria-label', save.voiceOn ? 'Voice on: click to mute the narration' : 'Voice off: click to read this card aloud');
+  b.title = save.voiceOn ? 'Mute the voice (V)' : 'Read aloud (V)';
+}
+function toggleVoice() {
+  save.voiceOn = !save.voiceOn; persist(); updateHud(); narrButton();
+  if (narr.active) save.voiceOn ? narr.resume() : narr.pause();
+  else toast(save.voiceOn ? 'Voice on: cards are read aloud' : 'Voice off');
+}
 const talkHTML = t => save.presenter && t ? `<div class="talk"><b>Talk track</b>${inline(t)}</div>` : '';
 
 function openCard(card, meta = {}) {
   const v = card.visual && VISUALS[card.visual];
   const w = meta.world;
   const node = el(`<div class="overlay"><div class="panel card ${meta.secret ? 'purple' : ''}" role="dialog" aria-modal="true" aria-label="${esc(card.title)}">
-    <div class="eyebrow"><span class="tag ${meta.secret ? 'purple' : 'gold'}">${esc(meta.eyebrow || '')}</span>${card.section && w ? esc(sectionTitle(w, card.section)) : ''}</div>
+    <div class="eyebrow"><span class="tag ${meta.secret ? 'purple' : 'gold'}">${esc(meta.eyebrow || '')}</span>${card.section && w ? esc(sectionTitle(w, card.section)) : ''}<button class="vmute" type="button"></button></div>
     <h2>${inline(card.title)}</h2>
     <div class="cbody ${v || card.item ? 'two' : ''}"><div class="cl">
     <div class="lines">${card.lines.map(l => `<p>${inline(l)}</p>`).join('')}</div>
@@ -3092,6 +3252,9 @@ function openCard(card, meta = {}) {
   const o = openOverlay(node, { kind: 'card', enterCloses: true, cleanup: () => cleanup && cleanup() });
   if (v) { run(); $('.replay', node).addEventListener('click', e => { e.stopPropagation(); run(); }); }
   node.addEventListener('click', e => { if (!e.target.closest('button,code,a')) userClose(); });
+  $('.vmute', node).addEventListener('click', e => { e.stopPropagation(); e.currentTarget.blur(); toggleVoice(); });
+  o.narr = narrPrepare(node);
+  narr.start(o);
   return o;
 }
 function attachHTML(id) {
@@ -3848,6 +4011,7 @@ addEventListener('keydown', e => {
     if (k === 'b') { e.preventDefault(); current.kind === 'pack' ? closeOverlay() : openBackpack(); return; }
     if (k === 'l') { e.preventDefault(); openList(); return; }
     if (k === 'p') { togglePresenter(); return; }
+    if (k === 'v') { toggleVoice(); return; }
     if (k === ' ' && current.kind !== 'title' && !e.target.closest('button')) e.preventDefault();
     if (k.startsWith('arrow') && current.kind !== 'pack' && current.kind !== 'camp' && current.kind !== 'finale') e.preventDefault();
     return;
@@ -3861,6 +4025,7 @@ addEventListener('keydown', e => {
     case 'b': openBackpack(); break;
     case 'l': openList(); break;
     case 'p': togglePresenter(); break;
+    case 'v': toggleVoice(); break;
     default: return;
   }
   e.preventDefault();
@@ -3895,6 +4060,7 @@ $('#btnList').addEventListener('click', e => { e.currentTarget.blur(); openList(
 $('#btnSound').addEventListener('click', e => { e.currentTarget.blur(); save.sfxOn = !save.sfxOn; persist(); updateHud(); if (save.sfxOn) sfx.tick(); });
 $('#btnMusic').addEventListener('click', e => { e.currentTarget.blur(); save.musicOn = !save.musicOn; persist(); updateHud(); audio(); syncMusic(); });
 $('#btnPresenter').addEventListener('click', e => { e.currentTarget.blur(); togglePresenter(); });
+$('#btnVoice').addEventListener('click', e => { e.currentTarget.blur(); toggleVoice(); });
 
 /* ---------------- routing + boot ---------------- */
 function worldFromHash() { const m = location.hash.match(/world-(\d)/); return m ? +m[1] : 0; }
@@ -3911,7 +4077,7 @@ function boot() {
   requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
 }
 // a small hook for automated checks
-window.__summit = { P, get L() { return L; }, get music() { return musicPlaying; }, save, loadWorld, keys, get current() { return current; }, makeZip, kitMarkdown, openCard: (w, i) => { loadWorld(w); openMarkerCard(i); }, openBasecamp: (w, i) => { loadWorld(w); openBasecamp(i); }, openBackpack, reachSummit: () => { loadWorld(6); reachSummit(); } };
+window.__summit = { P, get L() { return L; }, get music() { return musicPlaying; }, save, loadWorld, keys, get current() { return current; }, makeZip, kitMarkdown, openCard: (w, i) => { loadWorld(w); openMarkerCard(i); }, openBasecamp: (w, i) => { loadWorld(w); openBasecamp(i); }, openEgg: () => openCard(CONTENT.easterEgg, { eyebrow: 'Hidden marker', secret: true }), openBackpack, reachSummit: () => { loadWorld(6); reachSummit(); } };
 boot();
 })();
 </script>
